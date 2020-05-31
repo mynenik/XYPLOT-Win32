@@ -308,8 +308,8 @@ void CPlotDisplay::DeleteView ()
 
     if (m_pCt > m_qCT.begin())
     {
-        --m_pCt;
-        m_qCT.erase (m_pCt + 1, m_pCt + 2);
+	m_qCT.erase(m_pCt);
+	--m_pCt;
     }
 }
 //---------------------------------------------------------------
