@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include "ExpressionCompiler.h"
+#include "CDataset.h"
 #include "C3D_Real.h"
 
 C3D_Real::C3D_Real(int npts, char* name, char* hdr)

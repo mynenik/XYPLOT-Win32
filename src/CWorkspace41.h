@@ -9,9 +9,6 @@
 #ifndef __CWORKSPACE41_H__
 #define __CWORKSPACE41_H__
 
-#include "xyp41.h"
-#include <fstream.h>
-
 class CWorkspace41 {
 public:
 	char* m_szHeader;

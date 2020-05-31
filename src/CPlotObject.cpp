@@ -4,6 +4,9 @@
 //
 // Last Revised: 12-14-98
 
+#include "stdafx.h"
+#include <vector>
+#include "CTransform.h"
 #include "CPlotObject.h"
 
 CTransform* CPlotObject::m_pT = NULL;

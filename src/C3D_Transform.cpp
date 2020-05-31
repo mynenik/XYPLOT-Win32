@@ -5,6 +5,8 @@
 // Last Revised: 7-19-97
 
 #include <math.h>
+#include "stdafx.h"
+#include "CTransform.h"
 #include "C3D_Transform.h"
 
 //---------------------------------------------------------------

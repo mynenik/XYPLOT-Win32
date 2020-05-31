@@ -4,6 +4,8 @@
 //
 // Last Revised: 7-15-98
 
+#include "stdafx.h"
+#include "resource.h"
 #include "CVerifyDialog.h"
 
 CString CVerifyDialog::m_szPromptString = "\0";

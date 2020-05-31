@@ -10,8 +10,6 @@
 #ifndef __CPLOTOBJECT_H__
 #define __CPLOTOBJECT_H__
 
-#include "CTransform.h"
-
 // abstract base class for plotting objects
 
 class CPlotObject

@@ -10,11 +10,16 @@
 // Last Revised: 6-29-2003
 //
 
-#include "CPlotList.h"
-#include "ColorTable.h"
+#include "stdafx.h"
 #include <string.h>
 #include <stdio.h>
-
+#include <vector>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CPlotList.h"
+#include "ColorTable.h"
 
 CPlotList::CPlotList()
 {

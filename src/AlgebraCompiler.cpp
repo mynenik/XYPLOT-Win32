@@ -8,9 +8,9 @@
 //
 // Last Revised: 11-12-1999
 //
-#include <vector.h>
-#include <stack.h>
-#include <deque.h>
+#include <vector>
+#include <stack>
+#include <deque>
 #include <ctype.h>
 #include "fbc.h"
 #define byte unsigned char
@@ -40,8 +40,8 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
     char* delim = " ,\t\n\r";
     char* arm_op = "^*/+-";
 
-    stack< vector< byte >> hs;    // operator hold stack
-    deque< byte > op;             // sequence of operators in double ended queue
+    stack< byte > hs;    // operator hold stack
+    deque< byte > op;    // sequence of operators in double ended queue
 
     char exp_copy [256];
     char LabelName [256];

@@ -24,15 +24,14 @@ Revisions:
 */
 // #include<sys/poll.h>
 
-#include<sys/types.h>
-#include<sys/time.h>
-#include<sys/timeb.h>
-#include<sys/stat.h>
-#include<termios.h>
+// #include<sys/types.h>
+// #include<sys/time.h>
+// #include<sys/timeb.h>
+// #include<sys/stat.h>
+// #include<termios.h>
 #include<stdio.h>
-#include<unistd.h>
 #include<time.h>
-#include<fcntl.h>
+// #include<fcntl.h>
 #include<stdlib.h>
 #include<math.h>
 #include<windows.h>
@@ -240,160 +239,160 @@ int C_write ()
 
 int C_ioctl ()
 {
-  /* stack: ( fd request addr -- err | device control function ) */
-  int fd, request;
-  char* argp;
-
-  ++GlobalSp; ++GlobalTp;
-  argp = *((char**) GlobalSp);  /* don't do type checking on argp */
-  ++GlobalSp; ++GlobalTp;
-  request = *GlobalSp++;
-  fd = *GlobalSp;
-  *GlobalSp-- = 0; /* ioctl(fd, request, argp); */
-  return 0;
+//  stack: ( fd request addr -- err | device control function )
+//  int fd, request;
+//  char* argp;
+//
+//  ++GlobalSp; ++GlobalTp;
+//  argp = *((char**) GlobalSp);  /* don't do type checking on argp 
+//  ++GlobalSp; ++GlobalTp;
+//  request = *GlobalSp++;
+//  fd = *GlobalSp;
+//  *GlobalSp-- = 0; /* ioctl(fd, request, argp);
+return 0;
 }
 /*----------------------------------------------------------*/
 
 int C_key ()
 {
-  /* stack: ( -- n | wait for keypress and return key code ) */
-
-  char ch;
-  int n;
-  struct termios t1, t2;
-
-  if (key_query_char)
-    {
-      ch = key_query_char;
-      key_query_char = 0;
-    }
-  else
-    {
+//  stack: ( -- n | wait for keypress and return key code ) 
+//
+//  char ch;
+//  int n;
+//  struct termios t1, t2;
+//
+//  if (key_query_char)
+//    {
+//      ch = key_query_char;
+//      key_query_char = 0;
+//    }
+//  else
+//    {
 //      tcgetattr(0, &t1);
 //      t2 = t1;
-      t2.c_lflag &= ~ICANON;
-      t2.c_lflag &= ~ECHO;
-      t2.c_cc[VMIN] = 1;
-      t2.c_cc[VTIME] = 0;
+//      t2.c_lflag &= ~ICANON;
+//      t2.c_lflag &= ~ECHO;
+//      t2.c_cc[VMIN] = 1;
+//      t2.c_cc[VTIME] = 0;
 //      tcsetattr(0, TCSANOW, &t2);
-
-      do {
-	n = read(0, &ch, 1);
-      } while (n != 1);
-
+//
+//      do {
+//	n = read(0, &ch, 1);
+//      } while (n != 1);
+//
 //      tcsetattr(0, TCSANOW, &t1);
-    }
-
-  *GlobalSp-- = ch;
-  *GlobalTp-- = OP_IVAL;
-
-  return 0;
+//    }
+//
+//  *GlobalSp-- = ch;
+//  *GlobalTp-- = OP_IVAL;
+//
+return 0;
 }
 /*----------------------------------------------------------*/
 
 int C_keyquery ()
 {
-  /* stack: ( a -- b | return true if a key is available ) */
-
-  int result;
-  char ch = 0;
-  struct termios t1, t2;
-  int nread;
+//  stack: ( a -- b | return true if a key is available ) 
+//
+//  int result;
+//  char ch = 0;
+//  struct termios t1, t2;
+//  int nread;
 //  struct pollfd pfds[1];
-
-  if (key_query_char)
-    {
-      *GlobalSp-- = -1;
-    }
-  else
-    {
+//
+//  if (key_query_char)
+//    {
+//      *GlobalSp-- = -1;
+//    }
+//  else
+//    {
 //      tcgetattr(0, &t1);
 //      t2 = t1;
-      t2.c_lflag &= ~ICANON;
-      t2.c_lflag &= ~ECHO;
-      t2.c_lflag &= ~ISIG;
-      t2.c_lflag &= ~IEXTEN;
+//      t2.c_lflag &= ~ICANON;
+//      t2.c_lflag &= ~ECHO;
+//      t2.c_lflag &= ~ISIG;
+//      t2.c_lflag &= ~IEXTEN;
 //      t2.c_lflag |= O_NDELAY;
-      t2.c_cc[VMIN] = 0;
-      t2.c_cc[VTIME] = 0;
+//      t2.c_cc[VMIN] = 0;
+//      t2.c_cc[VTIME] = 0;
 //      tcsetattr(0, TCSANOW, &t2);
-
-      /* added by DPW  2-19-2001 so that key? works in Windows */
-      /* also added   struct pollfd pfds[1];  in C_keyquery declarations*/
-      /* also added #include<sys/poll.h> in include section of vmc.c*/
-
+//
+//      added by DPW  2-19-2001 so that key? works in Windows
+//      also added   struct pollfd pfds[1];  in C_keyquery declarations
+//      also added #include<sys/poll.h> in include section of vmc.c
+//
 //      pfds[0].fd=0;
 //      pfds[0].events=POLLIN;
 //      poll(pfds,1,0);
 //      if(pfds[0].revents && POLLIN)
 //          nread = read(0, &ch, 1) ;
 //      else
-          nread=0;
-      *GlobalSp-- = nread ? -1 : 0;
-      /* end of code added by DPW  2-19-2001 */
-
-      //*GlobalSp-- = read(0, &ch, 1) ? -1 : 0;
-      if (ch) key_query_char = ch;
+//          nread=0;
+//      *GlobalSp-- = nread ? -1 : 0;
+//      end of code added by DPW  2-19-2001 
+//
+//      //*GlobalSp-- = read(0, &ch, 1) ? -1 : 0;
+//      if (ch) key_query_char = ch;
 //      tcsetattr(0, TCSANOW, &t1);
-    }
-
-  *GlobalTp-- = OP_IVAL;
-  return 0;
+//    }
+//
+//  *GlobalTp-- = OP_IVAL;
+return 0;
 }
 /*----------------------------------------------------------*/
 
 int C_accept ()
 {
-  /* stack: ( a n1 -- n2 | wait for n characters to be received ) */
-
-  char ch, *cp, *cpstart, *bksp = "\010 \010";
-  int n1, n2, nr;
-  struct termios t1, t2;
-
-  ++GlobalSp; ++GlobalTp;
-  n1 = *GlobalSp++; ++GlobalTp;
-  if (*GlobalTp != OP_ADDR) return 1;
-  cp = *((char**)GlobalSp);
-  cpstart = cp;
-
+//  stack: ( a n1 -- n2 | wait for n characters to be received )
+//
+//  char ch, *cp, *cpstart, *bksp = "\010 \010";
+//  int n1, n2, nr;
+//  struct termios t1, t2;
+//
+//  ++GlobalSp; ++GlobalTp;
+//  n1 = *GlobalSp++; ++GlobalTp;
+//  if (*GlobalTp != OP_ADDR) return 1;
+//  cp = *((char**)GlobalSp);
+//  cpstart = cp;
+//
 //  tcgetattr(0, &t1);
-  t2 = t1;
-  t2.c_lflag &= ~ICANON;
-  t2.c_lflag &= ~ECHO;
-  t2.c_cc[VMIN] = 1;
-  t2.c_cc[VTIME] = 0;
+//  t2 = t1;
+//  t2.c_lflag &= ~ICANON;
+//  t2.c_lflag &= ~ECHO;
+//  t2.c_cc[VMIN] = 1;
+//  t2.c_cc[VTIME] = 0;
 //  tcsetattr(0, TCSANOW, &t2);
-
-  n2 = 0;
-  while (n2 < n1)
-    {
-      nr = read (0, cp, 1);
-      if (nr == 1)
-	{
-	  if (*cp == 10)
-	    break;
-	  else if (*cp == 8)
-	    {
-	      --cp; --n2;
-	      if ((cp < cpstart) || (n2 < 0))
-		{
-		  n2 = 0;
-		  cp = cpstart;
-		}
-	      else
-		write (0, bksp, 3);
-	    }
-	  else
-	    {
-	      write (0, cp, 1);
-	      ++n2; ++cp;
-	    }
-	}
-    }
-  *GlobalSp-- = n2;
-  *GlobalTp-- = OP_IVAL;
+//
+//  n2 = 0;
+//  while (n2 < n1)
+//    {
+//      nr = read (0, cp, 1);
+//      if (nr == 1)
+//	{
+//	  if (*cp == 10)
+//	    break;
+//	  else if (*cp == 8)
+//	    {
+//	      --cp; --n2;
+//	      if ((cp < cpstart) || (n2 < 0))
+//		{
+//		  n2 = 0;
+//		  cp = cpstart;
+//		}
+//	      else
+//		write (0, bksp, 3);
+//	    }
+//	  else
+//	    {
+//	      write (0, cp, 1);
+//	      ++n2; ++cp;
+//	    }
+//	}
+//    }
+//  *GlobalSp-- = n2;
+//  *GlobalTp-- = OP_IVAL;
 //  tcsetattr(0, TCSANOW, &t1);
-  return 0;
+return 0;
 }
 
 /*----------------------------------------------------------*/

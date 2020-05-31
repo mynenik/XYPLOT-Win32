@@ -13,6 +13,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <vector>
 #include "CDataset.h"
 
 CDataset::CDataset(int nLength, int nPoints, char* name, char* hdr) :

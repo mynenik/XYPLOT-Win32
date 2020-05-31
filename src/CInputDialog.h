@@ -9,10 +9,6 @@
 #ifndef __CINPUTDIALOG_H__
 #define __CINPUTDIALOG_H__
 
-#include <afxres.h>
-#include <afxwin.h>
-#include "resource.h"
-
 class CInputDialog : public CModalDialog {
 public:
 	static CString m_szResponseString;

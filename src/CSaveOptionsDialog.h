@@ -9,11 +9,6 @@
 #ifndef __CSAVEOPTIONSDIALOG_H__
 #define __CSAVEOPTIONSDIALOG_H__
 
-#include <afxres.h>
-#include <afxwin.h>
-#include "resource.h"
-#include "saveopts.h"
-
 class CSaveOptionsDialog : public CModalDialog {
     CButton* m_pButtons[11];
     SaveOptions* m_pSaveOptions;

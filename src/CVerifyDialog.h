@@ -9,10 +9,6 @@
 #ifndef __CVERIFYDIALOG_H__
 #define __CVERIFYDIALOG_H__
 
-#include <afxres.h>
-#include <afxwin.h>
-#include "resource.h"
-
 class CVerifyDialog : public CModalDialog {
 public:
 	static CString m_szPromptString;

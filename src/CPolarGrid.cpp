@@ -4,8 +4,17 @@
 //
 // Last Revised: 12-14-97
 
-#include "CPolarGrid.h"
+#include "stdafx.h"
 #include <math.h>
+#include <string.h>
+#include <vector>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CGrid.h"
+#include "CPolarGrid.h"
+
 extern char* LabelFormat (float, float, char);
 
 //---------------------------------------------------------------

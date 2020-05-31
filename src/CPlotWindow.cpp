@@ -8,10 +8,33 @@
 //
 // Last Revised: 8-22-2003
 
+#include "stdafx.h"
 #include "consts.h"
 #include <math.h>
 #include <strstrea.h>
-#include <vector.h>
+#include <fstream.h>
+#include <vector>
+#include <deque>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CGrid.h"
+#include "CPlotList.h"
+#include "saveopts.h"
+#include "CXyFile.h"
+#include "xyp41.h"
+#include "CWorkspace41.h"
+#include "CDatabase.h"
+#include "CPlotDisplay.h"
+#include "resource.h"
+#include "CInputDialog.h"
+#include "CPickDataDialog.h"
+#include "CGridDialog.h"
+#include "CHeaderDialog.h"
+#include "CVerifyDialog.h"
+#include "CSaveOptionsDialog.h"
+#include <afxdlgs.h>
 #include "CPlotWindow.h"
 #include "fbc.h"
 #include "ForthCompiler.h"

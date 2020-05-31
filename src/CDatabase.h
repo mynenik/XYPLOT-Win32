@@ -15,11 +15,6 @@
 #ifndef __CDATABASE_H__
 #define __CDATABASE_H__
 
-#include "CWorkspace41.h"
-#include "CDataset.h"
-#include "CXyFile.h"
-#include "saveopts.h"
-
 #define byte unsigned char
 
 class CDatabase

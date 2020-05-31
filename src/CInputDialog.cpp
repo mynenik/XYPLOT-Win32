@@ -4,6 +4,8 @@
 //
 // Last Revised: 2-25-96
 
+#include "stdafx.h"
+#include "resource.h"
 #include "CInputDialog.h"
 CString CInputDialog::m_szResponseString = "\0";
 CString CInputDialog::m_szPromptString = "\0";

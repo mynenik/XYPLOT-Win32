@@ -9,6 +9,12 @@
 //    6-14-2002 modified DrawPointPlot() to specify point size;
 //                added DrawHistogram()  KM
 
+#include "stdafx.h"
+#include <vector>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
 #include "CXyPlot.h"
 #define DEF_POINT_WIDTH 3
 

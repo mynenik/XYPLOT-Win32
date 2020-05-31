@@ -13,8 +13,6 @@
 #ifndef __CPLOTLIST_H__
 #define __CPLOTLIST_H__
 
-#include "CPlot.h"
-
 struct PlotListNode             // node structure for linked list of plots
 {
     CPlot* Plot;

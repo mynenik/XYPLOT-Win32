@@ -10,8 +10,6 @@
 #ifndef __C3DTRANSFORM_H__
 #define __C3DTRANSFORM_H__
 
-#include "CTransform.h"
-
 class C3D_Transform : public CTransform {
 	double Theta;		// view elevation angle
     double Phi;         // view azimuthal angle

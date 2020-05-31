@@ -9,10 +9,6 @@
 #ifndef __CPICKDATADIALOG_H__
 #define __CPICKDATADIALOG_H__
 
-#include <afxres.h>
-#include <afxwin.h>
-#include "resource.h"
-
 #define MAX_SETS            32
 
 class CPickDataDialog : public CModalDialog {

@@ -14,9 +14,15 @@
 //
 #include <stdlib.h>
 #include <string.h>
+#include <fstream.h>
+#include <vector>
 #include "consts.h"
+#include "saveopts.h"
+#include "xyp41.h"
+#include "CDataset.h"
+#include "CXyFile.h"
+#include "CWorkspace41.h"
 #include "CDatabase.h"
-
 
 //---------------------------------------------------------------
 
@@ -496,10 +502,5 @@ int CDatabase::Write (ofstream& ofile)
 
   return 0;
 }
-
-
-
-
-
 
 

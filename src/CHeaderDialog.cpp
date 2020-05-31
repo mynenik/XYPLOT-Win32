@@ -4,6 +4,9 @@
 //
 // Last Revised: 9-7-97
 
+#include "stdafx.h"
+#include <string.h>
+#include "resource.h"
 #include "CHeaderDialog.h"
 
 //---------------------------------------------------------------

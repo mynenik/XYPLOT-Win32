@@ -13,13 +13,6 @@
 #ifndef __CPLOTDISPLAY_H__
 #define __CPLOTDISPLAY_H__
 
-#include <vector.h>
-#include <deque.h>
-#include "CPlotList.h"
-#include "CPolarGrid.h"
-#include "CXyPlot.h"
-#include "CWorkspace41.h"
-
 enum COORDINATE_SYSTEM {CARTESIAN, CARTESIAN_INVERTED, POLAR};
 
 class CPlotDisplay {

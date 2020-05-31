@@ -9,11 +9,6 @@
 #ifndef __CXYFILE_H__
 #define __CXYFILE_H__
 
-#include <stdio.h>
-#include <fstream.h>
-#include "CDataset.h"
-#include "saveopts.h"
-
 #define HEADER_BEGIN    "\057*"
 #define HEADER_END      "*/"
 #define MAX_LINE_LENGTH 4096

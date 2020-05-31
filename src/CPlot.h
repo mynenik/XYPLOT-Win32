@@ -9,9 +9,6 @@
 #ifndef __CPLOT_H__
 #define __CPLOT_H__
 
-#include "CDataset.h"
-#include "CPlotObject.h"
-
 enum Symbol {
     sym_LINE,
     sym_DASHED,

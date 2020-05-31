@@ -12,9 +12,6 @@
 #ifndef __CTRANSFORM_H__
 #define __CTRANSFORM_H__
 
-#include <vector.h>
-#include <afxwin.h>
-
 class CTransform {
 protected:
     CRect m_nPRect;             // rectangle for physical area

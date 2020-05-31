@@ -9,11 +9,6 @@
 #ifndef __CHEADERDIALOG_H__
 #define __CHEADERDIALOG_H__
 
-#include <afxres.h>
-#include <afxwin.h>
-#include <string.h>
-#include "resource.h"
-
 class CHeaderDialog : public CModalDialog {
 	CEdit* m_pNameField;
 	CEdit* m_pHeaderField;

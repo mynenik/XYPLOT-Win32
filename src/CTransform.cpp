@@ -8,8 +8,10 @@
 //
 // Last Revised: 3-5-2001
 
-#include "CTransform.h"
+#include "stdafx.h"
 #include <math.h>
+#include <vector>
+#include "CTransform.h"
 
 //---------------------------------------------------------------
 

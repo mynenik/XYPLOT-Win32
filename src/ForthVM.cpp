@@ -67,7 +67,7 @@
 #include <fstream.h>
 #include <strstrea.h>
 #include "fbc.h"
-#include <vector.h>
+#include <vector>
 #include "ForthCompiler.h"
 #include "ForthVM.h"
 

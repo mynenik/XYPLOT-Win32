@@ -10,8 +10,6 @@
 #ifndef __CXYPLOT_H__
 #define __CXYPLOT_H__
 
-#include "CPlot.h"
-
 class CXyPlot : public CPlot {
     int m_nPointWidthScale;
 public:

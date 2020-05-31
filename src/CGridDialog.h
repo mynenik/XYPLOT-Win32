@@ -9,10 +9,6 @@
 #ifndef __CGRIDDIALOG_H__
 #define __CGRIDDIALOG_H__
 
-#include "resource.h"
-#include "CGrid.h"
-#include <afxres.h>
-
 class CGridDialog : public CModalDialog {
 public:
     CGrid* m_pGrid;

@@ -18,7 +18,33 @@ System: Windows 95/98
 Developed under Symantec C++ v7.5, using MFC 4.2
 */
 
+#include "stdafx.h"
 #include <math.h>
+#include <vector>
+#include <deque>
+#include <strstrea.h>
+#include <fstream.h>
+#include "saveopts.h"
+#include "xyp41.h"
+#include "resource.h"
+#include "CDataset.h"
+#include "CXyFile.h"
+#include "CWorkspace41.h"
+#include "CDatabase.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CGrid.h"
+#include "CXyPlot.h"
+#include "CPlotList.h"
+#include "CPlotDisplay.h"
+#include "CGridDialog.h"
+#include "CHeaderDialog.h"
+#include "CInputDialog.h"
+#include "CPickDataDialog.h"
+#include "CSaveOptionsDialog.h"
+#include "CVerifyDialog.h"
+#include "CPlotWindow.h"
 #include "xyplot.h"
 #include "fbc.h"
 #include "ForthCompiler.h"

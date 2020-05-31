@@ -8,6 +8,20 @@
 //
 // Last Revised: 6-29-2003
 
+#include "stdafx.h"
+#include <fstream.h>
+#include <vector>
+#include <deque>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CPlotList.h"
+#include "CGrid.h"
+#include "CPolarGrid.h"
+#include "CXyPlot.h"
+#include "xyp41.h"
+#include "CWorkspace41.h"
 #include "CPlotDisplay.h"
 #include <string.h>
 extern char* DisplayFormat (float, float);

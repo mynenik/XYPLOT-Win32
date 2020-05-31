@@ -4,6 +4,9 @@
 //
 // Last Revised: 10-11-1998
 
+#include "stdafx.h"
+#include "resource.h"
+#include "saveopts.h"
 #include "CSaveOptionsDialog.h"
 
 //---------------------------------------------------------------
@@ -40,7 +43,8 @@ BOOL CSaveOptionsDialog::OnInitDialog()
 
 void CSaveOptionsDialog::OnOK()
 {
-    for (int i = 0; i < 3; i++) if (m_pButtons[i]->GetCheck())
+    int i;
+    for (i = 0; i < 3; i++) if (m_pButtons[i]->GetCheck())
         m_pSaveOptions->HeaderType = i;
     for (i = 3; i < 6; i++) if (m_pButtons[i]->GetCheck())
         m_pSaveOptions->Delimiter = i - 3;

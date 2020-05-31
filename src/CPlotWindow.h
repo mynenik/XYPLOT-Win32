@@ -16,17 +16,6 @@ Last Update: 8-16-2003
 #ifndef __CPLOTWINDOW_H__
 #define __CPLOTWINDOW_H__
 
-#include "CDatabase.h"
-#include "CPlotDisplay.h"
-#include "CInputDialog.h"
-#include "CPickDataDialog.h"
-#include "CGridDialog.h"
-#include "CHeaderDialog.h"
-#include "CVerifyDialog.h"
-#include "CSaveOptionsDialog.h"
-#include <afxdlgs.h>
-#include <afxext.h>
-
 class CPlotWindow : public CFrameWnd {
         CStatusBar* m_pStatusBar;
         CFrameWnd* m_pForthConsole;

@@ -9,8 +9,6 @@
 #ifndef __COLORTABLE_H__
 #define __COLORTABLE_H__
 
-#include<windows.h>
-
 #define MAX_COLORS 32
 
 COLORREF color_table[] =

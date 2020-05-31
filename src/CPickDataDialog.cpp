@@ -4,7 +4,10 @@
 //
 // Last Revised: 11-28-95
 
+#include "stdafx.h"
+#include "resource.h"
 #include "CPickDataDialog.h"
+
 CString CPickDataDialog::m_szDataList[MAX_SETS];
 int CPickDataDialog::m_nSelection = 0;
 int CPickDataDialog::m_nSets = 0;

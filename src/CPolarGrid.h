@@ -9,8 +9,6 @@
 #ifndef __CPOLARGRID_H__
 #define __CPOLARGRID_H__
 
-#include "CGrid.h"
-
 class CPolarGrid : public CGrid {
 public:
 	CPolarGrid ();

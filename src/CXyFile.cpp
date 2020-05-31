@@ -5,7 +5,12 @@
 //
 // Last Revised: 2003-08-22
 
+#include <stdio.h>
+#include <fstream.h>
+#include <vector>
 #include "consts.h"
+#include "saveopts.h"
+#include "CDataset.h"
 #include "CXyFile.h"
 
 //---------------------------------------------------------------

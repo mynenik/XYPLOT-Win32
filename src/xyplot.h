@@ -9,12 +9,7 @@ Created: 21-Mar-93
 Last Update: 6-29-2003
 */
 
-#include <vector.h>
-#include <strstrea.h>
-#include "CPlotWindow.h"
-
 #define ANNOTATION_PREFIX "==XYPLOT==> "
-
 
 // The application class
 
@@ -22,8 +17,6 @@ class CXyplotApp : public CWinApp {
 public:
         BOOL InitInstance();
 };
-
-
 
 /* Function prototypes: */
 

@@ -10,6 +10,8 @@
 //	12-2-95, 8-24-1998, 2-4-1999
 
 #include <string.h>
+#include <fstream.h>
+#include "xyp41.h"
 #include "CWorkspace41.h"
 
 //---------------------------------------------------------------

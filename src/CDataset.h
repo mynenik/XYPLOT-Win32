@@ -15,9 +15,6 @@
 #ifndef __CDATASET_H__
 #define __CDATASET_H__
 
-#include<vector.h>
-// using std::vector;
-
 const int HEADER_LENGTH = 4096;
 const int NAME_LENGTH = 256;
 

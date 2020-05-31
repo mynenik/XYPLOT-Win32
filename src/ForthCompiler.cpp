@@ -90,8 +90,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "fbc.h"
-#include <vector.h>
-#include <stack.h>
+#include <vector>
+#include <stack>
 #include "ForthCompiler.h"
 
 extern int debug;

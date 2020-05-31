@@ -9,8 +9,6 @@
 #ifndef __C3DREAL_H__
 #define __C3DREAL_H__
 
-#include "CDataset.h"
-
 class C3D_Real : public CDataset {
 public:
 	C3D_Real (int, char*, char*);

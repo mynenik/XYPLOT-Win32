@@ -13,7 +13,6 @@
 #ifndef __CGRID_H__
 #define __CGRID_H__
 
-#include "CPlotObject.h"
 const int MAX_TICS = 100;
 
 int nXtics;

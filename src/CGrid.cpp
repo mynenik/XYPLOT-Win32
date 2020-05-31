@@ -8,9 +8,14 @@
 //
 // Last Revised: 6-29-2003
 
-#include "CGrid.h"
-#include <vector.h>
+#include "stdafx.h"
+#include <vector>
 #include <string.h>
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CGrid.h"
 
 bool CGridLines::m_bHorizontal = true;
 bool CGridLines::m_bVertical = true;

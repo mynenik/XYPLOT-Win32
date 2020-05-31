@@ -5,7 +5,15 @@
 //
 // Last Revised: 2003-08-22
 
+#include "stdafx.h"
 #include <stdlib.h>
+#include <vector>
+#include "resource.h"
+#include "CDataset.h"
+#include "CTransform.h"
+#include "CPlotObject.h"
+#include "CPlot.h"
+#include "CGrid.h"
 #include "CGridDialog.h"
 
 //---------------------------------------------------------------
