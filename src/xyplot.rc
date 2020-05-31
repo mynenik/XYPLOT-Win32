@@ -1,0 +1,129 @@
+// Resource script for XYPLOT
+//
+// Copyright (c) 1996--2003 Krishna Myneni
+// Creative Consulting for Research & Education
+//
+//  Last Revised: 8-13-2003
+//
+#include <afxres.h>
+#include "resource.h"
+
+XYPLOTICON ICON    DISCARDABLE     "XYPLOT.ICO"
+
+// Menus
+
+XYPLOTMENU MENU DISCARDABLE
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",            ID_FILE_NEW
+        MENUITEM "&Open",           ID_FILE_OPEN
+        MENUITEM "&Save",           ID_FILE_SAVE
+        MENUITEM "Save Op&tions",   ID_SAVE_OPTS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print",          ID_FILE_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",           ID_APP_EXIT
+    END
+
+    POPUP "&Edit"
+    BEGIN
+        POPUP "&Copy"
+        BEGIN
+            MENUITEM "&Metafile",       ID_EDIT_COPY_WMF
+            MENUITEM "&Bitmap",         ID_EDIT_COPY_BMP
+        END
+        MENUITEM "&Paste",              ID_EDIT_PASTE
+    END
+
+    POPUP "&Data"
+    BEGIN
+    	MENUITEM "&Header",			ID_DATA_HDR
+    	MENUITEM "&Delete",			ID_DATA_DEL
+    	MENUITEM "D&uplicate",		ID_DATA_DUP
+    	MENUITEM "&Join",			ID_DATA_JOIN
+    	MENUITEM "&Prune",			ID_DATA_PRUNE
+    END
+
+    POPUP "&Plot"
+    BEGIN
+    	POPUP "&View"
+    	BEGIN
+    	  MENUITEM "&Cartesian",	ID_VIEW_CARTESIAN
+    	  MENUITEM "&Polar",        ID_VIEW_POLAR
+    	  MENUITEM SEPARATOR
+    	  MENUITEM "&Aspect",       ID_VIEW_ASPECT
+    	  MENUITEM SEPARATOR
+    	  MENUITEM "&Back",         ID_VIEW_BACK
+    	  MENUITEM "&Forward",      ID_VIEW_FORWARD
+    	END
+        MENUITEM "&Extrema",        ID_PLOT_EXTREMA
+    	MENUITEM "&Pick",			ID_PLOT_PICK
+    	MENUITEM "&Drop",			ID_PLOT_DROP
+    	MENUITEM "&Grid",			ID_PLOT_GRID
+    	MENUITEM "&Color",			ID_PLOT_COLOR
+    	POPUP "&Symbol",
+    	BEGIN
+    	  MENUITEM "&Line",         ID_SYMBOL_LINE
+    	  MENUITEM "&Point",        ID_SYMBOL_POINT
+    	  MENUITEM "&Big Point",    ID_SYMBOL_BIGPOINT
+    	  MENUITEM "L&ine+Pt",      ID_SYMBOL_LINEPT
+    	  MENUITEM "&Stick",        ID_SYMBOL_STICK
+    	  MENUITEM "&Histogram",    ID_SYMBOL_HISTOGRAM
+    	  MENUITEM "&Toggle",       ID_SYMBOL_TOGGLE
+    	END
+    END
+
+    POPUP "&Math"
+    BEGIN
+    	MENUITEM "&Template",			ID_MATH_TEMPLATE
+    	MENUITEM "Exp&ression",			ID_MATH_EXPRESSION
+    END
+
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About...",                   ID_ABOUT
+    END
+END
+
+
+XYPLOTACCELTABLE ACCELERATORS MOVEABLE PURE
+BEGIN
+    "C",            ID_PLOT_COLOR,          ASCII
+    "c",            ID_PLOT_COLOR,          ASCII
+    "D",            ID_PLOT_DROP,           ASCII
+    "d",            ID_PLOT_DROP,           ASCII
+    "E",            ID_PLOT_EXTREMA,        ASCII
+    "e",            ID_PLOT_EXTREMA,        ASCII
+    "F",            ID_FILE_OPEN,           ASCII
+    "f",            ID_FILE_OPEN,           ASCII
+    "G",            ID_PLOT_GRID,           ASCII
+    "g",            ID_PLOT_GRID,           ASCII
+    "H",            ID_DATA_HDR,            ASCII
+    "h",            ID_DATA_HDR,            ASCII
+    "I",            ID_PLOT_PICK,           ASCII
+    "i",            ID_PLOT_PICK,           ASCII
+    "R",            ID_MATH_EXPRESSION,     ASCII
+    "r",            ID_MATH_EXPRESSION,     ASCII
+    "T",            ID_MATH_TEMPLATE,       ASCII
+    "t",            ID_MATH_TEMPLATE,       ASCII
+    "+",            ID_ARM_ADD,             ASCII
+    "-",            ID_ARM_SUB,             ASCII
+    "*",            ID_ARM_MUL,             ASCII
+    "/",            ID_ARM_DIV,             ASCII
+    ".",            ID_SYMBOL_TOGGLE,       ASCII
+    VK_F1,          ID_ABOUT,               VIRTKEY
+    VK_F9,          ID_FILE_SAVE,           VIRTKEY
+    VK_TAB,         ID_VIEW_FORWARD,        VIRTKEY
+    VK_ESCAPE,      ID_ESCAPE,              VIRTKEY
+END
+
+STRINGTABLE
+BEGIN
+  IDS_FILTERSTRING  "All files(*.*)|*.*|Data files(*.DAT)|*.dat|Workspace files(*.XSP)|*.xsp|Forth files(*.4TH)|*.4th|"
+  IDS_SAVETYPES     "Dataset (.DAT)|*.dat|Workspace (.XSP)|*.xsp|Metafile (.WMF)|*.wmf|"
+  IDS_CURSOR_X      "x:          "
+  IDS_CURSOR_Y      "y:          "
+END
+
+RCINCLUDE XYDLGS.DLG

@@ -1,0 +1,252 @@
+# Symantec IDDE generated .dpd file. V: 7200
+cdatabase.obj: \
+	cdatabase.cpp \
+	..\..\sc\include\typeinfo.h \
+	consts.h \
+	CDatabase.h \
+	CWorkspace41.h \
+	xyp41.h \
+	CDataset.h \
+	CXyFile.h \
+	saveopts.h 
+cdataset.obj: \
+	cdataset.cpp \
+	..\..\sc\include\typeinfo.h \
+	CDataset.h 
+cgrid.obj: \
+	cgrid.cpp \
+	..\..\sc\include\typeinfo.h \
+	CGrid.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+cinputdialog.obj: \
+	cinputdialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CInputDialog.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	resource.h 
+cpickdatadialog.obj: \
+	cpickdatadialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CPickDataDialog.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	resource.h 
+cplotdisplay.obj: \
+	cplotdisplay.cpp \
+	..\..\sc\include\typeinfo.h \
+	CPlotDisplay.h \
+	CPlotList.h \
+	CPlot.h \
+	CDataset.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	CPolarGrid.h \
+	CGrid.h \
+	CXyPlot.h \
+	CWorkspace41.h \
+	xyp41.h 
+cplotlist.obj: \
+	cplotlist.cpp \
+	..\..\sc\include\typeinfo.h \
+	CPlotList.h \
+	CPlot.h \
+	CDataset.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	ColorTable.h 
+cplotobject.obj: \
+	cplotobject.cpp \
+	..\..\sc\include\typeinfo.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+cplotwindow.obj: \
+	cplotwindow.cpp \
+	..\..\sc\include\typeinfo.h \
+	consts.h \
+	CPlotWindow.h \
+	CDatabase.h \
+	CWorkspace41.h \
+	xyp41.h \
+	CDataset.h \
+	CXyFile.h \
+	saveopts.h \
+	CPlotDisplay.h \
+	CPlotList.h \
+	CPlot.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	CPolarGrid.h \
+	CGrid.h \
+	CXyPlot.h \
+	CInputDialog.h \
+	resource.h \
+	CPickDataDialog.h \
+	CGridDialog.h \
+	CHeaderDialog.h \
+	CVerifyDialog.h \
+	CSaveOptionsDialog.h \
+	fbc.h \
+	ForthCompiler.h \
+	ForthVM.h 
+cpolargrid.obj: \
+	cpolargrid.cpp \
+	..\..\sc\include\typeinfo.h \
+	CPolarGrid.h \
+	CGrid.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+cworkspace41.obj: \
+	cworkspace41.cpp \
+	..\..\sc\include\typeinfo.h \
+	CWorkspace41.h \
+	xyp41.h 
+cxyfile.obj: \
+	cxyfile.cpp \
+	..\..\sc\include\typeinfo.h \
+	consts.h \
+	CXyFile.h \
+	CDataset.h \
+	saveopts.h 
+cxyplot.obj: \
+	cxyplot.cpp \
+	..\..\sc\include\typeinfo.h \
+	CXyPlot.h \
+	CPlot.h \
+	CDataset.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+xyplot.obj: \
+	xyplot.cpp \
+	..\..\sc\include\typeinfo.h \
+	xyplot.h \
+	CPlotWindow.h \
+	CDatabase.h \
+	CWorkspace41.h \
+	xyp41.h \
+	CDataset.h \
+	CXyFile.h \
+	saveopts.h \
+	CPlotDisplay.h \
+	CPlotList.h \
+	CPlot.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	CPolarGrid.h \
+	CGrid.h \
+	CXyPlot.h \
+	CInputDialog.h \
+	resource.h \
+	CPickDataDialog.h \
+	CGridDialog.h \
+	CHeaderDialog.h \
+	CVerifyDialog.h \
+	CSaveOptionsDialog.h \
+	fbc.h \
+	ForthCompiler.h \
+	ForthVM.h 
+cgriddialog.obj: \
+	cgriddialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CGridDialog.h \
+	resource.h \
+	CGrid.h \
+	CPlotObject.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+cheaderdialog.obj: \
+	cheaderdialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CHeaderDialog.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	resource.h 
+ctransform.obj: \
+	ctransform.cpp \
+	..\..\sc\include\typeinfo.h \
+	CTransform.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h 
+algebracompiler.obj: \
+	algebracompiler.cpp \
+	..\..\sc\include\typeinfo.h \
+	fbc.h 
+cverifydialog.obj: \
+	cverifydialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CVerifyDialog.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	resource.h 
+csaveoptionsdialog.obj: \
+	csaveoptionsdialog.cpp \
+	..\..\sc\include\typeinfo.h \
+	CSaveOptionsDialog.h \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	resource.h \
+	saveopts.h 
+vmc.obj: \
+	vmc.c \
+	..\..\sc\include\win32\pshpack4.h \
+	..\..\sc\include\win32\pshpack2.h \
+	..\..\sc\include\win32\poppack.h \
+	..\..\sc\include\win32\rpc.h \
+	..\..\sc\include\win32\rpcndr.h \
+	..\..\sc\include\win32\windows.h \
+	..\..\sc\include\win32\ole2.h \
+	..\..\sc\include\win32\wtypes.h \
+	..\..\sc\include\win32\unknwn.h \
+	..\..\sc\include\win32\objidl.h 
+forthcompiler.obj: \
+	forthcompiler.cpp \
+	..\..\sc\include\typeinfo.h \
+	fbc.h \
+	ForthCompiler.h 
+forthvm.obj: \
+	forthvm.cpp \
+	..\..\sc\include\typeinfo.h \
+	fbc.h \
+	ForthCompiler.h \
+	ForthVM.h 
+xyplot.RES: \
+	xyplot.rc \
+	..\..\SC\mfc\include\afxres.h \
+	..\..\SC\mfc\include\32-bit\afxres.h \
+	..\..\SC\mfc\include\32-bit\winres.h \
+	resource.h \
+	XYPLOT.ICO \
+	XYDLGS.DLG 
