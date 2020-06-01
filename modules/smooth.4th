@@ -2,10 +2,8 @@
 \
 \ Smooth function for xyplot
 \
-\ Copyright (c) 1999--2000 Krishna Myneni
+\ Copyright (c) 1999--2020 Krishna Myneni
 \ Creative Consulting for Research and Education
-\
-\ Last Revised: 2-21-1999
 \
 
 DatasetInfo dsa 	\ active dataset info structure
@@ -20,7 +18,7 @@ fvariable ylast
 	    0 dsa @xy fdup ylast f! 3e f*
 	    1 dsa @xy fswap fdrop f+ 4e f/
 	    0 dsa !xy
-	    dsa ->npts 1-
+	    dsa DatasetInfo->Npts @ 1-
 	    1 do
 	      ylast f@
 	      i dsa @xy
@@ -28,9 +26,9 @@ fvariable ylast
 	      i 1+ dsa @xy fswap fdrop f+
 	      4e f/ i dsa !xy
 	    loop
-	    dsa ->npts 1- dsa @xy 3e f* 
+	    dsa DatasetInfo->Npts @ 1- dsa @xy 3e f* 
 	    ylast f@ f+ 4e f/  
-	    dsa ->npts 1- dsa !xy
+	    dsa DatasetInfo->Npts @ 1- dsa !xy
 	    ?active set_ds_extrema
 	  then
 	else
@@ -39,7 +37,7 @@ fvariable ylast
 
 \ add "smooth" as an item in the math menu
 
-MN_MATH " Smooth" " smooth draw_window" add_menu_item
+MN_MATH c" Smooth" c" smooth draw_window" add_menu_item
 
 
 

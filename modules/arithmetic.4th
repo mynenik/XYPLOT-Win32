@@ -28,12 +28,12 @@ DatasetInfo ds3
 	
 	\ Set up the info structure for a new dataset
 
-	1+ ds3 DNAME !
-	"  " 1+ ds3 DHEADER !
-	256 ds3 DTYPE !
-	result mat_size@ drop ds3 DNPTS !
-	2 ds3 DSIZE !
-	result cell+ cell+ ds3 DDATA !
+	1+                    ds3 DatasetInfo->Name !
+	c"  " 1+              ds3 DatasetInfo->Header !
+	REAL_DOUBLE           ds3 DatasetInfo->Type !
+	result mat_size@ drop ds3 DatasetInfo->Npts !
+	2                     ds3 DatasetInfo->Size !
+	result cell+ cell+    ds3 DatasetInfo->Data !
 		 	      
 	ds3 make_ds ;
 
@@ -57,7 +57,7 @@ true ordering2 !
     r@ 0= IF
       r@ 1+
     ELSE
-      r@ ds2 DNPTS @ 1- = IF
+      r@ ds2 DatasetInfo->Npts @ 1- = IF
         r@ 1-
       ELSE
         r@
@@ -75,7 +75,7 @@ true ordering2 !
       y1 f@ y2 f@  y1 f! y2 f!
     THEN
     y2 f@ y1 f@ f- x2 f@ x1 f@ f- f/ slope f!
-    y2 f@ x2 f@ xs f@ f- slope f@ f* f-      
+    y2 f@ x2 f@ xs f@ f- slope f@ f* f- 
 ;
 
 variable rcntr
@@ -116,32 +116,28 @@ variable ar_operator
  
 : add_ds ( -- | add the operand set and the active set )
 	['] f+ do_arithmetic
-	if " Sum" make_result then ;
+	if c" Sum" make_result then ;
 
    
 : sub_ds ( -- | add the operand set and the active set )
 	['] f- do_arithmetic
-	if " Difference" make_result then ;
+	if c" Difference" make_result then ;
    	   
      	        
 : mul_ds ( -- | add the operand set and the active set )
 	['] f* do_arithmetic
-	if " Product" make_result then ;
+	if c" Product" make_result then ;
 
    
 : div_ds ( -- | add the operand set and the active set )
 	['] f/ do_arithmetic
-	if " Quotient" make_result then ;
+	if c" Quotient" make_result then ;
    
 
 \ add xyplot math menu items
 
-MN_MATH " Add"		" add_ds" add_menu_item
-MN_MATH " Subtract"	" sub_ds" add_menu_item
-MN_MATH " Multiply"	" mul_ds" add_menu_item
-MN_MATH " Divide"	" div_ds" add_menu_item
-
-
-
-
+MN_MATH c" Add"		c" add_ds" add_menu_item
+MN_MATH c" Subtract"	c" sub_ds" add_menu_item
+MN_MATH c" Multiply"	c" mul_ds" add_menu_item
+MN_MATH c" Divide"	c" div_ds" add_menu_item
 

@@ -9,7 +9,7 @@
 	if
 	  dsa get_ds
 	  0 >= if
-	    dsa ->npts 0 do
+	    dsa DatasetInfo->Npts @ 0 do
 	      i dsa @xy fdup 0e f>	\ test for y > 0
 	      if flog else fdrop 0e then
 	      i dsa !xy
@@ -23,4 +23,4 @@
 
 \ add "Log(Y)" as an item in the math menu
 
-MN_MATH " Log(Y)" " ylog reset_window" add_menu_item
+MN_MATH c" Log(Y)" c" ylog reset_window" add_menu_item

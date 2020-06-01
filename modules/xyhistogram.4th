@@ -26,7 +26,7 @@ variable dsaddr
 	1 dsaddr a@ @xy 
 	fdup hmin f! hmax f!
 	fdrop
-	dsaddr a@ ->npts 2 do
+	dsaddr a@ DatasetInfo->Npts @ 2 do
 	  i dsaddr a@ @xy   
 	  fdup hmin f@ f< if fdup hmin f! then
 	  fdup hmax f@ f> if fdup hmax f! then
@@ -69,7 +69,7 @@ DatasetInfo dshist
 	      	
 	    \ Create the histogram
 
-	    ds1 ->npts 0 do
+	    ds1 DatasetInfo->Npts @ 0 do
 	      i ds1 @xy
 	      hmin f@ f-
 	      bin_width f@ f/ fround>s 1+	\ bin index for current y val
@@ -86,12 +86,12 @@ DatasetInfo dshist
 
 	    \ Create dataset in xyplot
 
-	    c"  " 1+ dshist DHEADER !
-	    c" Histogram" 1+ dshist DNAME !
-	    256 dshist DTYPE !		\ double precision fp type
-	    hist mat_size@ drop dshist DNPTS !
-	    2 dshist DSIZE !
-	    hist 8 + dshist DDATA !
+	    c"  " 1+ dshist DatasetInfo->Header !
+	    c" Histogram" 1+ dshist DatasetInfo->Name !
+	    256 dshist DatasetInfo->TYPE !	\ double precision fp type
+	    hist mat_size@ drop dshist DatasetInfo->Npts !
+	    2 dshist DatasetInfo->Size !
+	    hist 8 + dshist DatasetInfo->Data !
 
 	    dshist make_ds	
 	    
@@ -113,6 +113,6 @@ DatasetInfo dshist
 	then ;
 
 
-MN_MATH " Histogram" " xyhistogram" add_menu_item
+MN_MATH c" Histogram" c" xyhistogram" add_menu_item
 
 	  

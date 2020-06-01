@@ -46,7 +46,7 @@ fvariable delta
     nterms @ 1 params a@ mat_size!                              
     nterms @ 2* 1- nmax !                                       
     nmax @ 1 sumx mat_size!                                    
-    dup DNPTS @ npts !                                  
+    dup DatasetInfo->Npts @ npts !                                  
     sumx fmat_zero                                              
     sumy fmat_zero                                              
     params a@ fmat_zero                                          
@@ -151,5 +151,5 @@ variable norder
 
 \ add "Poly Fit" as an item in the math menu
 
-MN_MATH " Poly Fit" " xypolyfit draw_window" add_menu_item
+MN_MATH c" Poly Fit" c" xypolyfit draw_window" add_menu_item
 

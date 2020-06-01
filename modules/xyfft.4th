@@ -58,7 +58,7 @@ fvariable fft_dt
 
 		\ Set the size of the fft data buffer
 		
-		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		dsfft DatasetInfo->Npts @ adjust_fft_size	\ ensure power of 2
 		fftdata fmat_zero		\ zero the buffer		
 
 		\ Determine frequency scale
@@ -71,7 +71,7 @@ fvariable fft_dt
 	     
 		\ Transfer data from xyplot dataset to the fftdata buffer
 
-		dsfft ->npts 0 do
+		dsfft DatasetInfo->Npts @ 0 do
 		  i dsfft @xy
 		  i 2* 1+ 1 fftdata fmat!
 		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
@@ -91,12 +91,12 @@ fvariable fft_dt
 	    
 		\ make a new xyplot dataset
 
-		c" Real(FT)" 1+ ds1 DNAME !
-		c"  " 1+ ds1 DHEADER !
-		256 ds1 DTYPE !
-		fftdata mat_size@ drop ds1 DNPTS !
-		2 ds1 DSIZE !
-		fftdata cell+ cell+ ds1 DDATA !		 	      
+		c" Real(FT)" 1+ ds1 DatasetInfo->Name !
+		c"  " 1+ ds1 DatasetInfo->Header !
+		256 ds1 DatasetInfo->Type !
+		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
+		2 ds1 DatasetInfo->Size !
+		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
 		ds1 make_ds
 	  then
 	else
@@ -111,7 +111,7 @@ fvariable fft_dt
 
 		\ Set the size of the fft data buffer
 		
-		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		dsfft DatasetInfo->Npts @ adjust_fft_size  \ ensure power of 2
 		fftdata fmat_zero		\ zero the buffer		
 
 		\ Determine frequency scale
@@ -124,7 +124,7 @@ fvariable fft_dt
 	     
 		\ Transfer data from xyplot dataset to the fftdata buffer
 
-		dsfft ->npts 0 do
+		dsfft DatasetInfo->Npts @ 0 do
 		  i dsfft @xy
 		  i 2* 1+ 1 fftdata fmat!
 		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
@@ -142,12 +142,12 @@ fvariable fft_dt
 	    
 		\ make a new xyplot dataset
 
-		c" Imag(FT)" 1+ ds1 DNAME !
-		c"  " 1+ ds1 DHEADER !
-		256 ds1 DTYPE !
-		fftdata mat_size@ drop ds1 DNPTS !
-		2 ds1 DSIZE !
-		fftdata cell+ cell+ ds1 DDATA !		 	      
+		c" Imag(FT)" 1+ ds1 DatasetInfo->Name !
+		c"  " 1+ ds1 DatasetInfo->Name !
+		256 ds1 DatasetInfo->Type !
+		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
+		2 ds1 DatasetInfo->Size !
+		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
 		ds1 make_ds
 	  then
 	else
@@ -162,7 +162,7 @@ fvariable fft_dt
 
 		\ Set the size of the fft data buffer
 		
-		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		dsfft DatasetInfo->Npts @ adjust_fft_size	\ ensure power of 2
 		fftdata fmat_zero		\ zero the buffer		
 
 		\ Determine time scale
@@ -172,7 +172,7 @@ fvariable fft_dt
 	     
 		\ Transfer data from xyplot dataset to the fftdata buffer
 
-		dsfft ->npts 0 do
+		dsfft DatasetInfo->Npts @ 0 do
 		  i dsfft @xy
 		  i 2* 1+ 1 fftdata fmat!
 		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
@@ -192,12 +192,12 @@ fvariable fft_dt
 	    
 		\ make a new xyplot dataset
 
-		c" Real(FT^-1)" 1+ ds1 DNAME !
-		c"  " 1+ ds1 DHEADER !
-		256 ds1 DTYPE !
-		fftdata mat_size@ drop ds1 DNPTS !
-		2 ds1 DSIZE !
-		fftdata cell+ cell+ ds1 DDATA !		 	      
+		c" Real(FT^-1)" 1+ ds1 DatasetInfo->Name !
+		c"  " 1+ ds1 DatasetInfo->Header !
+		256 ds1 DatasetInfo->Type !
+		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
+		2 ds1 DatasetInfo->Size !
+		fftdata cell+ cell+ ds1 DatasetInfo->Data !	      
 		ds1 make_ds
 	  then
 	else
@@ -212,7 +212,7 @@ fvariable fft_dt
 
 		\ Set the size of the fft data buffer
 		
-		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		dsfft DatasetInfo->Npts @ adjust_fft_size	\ ensure power of 2
 		fftdata fmat_zero		\ zero the buffer		
 
 		\ Determine frequency scale
@@ -225,7 +225,7 @@ fvariable fft_dt
 	     
 		\ Transfer data from xyplot dataset to the fftdata buffer
 
-		dsfft ->npts 0 do
+		dsfft DatasetInfo->Npts @ 0 do
 		  i dsfft @xy
 		  i 2* 1+ 1 fftdata fmat!
 		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
@@ -246,12 +246,12 @@ fvariable fft_dt
 	    
 		\ make a new xyplot dataset containing the power spectrum
 
-		c" PowerSpectrum" 1+ ds1 DNAME !
-		c"  " 1+ ds1 DHEADER !
-		256 ds1 DTYPE !
-		fftdata mat_size@ drop ds1 DNPTS !
-		2 ds1 DSIZE !
-		fftdata cell+ cell+ ds1 DDATA !		 	      
+		c" PowerSpectrum" 1+ ds1 DatasetInfo->Name !
+		c"  " 1+ ds1 DatasetInfo->Header !
+		256 ds1 DatasetInfo->Type !
+		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
+		2 ds1 DatasetInfo->Size !
+		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
 		ds1 make_ds
 	  then
 	else

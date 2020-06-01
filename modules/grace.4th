@@ -48,18 +48,6 @@ fvariable ymax
 variable gr_fid
 variable grace_line_count
 
-: tdstring ( -- a u | return a date and time string )
-	time&date
-	s"  "
-	rot 0 <# [char] - hold # # # # #> strcat
-	rot 0 <# [char] - hold # # #>     strcat
-	rot 0 <# bl hold # # #>           strcat
-	rot 0 <# [char] : hold # # #>     strcat
-	rot 0 <# [char] : hold # # #>     strcat
-	rot 0 <# # # #>                   strcat ;
-
-
-	  
 : >grfile ( a u -- | write string to grace file )
 	gr_fid @ write-line drop ;
 
@@ -136,18 +124,19 @@ fvariable ymax
 
 	MAXPLOTS 0 DO
 	  i pl1 get_plot 0< if leave then
-	  pl1 ->set ds1 get_ds drop
-	  pl1 ->set [char] 0 + set_specifier 7 + c!
-	  pl1 ->set s>d <# # # #> xyplot_set_specifier 11 + swap cmove
+	  pl1 PlotInfo->Set @  ds1 get_ds drop
+	  pl1 PlotInfo->Set @  [char] 0 + set_specifier 7 + c!
+	  pl1 PlotInfo->Set @  s>d <# # # #> xyplot_set_specifier 11 + swap cmove
 
 	  \ Write dataset name
 	  set_specifier 9 s" comment '" strcat
-	  ds1 ->name dup strlen strcat s" '" strcat rep(',") >grfile
+	  ds1 DatasetInfo->Name a@ dup strlen strcat 
+	  s" '" strcat rep(',") >grfile
 
 	  \ Write dataset header
 	  0 hdr_line_count !
-	  ds1 ->header dup strlen dup
-	  IF
+	  ds1 DatasetInfo->header a@ 
+	  dup strlen dup IF
 	    BEGIN
 	      2dup 10 scan dup >r
 	      2swap r> -  dup IF
@@ -166,29 +155,32 @@ fvariable ymax
 	  set_specifier 9 s" type xy" strcat >grfile
 
 	  set_specifier 9 s" symbol " strcat	  
-	  pl1 ->symbol dup dup SYM_POINT = swap 
+	  pl1 PlotInfo->Symbol @ dup dup SYM_POINT = swap 
 	                       SYM_LINE_PLUS_POINT = or swap
 			       SYM_BIG_POINT = or dup flag_symbol ! 
 	  abs u>string count strcat >grfile
 
 	  flag_symbol @ IF
 	    set_specifier 9 s" symbol size " strcat
-	    pl1 ->symbol SYM_BIG_POINT = IF s" 0.6" ELSE s" 0.2" THEN strcat >grfile
+	    pl1 PlotInfo->Symbol @ SYM_BIG_POINT = IF 
+	      s" 0.6" ELSE s" 0.2" 
+	    THEN strcat >grfile
 	    set_specifier 9 s" symbol color " strcat 
-	    pl1 ->color 2+ u>string count strcat >grfile
+	    pl1 PlotInfo->Color @ 2+ u>string count strcat >grfile
 	    set_specifier 9 s" symbol fill color " strcat
-	    pl1 ->color 2+ u>string count strcat >grfile
+	    pl1 PlotInfo->Color @ 2+ u>string count strcat >grfile
 	    set_specifier 9 s" symbol pattern 1" strcat >grfile
 	    set_specifier 9 s" symbol fill pattern 1" strcat >grfile
 	  THEN
 
 	  set_specifier 9 s" line type " strcat
-	  pl1 ->symbol dup  SYM_LINE = swap SYM_LINE_PLUS_POINT = or dup flag_line ! 	  
+	  pl1 PlotInfo->Symbol @ dup  
+	  SYM_LINE = swap SYM_LINE_PLUS_POINT = or dup flag_line ! 	  
 	  abs u>string count strcat >grfile
 
 	  flag_line @ IF
 	    set_specifier 9 s" line color " strcat
-	    pl1 ->color 2+ u>string count strcat >grfile
+	    pl1 PlotInfo->Color @ 2+ u>string count strcat >grfile
 	    set_specifier 9 s" linewidth 1.0" strcat >grfile
 	  THEN
 	LOOP
@@ -198,10 +190,11 @@ fvariable ymax
 
 	MAXPLOTS 0 do
 	  i pl1 get_plot 0< if leave then
-	  pl1 ->set ds1 get_ds drop
-	  s" @target G0.S" pl1 ->set u>string count strcat >grfile
+	  pl1 PlotInfo->Set @ ds1 get_ds drop
+	  s" @target G0.S" pl1 PlotInfo->Set @ 
+	  u>string count strcat >grfile
 	  s" @type xy" >grfile
-	  ds1 ->npts 0 ?do
+	  ds1 DatasetInfo->Npts @ 0 ?do
 	    i ds1 @xy 2>r 
 	    8 f>string count s"  " strcat 2r> 8 f>string count strcat >grfile
 	  loop
@@ -315,12 +308,12 @@ variable hdr_line
 
 : read_grace_set ( n -- err | read set n)
     grace_set !
-    grace_set @  get_grace_set_name drop ds1 DNAME !
-    grace_set @  get_grace_header   drop ds1 DHEADER !
-    256 ds1 DTYPE  !		\ real dataset (double precision)
-    2   ds1 DSIZE  !		\ dimension is 2 (x, y)
-    0   ds1 DNPTS  !
-    grace_xydata 2 cells + ds1 DDATA  !	\ pointer to data
+    grace_set @  get_grace_set_name drop ds1 DatasetInfo->Name !
+    grace_set @  get_grace_header   drop ds1 DatasetInfo->Header !
+    256 ds1 DatasetInfo->Type !   \ real dataset (double precision)
+    2   ds1 DatasetInfo->Size !	  \ dimension is 2 (x, y)
+    0   ds1 DatasetInfo->Npts !
+    grace_xydata 2 cells + ds1 DatasetInfo->Data !  \ pointer to data
     0 grace_set_npts !
 
     <grfile IF 
@@ -332,7 +325,7 @@ variable hdr_line
         over c@ [char] & = IF
           2drop
 	  grace_set_npts @ 0> IF
-	    grace_set_npts @ ds1 DNPTS  !
+	    grace_set_npts @ ds1 DatasetInfo->Npts !
 	    ds1 make_ds                         \ make the dataset
 
 	    \ make a corresponding plot also
@@ -345,15 +338,15 @@ variable hdr_line
 	        drop  SYM_LINE_PLUS_POINT   THEN
 	    ELSE grace_set @ 1+ 5 grace_pattrs mat@
 	      5 < IF SYM_POINT ELSE SYM_BIG_POINT THEN
-	    THEN   pl1 PSYM   !  \ plot symbol
+	    THEN   pl1 PlotInfo->Symbol !
 	  
-	    grace_set @ pl1 PDSET  !		\ dataset number
-	    0           pl1 PTYPE  !		\ plot type
+	    grace_set @ pl1 PlotInfo->Set !
+	    0           pl1 PlotInfo->Type !
 	    pl1 make_plot
 
 	    \ set the plot color
 
-	    pl1 ->symbol dup SYM_POINT = swap SYM_BIG_POINT = or
+	    pl1 PlotInfo->Symbol @ dup SYM_POINT = swap SYM_BIG_POINT = or
 	    IF  4  ELSE  2  THEN
 	    grace_set @ 1+ swap grace_pattrs mat@ 
 	    get_grace_color strpck set_plot_color

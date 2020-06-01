@@ -2,14 +2,13 @@
 \
 \ Auto-correlation function for xyplot
 \
-\ Copyright (c) 2000--2005 Krishna Myneni
+\ Copyright (c) 2000--2020 Krishna Myneni
 \ Provided under the GNU General Public License
 \
 \ Revisions:
 \    2000-3-6   created  km
 \    2005-1-14  updated use of DatasetInfo structure  km
 
-( DatasetInfo ds1 ) \ active dataset info structure; ds1 should exist
 DatasetInfo ds_acorr
 create acorrbuf 32768 dfloats allot
 
@@ -26,7 +25,7 @@ fvariable fcorrnorm
 	if
 	  ds1 get_ds
 	  0 >= if
-	    ds1 ->npts np !
+	    ds1 DatasetInfo->Npts @ np !
 
 	    \ Determine normalization constant
 
@@ -63,12 +62,12 @@ fvariable fcorrnorm
 	          
 	    \ setup the autocorrelation data structure
 
-	    c" autocorrelation" 1+ ds_acorr DNAME !
-	    c"  " 1+ ds_acorr DHEADER !
-	    ds1 DTYPE @ ds_acorr DTYPE !
-	    npcorr @ ds_acorr DNPTS !
-	    2 ds_acorr DSIZE !
-	    acorrbuf ds_acorr DDATA !
+	    c" autocorrelation" 1+ ds_acorr DatasetInfo->Name !
+	    c"  " 1+ ds_acorr DatasetInfo->Header !
+	    ds1 DatasetInfo->Type @ ds_acorr DatasetInfo->Type !
+	    npcorr @ ds_acorr DatasetInfo->Npts !
+	    2 ds_acorr DatasetInfo->Size !
+	    acorrbuf ds_acorr DatasetInfo->Data !
 
 	    ds_acorr make_ds
 		 

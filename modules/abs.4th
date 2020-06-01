@@ -2,33 +2,26 @@
 \
 \ Take absolute value of y values of the active dataset
 \
-\ Copyright (c) 2000 Krishna Myneni
+\ Copyright (c) 2000--2020 Krishna Myneni
 \
-\ Revisions:
-\	6-21-2000 KM
-
-DatasetInfo ds_info
+DatasetInfo ds
 
 : abs_ds ( -- )
 	?active			\ get the active set number
-	dup 0 >=		\ is it valid (non-negative)?
-	if
-	  ds_info get_ds	\ ok, get info about the dataset
-	  0 >=			\ did get_ds return an error?
-	  if
-	    ds_info ->npts	\ ok, obtain the number of points
-	    0 do	
-	      i ds_info @xy	\ fetch the i^th x, y pair 
-	      fabs  		\ take absolute value
-	      i ds_info !xy	\ store the i^th x, y pair
-	    loop
+	dup 0 >= IF		\ is it valid (non-negative)?
+	  ds get_ds		\ ok, get info about the dataset
+	  0 >= IF		\ did get_ds return an error?
+	    ds DatasetInfo->Npts @
+	    0 DO
+	      I ds @xy  fabs  I ds !xy
+	    LOOP
 	    ?active
-	    set_ds_extrema	\ reset the extrema for that dataset
-	  then
-	else
+	    set_ds_extrema	\ reset extrema for dataset
+	  THEN
+	ELSE
 	  drop
-	then ;
+	THEN ;
 
 \ add this function to the math menu
 
-MN_MATH " Magnitude" " abs_ds reset_window" add_menu_item
+MN_MATH c" Magnitude" c" abs_ds reset_window" add_menu_item

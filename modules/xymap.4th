@@ -48,58 +48,58 @@ variable map_type
 	    map_type @
 	    case
 	      0 of
-	        ds1 ->npts 1 do
+	        ds1 DatasetInfo->Npts @ 1 do
 	          i 1- ds1 @xy fswap fdrop
 	          i 1 map_data fmat!
 	          i ds1 @xy fswap fdrop
 	          i 2 map_data fmat!
 	        loop
  		c" Map of y_n+1 vs y_n"
-	        ds1 ->npts 1-  
+	        ds1 DatasetInfo->Npts @ 1-  
 	      endof
 	        
 	      1 of
-	        ds1 ->npts 1 do
+	        ds1 DatasetInfo->Npts @ 1 do
 	          i 1- ds1 @xy fdrop
 	          i 1 map_data fmat!
 	          i ds1 @xy fdrop
 	          i 2 map_data fmat!
 	        loop
  		c" Map of x_n+1 vs x_n"
-	        ds1 ->npts 1-  
+	        ds1 DatasetInfo->Npts @ 1-  
 	      endof
 
 	      2 of
-	        ds1 ->npts 1- 1 do
+	        ds1 DatasetInfo->Npts @ 1- 1 do
 	          i ds1 @xy fswap fdrop i 1- ds1 @xy fswap fdrop f-
 	          i 1 map_data fmat!
 	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
 	          i 2 map_data fmat!
 	        loop
 	        c" Map of dy_n+1 vs dy_n"
-	        ds1 ->npts 2-
+	        ds1 DatasetInfo->Npts @ 2-
 	      endof
 
 	      3 of
-	        ds1 ->npts 1- 1 do
+	        ds1 DatasetInfo->Npts @ 1- 1 do
 	          i ds1 @xy fdrop i 1- ds1 @xy fdrop f-
 	          i 1 map_data fmat!
 	          i 1+ ds1 @xy fdrop i ds1 @xy fdrop f-
 	          i 2 map_data fmat!
 	        loop
 	        c" Map of dx_n+1 vs dx_n"
-	        ds1 ->npts 2-
+	        ds1 DatasetInfo->Npts @ 2-
 	      endof
 
 	      4 of
-	        ds1 ->npts 1- 1 do
+	        ds1 DatasetInfo->Npts @ 1- 1 do
 	          i ds1 @xy fdrop i 1- ds1 @xy fdrop f-
 	          i 1 map_data fmat!
 	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
 	          i 2 map_data fmat!
 	        loop
 	        c" Map of dy_n+1 vs dx_n"
-	        ds1 ->npts 2-
+	        ds1 DatasetInfo->Npts @ 2-
 	      endof
 	      "  " 0
 	    endcase
@@ -110,11 +110,11 @@ variable map_type
 
 	    \ Create the map dataset in xyplot
 
-	    1+ dsmap DHEADER !
-	    c" Map" 1+ dsmap DNAME !
-	    256 dsmap DTYPE !		\ double precision fp type
-	    map_data mat_size@ drop dsmap DNPTS  !
-	    2 dsmap DSIZE  !
+	    1+ dsmap DatasetInfo->HEADER !
+	    c" Map" 1+ dsmap DatasetInfo->Name !
+	    256 dsmap DatasetInfo->Type !		\ double precision fp type
+	    map_data mat_size@ drop dsmap DatasetInfo->Npts !
+	    2 dsmap DatasetInfo->Size !
 
 	    dsmap make_ds
 	  then

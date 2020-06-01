@@ -33,8 +33,8 @@ variable ynm_pts
 	    0 >= if
 	      ds2 get_ds	\ get operand set info
 	      0 >= if
-	        ds1 ->npts
-	        ds2 ->npts
+	        ds1 DatasetInfo->Npts @
+	        ds2 DatasetInfo->Npts @
 	        min dup ynm_pts !	\ use minimum value for npts
 	        MAX_YNMPTS > if
 	          ." Too many points. Change MAX_YNMPTS." cr	
@@ -53,12 +53,12 @@ variable ynm_pts
 
 	        \ Make the new dataset in xyplot
 
-	        c" Yn_vs_Ym" 1+ ds3 DNAME !
-	        c"  " 1+ ds3 DHEADER !
-	        256 ds3 DTYPE !
-	        ynm_pts @ ds3 DNPTS !
-	        2 ds3 DSIZE !
-	        ynm cell+ cell+ ds3 DDATA !
+	        c" Yn_vs_Ym" 1+ ds3 DatasetInfo->Name !
+	        c"  " 1+ ds3 DatasetInfo->Header !
+	        256 ds3 DatasetInfo->Type !
+	        ynm_pts @ ds3 DatasetInfo->Npts !
+	        2 ds3 DatasetInfo->Size !
+	        ynm cell+ cell+ ds3 DatasetInfo->Data !
 		ds3 make_ds
 
 	      then
@@ -75,5 +75,5 @@ variable ynm_pts
 
 \ add xyplot math menu item
 
-MN_MATH " Y_m vs Y_n"	" yn_vs_ym" add_menu_item
+MN_MATH c" Y_m vs Y_n"	c" yn_vs_ym" add_menu_item
 

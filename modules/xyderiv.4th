@@ -16,22 +16,22 @@
 
 DatasetInfo dsder
 MAX_DER_PTS 2 fmatrix der
-der 2 cells + dsder DDATA !
+der 2 cells + dsder DatasetInfo->Data !
 
 : xyderiv ( -- )
 	?active dup
 	0 >= if
 	  ds1 get_ds
 	  0 >= if
-	    ds1 ->npts MAX_DER_PTS > if
+	    ds1 DatasetInfo->Npts @ MAX_DER_PTS > if
 	      ." Too many points. Resize the fmatrix der."
 	      exit
 	    then
-	    ds1 ->npts 2 der mat_size!	\ Resize the derivative matrix
+	    ds1 DatasetInfo->Npts @ 2 der mat_size!	\ Resize the derivative matrix
 	    
 	    \ Copy dataset x,y values to the derivative matrix
 
-	    ds1 ->npts 1+ 1 do
+	    ds1 DatasetInfo->Npts @ 1+ 1 do
 	      i 1- ds1 @xy
 	      i 2 der fmat!
 	      i 1 der fmat!
@@ -46,11 +46,11 @@ der 2 cells + dsder DDATA !
 
 	    \ Make a new dataset
 
-	    c" Derivative" 1+ dsder DNAME !
-	    c" Derivative" 1+ dsder DHEADER !
-	    256 dsder DTYPE !		\ double precision fp type
-	    ds1 ->npts dsder DNPTS !
-	    2 dsder DSIZE !
+	    c" Derivative" 1+ dsder DatasetInfo->Name !
+	    c" Derivative" 1+ dsder DatasetInfo->Header !
+	    REAL_DOUBLE dsder DatasetInfo->Type !	\ double precision fp type
+	    ds1 DatasetInfo->Npts @ dsder DatasetInfo->Npts !
+	    2 dsder DatasetInfo->Size !
 
 	    dsder make_ds
 	  then
@@ -58,4 +58,4 @@ der 2 cells + dsder DDATA !
 	  drop
 	then ;
 	       
-MN_MATH " Derivative"	" xyderiv" add_menu_item
+MN_MATH c" Derivative"	c" xyderiv" add_menu_item

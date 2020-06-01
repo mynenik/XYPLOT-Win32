@@ -23,6 +23,7 @@
 \	d v_out / dt  = (v_in - v_out)/RC
 \
 
+DatasetInfo ds
 fvariable RC		1e-4 RC f!	\ default time constant of the filter
 fvariable xlast
 fvariable ylast
@@ -33,15 +34,15 @@ fvariable ylast
 
 	?active dup 0 >=
 	if
-	  dsa get_ds
+	  ds get_ds
 	  0 >= if
-	    0 dsa @xy  ylast f! xlast f!
+	    0 ds @xy  ylast f! xlast f!
 
-	    dsa ->npts 1- 1 do
-	      i dsa @xy ylast f@ f- RC f@ f/ fswap xlast f@ f- f*    
+	    ds DatasetInfo->Npts @ 1- 1 do
+	      i ds @xy ylast f@ f- RC f@ f/ fswap xlast f@ f- f*    
 	      ylast f@ f+ ylast f!
-	      i dsa @xy fdrop 
-	      fdup ylast f@ i dsa !xy
+	      i ds @xy fdrop 
+	      fdup ylast f@ i ds !xy
 	      xlast f!
 	    loop 
 	    ?active set_ds_extrema

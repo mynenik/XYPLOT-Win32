@@ -2,7 +2,7 @@
 \
 \ xyplot Forth interface utilities
 \
-\ Copyright (c) 1999-2000 Krishna Myneni
+\ Copyright (c) 1999-2020 Krishna Myneni
 \
 \ This software is provided under the terms of the GNU
 \ General Public License
@@ -11,6 +11,18 @@
 \
 \
 \
+
+: tdstring ( -- a u | return a date and time string )
+        time&date
+        s"  "
+        rot 0 <# [char] - hold # # # # #> strcat
+        rot 0 <# [char] - hold # # #>     strcat
+        rot 0 <# bl hold # # #>           strcat
+        rot 0 <# [char] : hold # # #>     strcat
+        rot 0 <# [char] : hold # # #>     strcat
+        rot 0 <# # # #>                   strcat
+;
+
 
 DatasetInfo ds1
 DatasetInfo ds2
@@ -24,7 +36,7 @@ fvariable fymax
 : ds_extrema ( dsaddr1 -- | determine the dataset extrema )
 	\ results are stored in the variables fxmin, fxmax, fymin, fymax
 	dup 0 swap @xy fdup fymax f! fymin f! fdup fxmax f! fxmin f!
-	dup ->npts 1 do
+	dup DatasetInfo->Npts @ 1 do
 	  i over @xy
 	  fdup fymin f@ fmin fymin f!
 	  fymax f@ fmax fymax f!
@@ -42,7 +54,7 @@ variable jtemp
 
 : findx ( fx addr -- n | return index of point with closest x to fx )
 	\ addr is the address of a dataset info structure
-	dup dstemp ! ->npts npts !	
+	dup dstemp ! DatasetInfo->Npts @ npts !	
 	0 dstemp a@ @xy fdrop
 	npts @ 1- dstemp a@ @xy fdrop
 	f< ordering !

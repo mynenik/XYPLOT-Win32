@@ -22,7 +22,7 @@
 5 constant DEF_PEAK_WIDTH
 
 DatasetInfo dspks
-peaks 2 cells + dspks DDATA !
+peaks 2 cells + dspks DatasetInfo->Data !
 
 MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 
@@ -31,15 +31,15 @@ MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 	0 >= if
 	  ds1 get_ds
 	  0 >= if
-	    ds1 ->npts MAX_PEAKSEARCH_PTS > if
+	    ds1 DatasetInfo->Npts @ MAX_PEAKSEARCH_PTS > if
 	      ." Too many points. Resize the fmatrices input_data and pksin."
 	      exit
 	    then
-	    ds1 ->npts 2 input_data mat_size!  \ Resize the input_data matrix
+	    ds1 DatasetInfo->Npts @ 2 input_data mat_size!  \ Resize the input_data matrix
 	    
 	    \ Copy dataset x,y values to the input_data matrix
 
-	    ds1 ->npts 1+ 1 do
+	    ds1 DatasetInfo->Npts @ 1+ 1 do
 	      i 1- ds1 @xy
 	      i 2 input_data fmat!
 	      i 1 input_data fmat!
@@ -62,11 +62,11 @@ MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 	    \ Make a new dataset
 
 	    npeaks @ 0 > if
-	      c" Peaks" 1+ dspks DNAME !
-	      c" Peaks" 1+ dspks DHEADER !
-	      256 dspks DTYPE !		\ double precision fp type
-	      npeaks @ dspks DNPTS !
-	      2 dspks DSIZE !
+	      c" Peaks" 1+ dspks DatasetInfo->Name !
+	      c" Peaks" 1+ dspks DatasetInfo->Header !
+	      256 dspks DatasetInfo->Type !		\ double precision fp type
+	      npeaks @ dspks DatasetInfo->Npts !
+	      2 dspks DatasetInfo->Size !
 
 	      dspks make_ds
 	    then
@@ -75,4 +75,4 @@ MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 	  drop
 	then ;
 	       
-MN_MATH " Find Peaks"	" xypeaks" add_menu_item
+MN_MATH c" Find Peaks"	c" xypeaks" add_menu_item

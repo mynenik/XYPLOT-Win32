@@ -5,10 +5,10 @@
 \ Copyright (c) 1999--2020 Krishna Myneni
 \ Creative Consulting for Research and Education
 \
-\ This software is provided under the terms of the GNU General
-\ Public License.
+\ This software is provided under the terms of the 
+\ GNU Affero General Public License (AGPL), v3.0 or later.
 \
-\ Last Revised: 1-14-2005
+\ Requires: xypw32.exe version >= 1.1.4
 \
 \ XYPLOT defines Forth constants which contain pointers to
 \ C++ functions that interface with the Forth environment.
@@ -144,34 +144,54 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_foreground ( colorname -- | set plot window foreground color )
 	FN_SET_FOREGROUND call ;
 
+\ stub to implement in xyplot.cpp
+: message_box ( a u -- | pop up a message window to display text )
+       \ FN_MESSAGE_BOX call ;
+;
+
 : get_input ( ^prompt -- ^resp flag | get text input from dialog box )
 	FN_GET_INPUT call ;
 
 4 constant SFSIZE	\ size in bytes of single precision float
 
 
-\ Dataset Information Structure
 
 include ans-words.4th
 include strings.4th
 include files.4th
 include struct.4th
 
+
+\ Save Options structure
+\   HeaderType: 0=none, 1=xyplot format, 2=user-defined line prefix
+\   Delimiter:  0=space, 1=tab, 2=comma, other=space
+\   NumberFormat: 0=exponential, 1=floating poin, 2=integer, other=exponential
+\   EndOfLine:  0=Unix, 1=DOS
+\   UserPrefix: text prefix for header type option 2
 struct
-  cell%  field  DNAME            \ pointer to name string
-  cell%  field  DHEADER          \ pointer to header string
-  cell%  field  DTYPE            \ dataset type
-  cell%  field  DNPTS            \ number of points in set
-  cell%  field  DSIZE            \ datum dimension
-  cell%  field  DDATA            \ pointer to data
+  cell%  field  SaveOptions->HeaderType
+  cell%  field  SaveOptions->Delimiter
+  cell%  field  SaveOptions->NumberFormat
+  cell%  field  SaveOptions->EndOfLine
+  1 16 chars field SaveOptions->UserPrefix
+end-struct SaveOptions%
+
+\ Dataset Information Structure
+struct
+  cell%  field  DataSetInfo->Name    \ pointer to name string
+  cell%  field  DataSetInfo->Header  \ pointer to header string
+  cell%  field  DataSetInfo->Type    \ dataset type
+  cell%  field  DataSetInfo->Npts    \ number of points in set
+  cell%  field  DataSetInfo->Size    \ datum dimension
+  cell%  field  DataSetInfo->Data    \ pointer to data
 end-struct DatasetInfo%
 
-
+\ Plot Information Structure
 struct
-  cell%  field  PDSET
-  cell%  field  PTYPE
-  cell%  field  PSYM
-  cell%  field  PCOLOR
+  cell%  field  PlotInfo->Set     \ data set number
+  cell%  field  PlotInfo->Type    \
+  cell%  field  PlotInfo->Symbol  \ plot symbol
+  cell%  field  PlotInfo->Color   \ plot color
 end-struct PlotInfo%
 
 
@@ -179,31 +199,7 @@ end-struct PlotInfo%
 
 : DatasetInfo  create DatasetInfo% %allot drop ; nondeferred
 : PlotInfo     create PlotInfo%    %allot drop ; nondeferred 
-
-
-\ Helper words for member access to dataset and plot info structures
-
-: ->name ( dsaddr -- a | fetch address of name string )
-	DNAME a@ ;
-: ->header ( dsaddr -- a | fetch address of header string )
-	DHEADER a@ ;
-: ->type ( dsaddr -- n | fetch data type )
-	DTYPE @ ;
-: ->npts ( dsaddr -- n | fetch number of points from dsinfo )
-	DNPTS @ ;
-: ->size ( dsaddr -- n | fetch datum size from dsinfo )
-	DSIZE @ ;
-: ->data ( dsaddr -- a | fetch address of data buffer from dsinfo )
-	DDATA a@ ;
-
-: ->set ( pladdr -- n | fetch dataset number )
-	PDSET  @ ;
-: ->type ( pladdr -- n | fetch plot type )
-	PTYPE  @ ;
-: ->symbol ( pladdr -- n | fetch plot symbol )
-	PSYM  @ ;
-: ->color ( pladdr -- n | fetch plot color )
-	PCOLOR  @ ;
+: SaveOptions  create SaveOptions% %allot drop ; nondeferred
 
 
 \ Useful words to fetch and store the i^th x, y pair from/to
@@ -219,11 +215,11 @@ end-struct PlotInfo%
 \ test1 and test2, contained in test.4th.
 
 : @xy ( i addr -- fx fy | retrieve the i^th x, y pair )
-	dup DSIZE @ SFSIZE * rot * swap DDATA a@
+	dup DatasetInfo->Size @ SFSIZE * rot * swap DatasetInfo->Data a@
 	swap + dup >r sf@ r> SFSIZE + sf@ ; 
 
 : !xy ( fx fy i addr -- | store the i^th x, y pair )
-	dup DSIZE @ SFSIZE * rot * swap DDATA a@
+	dup DatasetInfo->Size @ SFSIZE * rot * swap DatasetInfo->Data a@
 	swap + dup >r SFSIZE + sf! r> sf! ; 
 
 
@@ -235,7 +231,6 @@ end-struct PlotInfo%
 include matrix
 include xutils
 \ include signal
-
 include xypolyfit
 include arithmetic
 include abs
@@ -251,10 +246,9 @@ include derivative
 include xyderiv
 include polyfit
 include peak_search
-include xypeaks
-include xymap
+\ include xypeaks
+\ include xymap
 \ include yn_vs_ym
-\ include pnm
 include grace
 
 \ You can put some initialization stuff here, for example

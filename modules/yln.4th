@@ -9,7 +9,7 @@
 	if
 	  dsa get_ds
 	  0 >= if
-	    dsa ->npts 0 do
+	    dsa DatasetInfo->Npts @ 0 do
 	      i dsa @xy fdup 0e f>	\ test for y > 0
 	      if fln else fdrop 0e then
 	      i dsa !xy
@@ -23,4 +23,4 @@
 
 \ add "Ln(Y)" as an item in the math menu
 
-MN_MATH " Ln(Y)" " yln reset_window" add_menu_item
+MN_MATH c" Ln(Y)" c" yln reset_window" add_menu_item
