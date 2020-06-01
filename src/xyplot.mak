@@ -1,5 +1,5 @@
-ORIGIN		= Symantec C++
-ORIGIN_VER	= Version 7.22
+ORIGIN		= Digital Mars C++
+ORIGIN_VER	= Version 8.34.12
 VERSION		= RELEASE
 
 !IFDEF SUB_DEBUG
@@ -10,9 +10,9 @@ DEBUG		= 0
 NDEBUG		= 1
 !ENDIF
 
-PROJ		= xyplot
+PROJ		= xypw32
 APPTYPE		= WIN32 EXE
-PROJTYPE	= EXE
+PROJTYPE	= exe
 
 CC		= SC
 CPP		= SPP
@@ -109,7 +109,7 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -ID:\dm\include -ID:\dm\include\stl 
+INCLUDES	= -ID:\dm\include;D:\dm\stl 
 
 INCLUDEDOBJS	=  VM.OBJ 
 
@@ -369,9 +369,9 @@ clean:
 		-del $(TARGETDIR)\$$SCW$$.$(PROJTYPE)
 		-del $(PROJ).CLE
 		-del $(OUTPUTDIR)\SCPH.SYM
-		-del xyplot.dpd
 		-del $(OBJS)
-		-del XYPLOT.RES
+		-del xyplot.res
+		-del xyplot.map
 
 cleanres:
 		-del XYPLOT.RES

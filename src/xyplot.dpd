@@ -1,4 +1,4 @@
-# Symantec IDDE generated .dpd file. V: 7200
+# xyplot object file dependencies
 cdatabase.obj: \
 	cdatabase.cpp \
 	consts.h \
@@ -163,8 +163,8 @@ forthvm.obj: \
 	fbc.h \
 	ForthCompiler.h \
 	ForthVM.h 
-xyplot.RES: \
+xyplot.res: \
 	xyplot.rc \
 	resource.h \
-	XYPLOT.ICO \
-	XYDLGS.DLG 
+	xyplot.ico \
+	xydlgs.dlg 
