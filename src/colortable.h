@@ -3,7 +3,6 @@
 // default colors for xyplot
 //
 // Created: 10-17-97
-// Last Revised: 6-29-2003
 //
 
 #ifndef __COLORTABLE_H__
@@ -15,7 +14,7 @@ COLORREF color_table[] =
 {
     RGB(0,0,255),
     RGB(255,0,0),
-    RGB(0,255,128),
+    RGB(32,131,58),
     RGB(128,0,255),
     RGB(128,255,0),
     RGB(0,0,0),
