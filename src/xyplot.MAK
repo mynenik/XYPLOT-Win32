@@ -109,7 +109,7 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -IZ:\dm\include -IZ:\dm\include\stl 
+INCLUDES	= -ID:\dm\include -ID:\dm\include\stl 
 
 INCLUDEDOBJS	=  VM.OBJ 
 
@@ -408,7 +408,7 @@ ForthCompiler.OBJ+
 ForthVM.OBJ
 $$SCW$$.EXE
 NUL
-Z:\dm\lib\gdi32.lib Z:\dm\lib\kernel32.lib Z:\dm\lib\user32.lib Z:\dm\lib\advapi32.lib Z:\dm\lib\comctl32.lib Z:\dm\lib\comdlg32.lib Z:\dm\lib\shell32.lib Z:\dm\lib\winspool.lib Z:\dm\lib\snn.lib 
+gdi32.lib kernel32.lib user32.lib advapi32.lib comctl32.lib comdlg32.lib shell32.lib winspool.lib snn.lib 
 xyplot.DEF;
 <<
 !ELSE
@@ -439,7 +439,7 @@ ForthCompiler.OBJ+
 ForthVM.OBJ
 $$SCW$$.EXE
 xyplot.MAP
-Z:\dm\lib\gdi32.lib Z:\dm\lib\kernel32.lib Z:\dm\lib\user32.lib Z:\dm\lib\advapi32.lib Z:\dm\lib\comctl32.lib Z:\dm\lib\comdlg32.lib Z:\dm\lib\shell32.lib Z:\dm\lib\winspool.lib Z:\dm\mfc\LIB\nafxcw.lib Z:\dm\lib\snn.lib
+gdi32.lib kernel32.lib user32.lib advapi32.lib comctl32.lib comdlg32.lib shell32.lib winspool.lib nafxcw.lib snn.lib
 xyplot.DEF;
 <<
 !ENDIF
