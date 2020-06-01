@@ -19,19 +19,34 @@
 \                   added ability to store and read dataset headers in agr files;
 \                   fixed stack garbage in reader words.  km
 
-   10  constant  MAXPLOTS
-32768  constant  MAXGRACEPTS
+   20  constant  MAXSETS
+   20  constant  MAXPLOTS
+65536  constant  MAXGRACEPTS
 16384  constant  MAXHDRSIZE
 
-    0  constant  SYM_LINE
-    1  constant  SYM_DASHED
-    2  constant  SYM_POINT
-    3  constant  SYM_BIG_POINT
-    4  constant  SYM_LINE_PLUS_POINT
-    5  constant  SYM_STICK
-    6  constant  SYM_HISTOGRAM
+fvariable xmin
+fvariable xmax
+fvariable ymin
+fvariable ymax
+
+: rep(',") ( a u -- a u | replace every single quote with double quote in string)
+	2dup 0 ?do dup c@ [char] ' = if [char] " over c! then 1+ loop drop ;
+
+: rep(comma,space) ( a u -- a u | replace every comma with a space in string)
+        2dup 0 ?do dup c@ [char] , = if bl over c! then 1+ loop drop ;
+
+\ Number <=> string conversions, enforcing conversion in base 10
+\ (uses words from strings.4th ).
+: u>$ ( u1 -- a u2 ) u>string count  ;
+: $>s ( a u -- n )   strpck string>s ;
+: f>$ ( r -- a u )   f>string count  ;
+: $>f ( a u -- r )   strpck string>f ;
+
+: parse_csv ( a u -- r1 ... rn n )
+    rep(comma,space) parse_args ;
 
 variable gr_fid
+variable grace_line_count
 
 : tdstring ( -- a u | return a date and time string )
 	time&date
@@ -44,18 +59,17 @@ variable gr_fid
 	rot 0 <# # # #>                   strcat ;
 
 
-: rep(',") ( a u -- a u | replace every single quote with double quote in string)
-	2dup 0 ?do dup c@ [char] ' = if [char] " over c! then 1+ loop drop ;
 	  
 : >grfile ( a u -- | write string to grace file )
 	gr_fid @ write-line drop ;
 
 create grfile_buf 256 allot
-variable grace_line_count
 
-: <grfile ( -- a u flag | read string from grace file )
-	grfile_buf 256 gr_fid @ read-line drop grfile_buf -rot 
-	1 grace_line_count +! ;
+: <grfile ( -- a u b | read string from grace file )
+    grfile_buf 256 erase
+    grfile_buf 256 gr_fid @ read-line drop
+    grfile_buf -rot
+    1 grace_line_count +! ;
 
 PlotInfo pl1
 DatasetInfo ds1
@@ -246,17 +260,16 @@ create  grace_headers    MAXHDRSIZE MAXPLOTS * allot  \ buffer to store headers
 
 
 : parse_color_name ( a u -- | parse and store color name )
-    -trailing 9 /string parse_token strpck string>s  >r
+    -trailing 10 /string parse_token strpck string>s  >r
     s" ), " search IF
-       4 /string 1- 31 min  \ a2 u2  (substring containing color name)
+       4 /string 1- 31 min  \ a2 u2  ( color name substring )
        r@ MAXPLOTS < IF
-         r> 32 * grace_color_map + dup 32 erase
+         r> 32 * grace_color_map +
+	 dup 32 erase
 	 swap cmove
-         EXIT
        THEN
-    THEN
-    2drop r> drop
-;
+    ELSE 2drop r> drop
+    THEN ;
 
 : get_grace_color ( n -- a u | retrieve color name of color n from map)
     dup MAXPLOTS < IF

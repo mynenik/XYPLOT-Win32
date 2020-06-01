@@ -2,7 +2,7 @@
 \
 \ Forth interface to xyplot
 \
-\ Copyright (c) 1999--2005 Krishna Myneni
+\ Copyright (c) 1999--2020 Krishna Myneni
 \ Creative Consulting for Research and Education
 \
 \ This software is provided under the terms of the GNU General
@@ -42,6 +42,28 @@
 \  add_menu_item ( menu name command -- ) Add a new menu item
 \  set_background ( colorname -- ) Set plot window background color.
 \  set_foreground ( colorname -- ) Set plot window foreground color.
+
+\ Data type and precision constants
+
+0  constant  data_REAL
+1  constant  data_COMPLEX  ( currently not used )
+
+0  constant  prec_SINGLE
+1  constant  prec_DOUBLE
+
+\ Data set types
+
+prec_SINGLE  8 LSHIFT  data_REAL  OR  constant  REAL_SINGLE
+prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
+
+\ Plotting symbol constants
+0  constant  sym_LINE
+1  constant  sym_DASHED
+2  constant  sym_POINT
+3  constant  sym_BIG_POINT
+4  constant  sym_LINE_PLUS_POINT
+5  constant  sym_STICK
+6  constant  sym_HISTOGRAM
 
 : get_active_set ( -- n | return the active dataset number )
 	\ n less than zero indicates an error.
@@ -131,6 +153,8 @@
 \ Dataset Information Structure
 
 include ans-words.4th
+include strings.4th
+include files.4th
 include struct.4th
 
 struct
@@ -208,9 +232,7 @@ end-struct PlotInfo%
 \ Load all of the forth files that provide basic functions
 \ and menu items
 
-include strings
 include matrix
-include files
 include xutils
 \ include signal
 
