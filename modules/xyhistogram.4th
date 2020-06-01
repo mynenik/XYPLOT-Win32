@@ -2,7 +2,7 @@
 \
 \ Bin series of y values from the active dataset to create a histogram
 \
-\ Copyright (c) 2001--2003 Krishna Myneni
+\ Copyright (c) 2001--2005 Krishna Myneni
 \ This software is provided under the terms of the GNU General Public License
 \
 \ Requires:
@@ -10,7 +10,8 @@
 \
 \ Revisions:
 \	7-27-2001 modified histogram.4th for use with xyplot KM
-\	6-18-2003 changed F>S to FROUND>S  km
+\	9-24-2001 modified find_min_max to take argument  KM
+\       1-13-2005 changed F>S to FROUND>S; updated use of DatasetInfo structure  KM
 
 1024 constant MAX_BINS
 MAX_BINS 2 fmatrix hist
@@ -18,12 +19,15 @@ MAX_BINS 2 fmatrix hist
 fvariable hmax 0e hmax f!
 fvariable hmin 0e hmin f!
 
-: find_min_max ( -- | determine min and max of y values of dataset)
-	1 ds1 @xy 
+variable dsaddr
+
+: find_min_max ( addr -- | determine min and max of y values of dataset)
+	dsaddr ! 
+	1 dsaddr a@ @xy 
 	fdup hmin f! hmax f!
 	fdrop
-	ds1 ->npts 2 do
-	  i ds1 @xy   
+	dsaddr a@ ->npts 2 do
+	  i dsaddr a@ @xy   
 	  fdup hmin f@ f< if fdup hmin f! then
 	  fdup hmax f@ f> if fdup hmax f! then
 	  fdrop fdrop
@@ -43,7 +47,7 @@ DatasetInfo dshist
 	?active dup 0 >= if
 	  ds1 get_ds
 	  0 >= if
-	    find_min_max	\ determine min and max of y values
+	    ds1 find_min_max	\ determine min and max of y values
 	    bin_width f@ ?bins nbins !	\ no. of histogram bins needed
 
 	    nbins @ MAX_BINS > if
@@ -68,7 +72,7 @@ DatasetInfo dshist
 	    ds1 ->npts 0 do
 	      i ds1 @xy
 	      hmin f@ f-
-	      bin_width f@ f/ fround>s 1+  \ bin index for current y val
+	      bin_width f@ f/ fround>s 1+	\ bin index for current y val
 	      1 swap 2 hist fmat_addr +!  \ increment bin count (as integer)
 	      fdrop
 	    loop
@@ -82,12 +86,12 @@ DatasetInfo dshist
 
 	    \ Create dataset in xyplot
 
-	    "  " 1+ dshist DHEADER + !
-	    " Histogram" 1+ dshist DNAME + !
-	    256 dshist DTYPE + !		\ double precision fp type
-	    hist mat_size@ drop dshist DNPTS + !
-	    2 dshist DSIZE + !
-	    hist 8 + dshist DDATA + !
+	    c"  " 1+ dshist DHEADER !
+	    c" Histogram" 1+ dshist DNAME !
+	    256 dshist DTYPE !		\ double precision fp type
+	    hist mat_size@ drop dshist DNPTS !
+	    2 dshist DSIZE !
+	    hist 8 + dshist DDATA !
 
 	    dshist make_ds	
 	    

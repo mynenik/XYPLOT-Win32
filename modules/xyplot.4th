@@ -2,13 +2,13 @@
 \
 \ Forth interface to xyplot
 \
-\ Copyright (c) 1999--2003 Krishna Myneni
+\ Copyright (c) 1999--2005 Krishna Myneni
 \ Creative Consulting for Research and Education
 \
 \ This software is provided under the terms of the GNU General
 \ Public License.
 \
-\ Last Revised: 8-12-2003
+\ Last Revised: 1-14-2005
 \
 \ XYPLOT defines Forth constants which contain pointers to
 \ C++ functions that interface with the Forth environment.
@@ -32,7 +32,7 @@
 \  set_plot_color ( colorname -- ) set active plot color.
 \  draw_plot ( flag -- ) draw the active plot.
 \  set_grid_tics ( nx ny -- ) set number of tics for x and y axes
-\  set_grid_lines ( flagx flagy -- ) set grid lines on/off for x and y axes
+\  set_grid_lines ( flagx flagy -- ) set grid lines on/off for x and y axes 
 \  clear_window ( -- )	Clear the plot window.
 \  draw_window ( -- ) 	Draw the plot window.
 \  reset_window ( -- ) 	Reset the plot window.
@@ -127,72 +127,80 @@
 
 4 constant SFSIZE	\ size in bytes of single precision float
 
-\ Some useful constants for accessing elements inside a dataset
-\ info structure
 
-0 constant DNAME		\ pointer to name string
-DNAME 4 + constant DHEADER	\ pointer to header string
-DHEADER 4 + constant DTYPE	\ dataset type
-DTYPE 4 + constant DNPTS	\ number of points in set
-DNPTS 4 + constant DSIZE	\ datum dimension
-DSIZE 4 + constant DDATA	\ pointer to data
+\ Dataset Information Structure
 
-: DatasetInfo ( -- | defining word for a dataset info structure )
-	create 6 cells allot ;
+include ans-words.4th
+include struct.4th
+
+struct
+  cell%  field  DNAME            \ pointer to name string
+  cell%  field  DHEADER          \ pointer to header string
+  cell%  field  DTYPE            \ dataset type
+  cell%  field  DNPTS            \ number of points in set
+  cell%  field  DSIZE            \ datum dimension
+  cell%  field  DDATA            \ pointer to data
+end-struct DatasetInfo%
+
+
+struct
+  cell%  field  PDSET
+  cell%  field  PTYPE
+  cell%  field  PSYM
+  cell%  field  PCOLOR
+end-struct PlotInfo%
+
+
+\ Defining words for making DatasetInfo% and PlotInfo% structures
+
+: DatasetInfo  create DatasetInfo% %allot drop ; nondeferred
+: PlotInfo     create PlotInfo%    %allot drop ; nondeferred 
+
+
+\ Helper words for member access to dataset and plot info structures
 
 : ->name ( dsaddr -- a | fetch address of name string )
-	DNAME + a@ ;
+	DNAME a@ ;
 : ->header ( dsaddr -- a | fetch address of header string )
-	DHEADER + a@ ;
+	DHEADER a@ ;
 : ->type ( dsaddr -- n | fetch data type )
-	DTYPE + @ ;
+	DTYPE @ ;
 : ->npts ( dsaddr -- n | fetch number of points from dsinfo )
-	DNPTS + @ ;
+	DNPTS @ ;
 : ->size ( dsaddr -- n | fetch datum size from dsinfo )
-	DSIZE + @ ;
+	DSIZE @ ;
 : ->data ( dsaddr -- a | fetch address of data buffer from dsinfo )
-	DDATA + a@ ;
-
-
-\ Some usefule constants for accessing elements inside a plot
-\ info structure
-
-0 constant PDSET		\ dataset number for plot
-PDSET 4 + constant PTYPE	\ plot type
-PTYPE 4 + constant PSYM		\ plot symbol
-PSYM 4 + constant PCOLOR	\ plot color
-
-: PlotInfo ( -- | defining word for a plot info structure )
-	create 4 cells allot ;
+	DDATA a@ ;
 
 : ->set ( pladdr -- n | fetch dataset number )
-	PDSET + @ ;
-: ->plot-type ( pladdr -- n | fetch plot type )
-	PTYPE + @ ;
+	PDSET  @ ;
+: ->type ( pladdr -- n | fetch plot type )
+	PTYPE  @ ;
 : ->symbol ( pladdr -- n | fetch plot symbol )
-	PSYM + @ ;
+	PSYM  @ ;
 : ->color ( pladdr -- n | fetch plot color )
-	PCOLOR + @ ;
+	PCOLOR  @ ;
+
 
 \ Useful words to fetch and store the i^th x, y pair from/to
-\ a dataset are given below. Note that addr is the address of
-\ the dataset info structure and the index i starts at 0 for
+\ a dataset are given below. Note that addr is the address of 
+\ the dataset info structure and the index i starts at 0 for 
 \ the first point.
 \
 \ If you want to perform computations efficiently, it's better to
 \ work with the pointer to the data directly and increment it
 \ to avoid all of the computations for each index. Both methods
-\ -- one using the @xy and !xy words, and one that works
-\ directly with the data pointer are illustrated in the words
+\ -- one using the @xy and !xy words, and one that works 
+\ directly with the data pointer are illustrated in the words 
 \ test1 and test2, contained in test.4th.
 
 : @xy ( i addr -- fx fy | retrieve the i^th x, y pair )
-	dup ->size SFSIZE * rot * swap ->data
-	swap + dup >r sf@ r> SFSIZE + sf@ ;
+	dup DSIZE @ SFSIZE * rot * swap DDATA a@
+	swap + dup >r sf@ r> SFSIZE + sf@ ; 
 
 : !xy ( fx fy i addr -- | store the i^th x, y pair )
-	dup ->size SFSIZE * rot * swap ->data
-	swap + dup >r SFSIZE + sf! r> sf! ;
+	dup DSIZE @ SFSIZE * rot * swap DDATA a@
+	swap + dup >r SFSIZE + sf! r> sf! ; 
 
 
 \ see the file test.4th for examples of usage
@@ -202,34 +210,37 @@ PSYM 4 + constant PCOLOR	\ plot color
 
 include strings
 include matrix
+include files
 include xutils
+\ include signal
 
 include xypolyfit
 include arithmetic
-include xyhistogram
 include abs
-include smooth
-include lpf
+include xyhistogram
 include fft
 include xyfft
+include smooth
+include lpf
 include ylog
+include yln
+include autocorr
 include derivative
 include xyderiv
 include polyfit
 include peak_search
 include xypeaks
+include xymap
+\ include yn_vs_ym
+\ include pnm
+include grace
 
 \ You can put some initialization stuff here, for example
 \  to set the background and foreground colors.
 
-" white" set_background
-" black" set_foreground
-false false set_grid_lines
+c" white" set_background
+c" black" set_foreground
+0 0 set_grid_lines
 
 \ end of xyplot.4th
-
-
-
-
-
 

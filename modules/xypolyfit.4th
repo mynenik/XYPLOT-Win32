@@ -16,7 +16,7 @@
 \	3-15-2000 Adapted for xyplot KM
 \	4-15-2000 Added user query for order KM
 \ 	12-12-2000 Indexing mods and use of fmatrix  KM
-\	03-30-2001 Renamed polfit to xpolfit  KM
+\        1-13-2005 use DatasetInfo structure creation word and update usage  KM
 
 variable nterms     \ number of terms (order - 1)               
 variable params     \ holds address of parameter matrix         
@@ -38,7 +38,7 @@ fvariable delta
 \ a = address of fmatrix for receiving fitted parameters        
 \ n = order of fitting polynomial                               
                                                                 
-: xpolfit ( ds a n -- chi-square | perform polynomial fit )     
+: polfit ( ds a n -- chi-square | perform polynomial fit )     
     1+ nterms !                                                 
     params !                                                    
     nterms @ dup apfit mat_size!                               
@@ -46,7 +46,7 @@ fvariable delta
     nterms @ 1 params a@ mat_size!                              
     nterms @ 2* 1- nmax !                                       
     nmax @ 1 sumx mat_size!                                    
-    dup DNPTS + @ npts !                                  
+    dup DNPTS @ npts !                                  
     sumx fmat_zero                                              
     sumy fmat_zero                                              
     params a@ fmat_zero                                          
@@ -117,12 +117,12 @@ fvariable delta
     chisq f@                                                    
     npts @ nterms @ - s>f                                       
     f/ ;
-                                                               
-create ds_pdata 8 cells allot
-create ds_pfit 8 cells allot
 
-create poly_params 10 1 * dfloats cell+ cell+ allot
-10 1 poly_params mat_size!
+                                                               
+DatasetInfo  ds_pdata 
+DatasetInfo  ds_pfit 
+
+10 1  fmatrix  poly_params
 
 variable norder
 
@@ -132,7 +132,7 @@ variable norder
 	if
 	  ds_pdata get_ds
 	  0 >= if
-	    ds_pdata poly_params norder @ xpolfit
+	    ds_pdata poly_params norder @ polfit
 	    ." Reduced chi-square = " f. cr 
 	    nterms @ 0 do i dup . 2 spaces 1+ 1 poly_params fmat@ f. cr loop 
           then
@@ -153,10 +153,3 @@ variable norder
 
 MN_MATH " Poly Fit" " xypolyfit draw_window" add_menu_item
 
-	    
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                

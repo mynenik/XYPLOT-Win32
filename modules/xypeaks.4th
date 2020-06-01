@@ -1,11 +1,13 @@
 \ xypeaks.4th
 \
-\ xyplot module for automated peak finding
+\ xyplot module for automated peak finding. The active dataset should be 
+\   smoothed or filtered sufficiently to remove high frequency noise prior 
+\   to calling the peak search function. Note that if you use low-pass
+\   filtering on the data, it will shift the horizontal positions of the peaks.
 \
-\ The active dataset should be smoothed sufficiently
-\   prior to calling the peak search function
+\ Copyright (c) 2001--2005 Krishna Myneni
+\ Provided under the GNU General Public License
 \
-\ Krishna Myneni, 3-30-2001
 \ Requires:
 \	matrix.4th
 \	derivative.4th
@@ -14,11 +16,13 @@
 \	xyplot.4th
 \
 \ Revisions:
+\	3-30-2001  created
+\	1-14-2005  updated use of DatasetInfo structure  km
 \
 5 constant DEF_PEAK_WIDTH
 
 DatasetInfo dspks
-peaks 8 + dspks DDATA + !
+peaks 2 cells + dspks DDATA !
 
 MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 
@@ -58,11 +62,11 @@ MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 	    \ Make a new dataset
 
 	    npeaks @ 0 > if
-	      " Peaks" 1+ dspks DNAME + !
-	      " Peaks" 1+ dspks DHEADER + !
-	      256 dspks DTYPE + !		\ double precision fp type
-	      npeaks @ dspks DNPTS + !
-	      2 dspks DSIZE + !
+	      c" Peaks" 1+ dspks DNAME !
+	      c" Peaks" 1+ dspks DHEADER !
+	      256 dspks DTYPE !		\ double precision fp type
+	      npeaks @ dspks DNPTS !
+	      2 dspks DSIZE !
 
 	      dspks make_ds
 	    then

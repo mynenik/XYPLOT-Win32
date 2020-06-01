@@ -17,10 +17,10 @@
 \
 \ Revisions:
 \
-16384 constant MAX_PEAKSEARCH_PTS
+1024 1024 * constant MAX_PEAKSEARCH_PTS
 MAX_PEAKSEARCH_PTS 2 fmatrix pksin
 
-2048 constant MAX_PEAKS
+32768 constant MAX_PEAKS
 MAX_PEAKS 2 fmatrix peaks
 
 32 constant MAX_WIDTH

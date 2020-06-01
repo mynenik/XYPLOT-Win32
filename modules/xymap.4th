@@ -1,21 +1,30 @@
 \ xymap.4th
 \
-\ xyplot module for creating maps on x and y
+\ xyplot module for creating 1-D maps on x or y values of a dataset. 
+\  Maps are useful for analyzing chaotic sequences. For example,
+\  a dataset can contain the sequence of peaks in a chaotic waveform, 
+\  where the x values are the positions, and the y values are the peak
+\  heights. A "return-map" on the peak heights or heights usually shows
+\  a simple structure for low-dimensional chaotic systems. The peak 
+\  searching module for xyplot (xypeaks.4th) may be used to 
+\  extract peak information from waveform data.
 \
-\ Krishna Myneni, 4-1-2000
+\ Copyright (c) 2000--2005 Krishna Myneni
+\ Provided under the GNU General Public License
 \
 \ Required files:
 \	xyplot.4th
 \	matrix.4th
 \
 \ Revisions:
-\
+\      4-1-2000   created
+\      1-15-2005  updated use of DatasetInfo structure km
 
 DatasetInfo dsmap
 
-16384 constant MAX_MAP_PTS
+32768 4 * constant MAX_MAP_PTS
 MAX_MAP_PTS 2 fmatrix map_data
-map_data 8 + dsmap DDATA + !		\ store the data pointer
+map_data 2 cells + dsmap DDATA !	\ store the data pointer
 
 variable map_type
 
@@ -45,7 +54,7 @@ variable map_type
 	          i ds1 @xy fswap fdrop
 	          i 2 map_data fmat!
 	        loop
- 		" Map of y_n+1 vs y_n"
+ 		c" Map of y_n+1 vs y_n"
 	        ds1 ->npts 1-  
 	      endof
 	        
@@ -56,7 +65,7 @@ variable map_type
 	          i ds1 @xy fdrop
 	          i 2 map_data fmat!
 	        loop
- 		" Map of x_n+1 vs x_n"
+ 		c" Map of x_n+1 vs x_n"
 	        ds1 ->npts 1-  
 	      endof
 
@@ -67,7 +76,7 @@ variable map_type
 	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
 	          i 2 map_data fmat!
 	        loop
-	        " Map of dy_n+1 vs dy_n"
+	        c" Map of dy_n+1 vs dy_n"
 	        ds1 ->npts 2-
 	      endof
 
@@ -78,7 +87,7 @@ variable map_type
 	          i 1+ ds1 @xy fdrop i ds1 @xy fdrop f-
 	          i 2 map_data fmat!
 	        loop
-	        " Map of dx_n+1 vs dx_n"
+	        c" Map of dx_n+1 vs dx_n"
 	        ds1 ->npts 2-
 	      endof
 
@@ -89,7 +98,7 @@ variable map_type
 	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
 	          i 2 map_data fmat!
 	        loop
-	        " Map of dy_n+1 vs dx_n"
+	        c" Map of dy_n+1 vs dx_n"
 	        ds1 ->npts 2-
 	      endof
 	      "  " 0
@@ -101,11 +110,11 @@ variable map_type
 
 	    \ Create the map dataset in xyplot
 
-	    1+ dsmap DHEADER + !
-	    " Map" 1+ dsmap DNAME + !
-	    256 dsmap DTYPE + !		\ double precision fp type
-	    map_data mat_size@ drop dsmap DNPTS + !
-	    2 dsmap DSIZE + !
+	    1+ dsmap DHEADER !
+	    c" Map" 1+ dsmap DNAME !
+	    256 dsmap DTYPE !		\ double precision fp type
+	    map_data mat_size@ drop dsmap DNPTS  !
+	    2 dsmap DSIZE  !
 
 	    dsmap make_ds
 	  then
@@ -113,10 +122,10 @@ variable map_type
 	  drop
 	then ;	    
 	    
-MN_MATH " Map: y_n+1 vs y_n" " 0 map" add_menu_item
-MN_MATH " Map: x_n+1 vs x_n" " 1 map" add_menu_item
-MN_MATH " Map: dy_n+1 vs dy_n" " 2 map" add_menu_item
-MN_MATH " Map: dx_n+1 vs dx_n" " 3 map" add_menu_item
-MN_MATH " Map: dy_n+1 vs dx_n" " 4 map" add_menu_item
+MN_MATH  c" Map: y_n+1 vs y_n"    c" 0 map"  add_menu_item
+MN_MATH  c" Map: x_n+1 vs x_n"    c" 1 map"  add_menu_item
+MN_MATH  c" Map: dy_n+1 vs dy_n"  c" 2 map"  add_menu_item
+MN_MATH  c" Map: dx_n+1 vs dx_n"  c" 3 map"  add_menu_item
+MN_MATH  c" Map: dy_n+1 vs dx_n"  c" 4 map"  add_menu_item
  	 	
 	

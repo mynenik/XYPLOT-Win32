@@ -8,12 +8,15 @@
 \	matrix.4th
 \	derivative.4th
 \	xyplot.4th
-
-16384 constant MAX_DER_PTS
+\
+\ Revisions: 
+\       1-14-2005  updated for new DatasetInfo data structure  km
+ 
+32768 constant MAX_DER_PTS
 
 DatasetInfo dsder
 MAX_DER_PTS 2 fmatrix der
-der 8 + dsder DDATA + !
+der 2 cells + dsder DDATA !
 
 : xyderiv ( -- )
 	?active dup
@@ -43,11 +46,11 @@ der 8 + dsder DDATA + !
 
 	    \ Make a new dataset
 
-	    " Derivative" 1+ dsder DNAME + !
-	    " Derivative" 1+ dsder DHEADER + !
-	    256 dsder DTYPE + !		\ double precision fp type
-	    ds1 ->npts dsder DNPTS + !
-	    2 dsder DSIZE + !
+	    c" Derivative" 1+ dsder DNAME !
+	    c" Derivative" 1+ dsder DHEADER !
+	    256 dsder DTYPE !		\ double precision fp type
+	    ds1 ->npts dsder DNPTS !
+	    2 dsder DSIZE !
 
 	    dsder make_ds
 	  then

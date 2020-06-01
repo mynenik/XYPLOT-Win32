@@ -2,7 +2,7 @@
 \
 \ String utility words for kForth
 \
-\ Copyright (c) 1999--2001 Krishna Myneni
+\ Copyright (c) 1999--2002 Krishna Myneni
 \
 \ This software is provided under the terms of the
 \ GNU General Public License.
@@ -25,7 +25,10 @@
 \	10-02-2001  added parse_args  KM
 \	10-10-2001  fixed problem with f>string when number is 0e  KM
 \	10-15-2001  added /STRING  KM
-\
+\	03-28-2002  added SEARCH, PARSE_TOKEN, PARSE_LINE, IS_LC_ALPHA  KM
+\	07-31-2002  added SLITERAL; removed SEARCH since SEARCH and
+\		      COMPARE are now part of kForth  KM
+
 : blank ( addr u -- | fill u bytes starting at addr with bl character )
 	bl fill ;
 
@@ -81,11 +84,30 @@
 	  rot drop
 	then ; 
 
+: sliteral ( a u -- | compile string into definition at compile time )
+	swap postpone literal postpone literal ; immediate
 
+: parse_token ( a u -- a2 u2 a3 u3)
+	\ parse next token from the string; a3 u3 is the token string
+	BL SKIP 2DUP BL SCAN 2>R R@ - 2R> 2SWAP ;
+
+: parse_line ( a u -- a1 u1 a2 u2 ... n )
+	( -trailing)
+	0 >r
+	begin
+	  parse_token
+	  dup
+	while
+	  r> 1+ >r
+	  2swap
+	repeat  
+	2drop 2drop r> ;
+
+: is_lc_alpha ( n -- flag | true if n is a lower case alphabetical character)
+	DUP 96 > SWAP 123 < AND ;	
+	
 : isdigit ( n -- flag | return true if n is ascii value of '0' through '9' )
-	dup [char] / > swap [char] : < and ;  
-
-
+	dup [char] / > swap [char] : < and ;
 
 : strcpy ( ^str addr -- | copy a counted string to addr )
 	>r dup c@ 1+ r> swap cmove ;

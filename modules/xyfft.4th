@@ -2,7 +2,7 @@
 \
 \ FFT module for xyplot
 \
-\ Copyright (c) 2000 Krishna Myneni
+\ Copyright (c) 2000--2005 Krishna Myneni
 \ Provided under the GNU General Public License
 \
 \ Requires:
@@ -14,7 +14,13 @@
 \
 \	data should be uniformly spaced
 \
-create dsfft 8 4 * allot
+\ Revisions:
+\
+\	2004-07-26  added Real(FT) and Imag(FT) functions  KM
+\	2004-07-27  added Real(FT^-1) KM
+\       2005-01-13  updated use of DatasetInfo structure  KM
+
+DatasetInfo dsfft 
 
 512 1024 * constant FFT_SIZE		\ max number of points for FFT
 FFT_SIZE 2* 1 fmatrix fftdata
@@ -42,6 +48,161 @@ FFT_SIZE 2* 1 fmatrix fftdata
 
 fvariable fft_dx
 fvariable fft_df
+fvariable fft_dt
+
+: real-ft ( -- | take Real[FT] )
+	?active dup 0 >=
+	if
+	  dsfft get_ds
+	  0 >= if
+
+		\ Set the size of the fft data buffer
+		
+		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		fftdata fmat_zero		\ zero the buffer		
+
+		\ Determine frequency scale
+
+		0 dsfft @xy fdrop
+	        1 dsfft @xy fdrop
+		f- fabs fft_dx f!
+		1e fftdata mat_size@ drop s>f f/ fft_dx f@ f/
+		fft_df f!
+	     
+		\ Transfer data from xyplot dataset to the fftdata buffer
+
+		dsfft ->npts 0 do
+		  i dsfft @xy
+		  i 2* 1+ 1 fftdata fmat!
+		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
+		  fdrop
+		loop
+	    
+		fftdata fft	\ perform the Fast Fourier Transform
+
+		\ Replace the data with appropriate x and Real(FT) values
+
+		fftdata mat_size@ drop 1+ 1 do
+		  i 1 fftdata fmat@
+		  i 1+ 1 fftdata fmat!		\ store y value
+		  i s>f fft_df f@ f* 		\ determine x value
+		  i 1 fftdata fmat!
+		2 +loop
+	    
+		\ make a new xyplot dataset
+
+		c" Real(FT)" 1+ ds1 DNAME !
+		c"  " 1+ ds1 DHEADER !
+		256 ds1 DTYPE !
+		fftdata mat_size@ drop ds1 DNPTS !
+		2 ds1 DSIZE !
+		fftdata cell+ cell+ ds1 DDATA !		 	      
+		ds1 make_ds
+	  then
+	else
+	  drop
+	then ;
+
+: imag-ft ( -- | take Imag[FT] )
+	?active dup 0 >=
+	if
+	  dsfft get_ds
+	  0 >= if
+
+		\ Set the size of the fft data buffer
+		
+		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		fftdata fmat_zero		\ zero the buffer		
+
+		\ Determine frequency scale
+
+		0 dsfft @xy fdrop
+	        1 dsfft @xy fdrop
+		f- fabs fft_dx f!
+		1e fftdata mat_size@ drop s>f f/ fft_dx f@ f/
+		fft_df f!
+	     
+		\ Transfer data from xyplot dataset to the fftdata buffer
+
+		dsfft ->npts 0 do
+		  i dsfft @xy
+		  i 2* 1+ 1 fftdata fmat!
+		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
+		  fdrop
+		loop
+	    
+		fftdata fft	\ perform the Fast Fourier Transform
+
+		\ Replace the data with appropriate x and Imag(FT) values
+
+		fftdata mat_size@ drop 1+ 1 do
+		  i s>f fft_df f@ f* 		\ determine x value
+		  i 1 fftdata fmat!
+		2 +loop
+	    
+		\ make a new xyplot dataset
+
+		c" Imag(FT)" 1+ ds1 DNAME !
+		c"  " 1+ ds1 DHEADER !
+		256 ds1 DTYPE !
+		fftdata mat_size@ drop ds1 DNPTS !
+		2 ds1 DSIZE !
+		fftdata cell+ cell+ ds1 DDATA !		 	      
+		ds1 make_ds
+	  then
+	else
+	  drop
+	then ;
+
+: real-ft^-1 ( -- | take Real[FT^-1] )
+	?active dup 0 >=
+	if
+	  dsfft get_ds
+	  0 >= if
+
+		\ Set the size of the fft data buffer
+		
+		dsfft ->npts adjust_fft_size	\ ensure power of 2
+		fftdata fmat_zero		\ zero the buffer		
+
+		\ Determine time scale
+
+		0 dsfft @xy fdrop
+		fabs 2e f* 1e fswap f/ fft_dt f!
+	     
+		\ Transfer data from xyplot dataset to the fftdata buffer
+
+		dsfft ->npts 0 do
+		  i dsfft @xy
+		  i 2* 1+ 1 fftdata fmat!
+		  0e i 1+ 2* 1 fftdata fmat! \ set imaginary part to zero
+		  fdrop
+		loop
+	    
+		fftdata inv_fft	\ perform the Fast Fourier Transform
+
+		\ Replace the data with appropriate x and Re(FT^-1) values
+
+		fftdata mat_size@ drop 1+ 1 do
+		  i 1 fftdata fmat@
+		  i 1+ 1 fftdata fmat!		\ store y value
+		  i 1- s>f fft_dt f@ f* 	\ determine x value
+		  i 1 fftdata fmat!
+		2 +loop
+	    
+		\ make a new xyplot dataset
+
+		c" Real(FT^-1)" 1+ ds1 DNAME !
+		c"  " 1+ ds1 DHEADER !
+		256 ds1 DTYPE !
+		fftdata mat_size@ drop ds1 DNPTS !
+		2 ds1 DSIZE !
+		fftdata cell+ cell+ ds1 DDATA !		 	      
+		ds1 make_ds
+	  then
+	else
+	  drop
+	then ;
 
 :  power ( -- | take fft of data and obtain its power spectrum )
 	?active dup 0 >=
@@ -85,16 +246,19 @@ fvariable fft_df
 	    
 		\ make a new xyplot dataset containing the power spectrum
 
-		" PowerSpectrum" 1+ ds1 DNAME + !
-		"  " 1+ ds1 DHEADER + !
-		256 ds1 DTYPE + !
-		fftdata mat_size@ drop ds1 DNPTS + !
-		2 ds1 DSIZE + !
-		fftdata cell+ cell+ ds1 DDATA + !		 	      
+		c" PowerSpectrum" 1+ ds1 DNAME !
+		c"  " 1+ ds1 DHEADER !
+		256 ds1 DTYPE !
+		fftdata mat_size@ drop ds1 DNPTS !
+		2 ds1 DSIZE !
+		fftdata cell+ cell+ ds1 DDATA !		 	      
 		ds1 make_ds
 	  then
 	else
 	  drop
 	then ;	
 
-MN_MATH " Power Spectrum"  " power" add_menu_item
+MN_MATH c" Real(FT)"        c" real-ft" add_menu_item
+MN_MATH c" Imag(FT)"        c" imag-ft" add_menu_item
+MN_MATH c" Real(FT^-1)"     c" real-ft^-1" add_menu_item
+MN_MATH c" Power Spectrum"  c" power"   add_menu_item

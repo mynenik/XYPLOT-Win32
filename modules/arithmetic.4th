@@ -28,12 +28,12 @@ DatasetInfo ds3
 	
 	\ Set up the info structure for a new dataset
 
-	1+ ds3 DNAME + !
-	"  " 1+ ds3 DHEADER + !
-	256 ds3 DTYPE + !
-	result mat_size@ drop ds3 DNPTS + !
-	2 ds3 DSIZE + !
-	result cell+ cell+ ds3 DDATA + !
+	1+ ds3 DNAME !
+	"  " 1+ ds3 DHEADER !
+	256 ds3 DTYPE !
+	result mat_size@ drop ds3 DNPTS !
+	2 ds3 DSIZE !
+	result cell+ cell+ ds3 DDATA !
 		 	      
 	ds3 make_ds ;
 
@@ -57,7 +57,7 @@ true ordering2 !
     r@ 0= IF
       r@ 1+
     ELSE
-      r@ ds2 DNPTS + @ 1- = IF
+      r@ ds2 DNPTS @ 1- = IF
         r@ 1-
       ELSE
         r@
