@@ -116,8 +116,8 @@ vector<float>::iterator CDataset::Find(float x)
     {
         // use intelligent search
 
-        int jl = 0;
-	int ju = NumberOfPoints()-1;
+        int jl = -1;
+	int ju = NumberOfPoints();
         int jm = 0;
         int ascending = m_nOrdering > 0;
 
