@@ -3,18 +3,19 @@ CPlotWindow.h
 
 Header file for the CPlotWindow class
 
-Copyright (c) 1996--2003 Krishna Myneni
+Copyright (c) 1995--2020 Krishna Myneni
 Creative Consulting for Research & Education
 
 This software is provided under the terms of the
-GNU General Public License
+GNU Affero General Public License 3.0 or later
 
 Created: 11-11-95
-Last Update: 8-16-2003
 */
 
 #ifndef __CPLOTWINDOW_H__
 #define __CPLOTWINDOW_H__
+
+extern COLORREF LookupColor (char*);
 
 class CPlotWindow : public CFrameWnd {
         CStatusBar* m_pStatusBar;
@@ -79,7 +80,7 @@ public:
         BOOL SaveMetafile (char*);
         int LoadForthFile (char*);
         enum Symbol GetSymbol (char* sym_name) {return (enum Symbol) 0;}
-        unsigned GetColor (char* color_name) {return 0;}
+        unsigned GetColor (char* color_name) {return LookupColor(color_name);}
         unsigned GetBackgroundColor (void) {return 0;}
         void SetBackgroundColor (char*) ;
         void SetForegroundColor (char*) ;
