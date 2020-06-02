@@ -16,9 +16,9 @@ hex
 1 constant W/O
 2 constant R/W
 A constant EOL
-200 constant O_CREAT
-800 constant O_EXCL
-400 constant O_TRUNC
+100 constant O_CREAT
+400 constant O_EXCL
+200 constant O_TRUNC
   8 constant O_APPEND
 0 constant SEEK_SET
 1 constant SEEK_CUR
