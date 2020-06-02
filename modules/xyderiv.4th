@@ -52,7 +52,7 @@ der 2 cells + dsder DatasetInfo->Data !
 	    ds1 DatasetInfo->Npts @ dsder DatasetInfo->Npts !
 	    2 dsder DatasetInfo->Size !
 
-	    dsder make_ds
+	    dsder make_ds drop
 	  then
 	else
 	  drop

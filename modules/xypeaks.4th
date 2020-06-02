@@ -68,7 +68,7 @@ MAX_PEAKSEARCH_PTS 2 fmatrix input_data
 	      npeaks @ dspks DatasetInfo->Npts !
 	      2 dspks DatasetInfo->Size !
 
-	      dspks make_ds
+	      dspks make_ds drop
 	    then
 	  then
 	else

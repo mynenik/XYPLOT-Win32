@@ -1,7 +1,7 @@
 /*
 XYPLOT.CPP
 
-Copyright (c) 1995--2003 Creative Consulting for Research & Education
+Copyright (c) 1995--2020 Creative Consulting for Research & Education
 
 Provided under the terms of the GNU General Public License.
 
@@ -12,9 +12,8 @@ Contributions by:
         Bryan Frazar
 
 Created: 2-1-94
-Last Update: 12-8-1998, 2003-08-14
 
-System: Windows 95/98
+System: Windows 95/98/NT/XP
 Developed under Symantec C++ v7.5, using MFC 4.2
 */
 
@@ -781,17 +780,22 @@ int make_ds ()
 	{
 	  sprintf (s, "Created new dataset %s", name);
 	  // pMainWnd->WriteStatusMessage(s);
+	  int n = pMainWnd->m_pDb->Nsets();
+	  *GlobalSp-- = n-1;
 	}
       else
 	{
 	  sprintf (s, "Cannot create dataset %s", name);
 	  pMainWnd->MessageBox(s);
+	  *GlobalSp-- = -1;
 	}
     }
   else
     {
       pMainWnd->MessageBox("Invalid parameter for make_ds");
+      *GlobalSp-- = -1;
     }
+  *GlobalTp-- = OP_IVAL;
   return 0;
 }
 //-----------------------------------------------------------------
@@ -902,6 +906,7 @@ int set_plot_color ()
     {
       char* color_name = *((char**)GlobalSp);
       ++color_name;
+      // pMainWnd->MessageBox(color_name);
       unsigned c = pMainWnd->GetColor(color_name);
       pMainWnd->m_pDi->GetActivePlot()->SetColor(c);
       pMainWnd->Invalidate();

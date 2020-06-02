@@ -97,7 +97,7 @@ fvariable fft_dt
 		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
 		2 ds1 DatasetInfo->Size !
 		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
-		ds1 make_ds
+		ds1 make_ds drop
 	  then
 	else
 	  drop
@@ -148,7 +148,7 @@ fvariable fft_dt
 		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
 		2 ds1 DatasetInfo->Size !
 		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
-		ds1 make_ds
+		ds1 make_ds drop
 	  then
 	else
 	  drop
@@ -198,7 +198,7 @@ fvariable fft_dt
 		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
 		2 ds1 DatasetInfo->Size !
 		fftdata cell+ cell+ ds1 DatasetInfo->Data !	      
-		ds1 make_ds
+		ds1 make_ds drop
 	  then
 	else
 	  drop
@@ -252,7 +252,7 @@ fvariable fft_dt
 		fftdata mat_size@ drop ds1 DatasetInfo->Npts !
 		2 ds1 DatasetInfo->Size !
 		fftdata cell+ cell+ ds1 DatasetInfo->Data !		 	      
-		ds1 make_ds
+		ds1 make_ds drop
 	  then
 	else
 	  drop

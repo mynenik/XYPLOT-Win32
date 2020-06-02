@@ -95,7 +95,7 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_ds_extrema ( i -- | recompute the extrema for dataset i )
 	FN_SET_DS_EXTREMA call ;
 
-: make_ds ( addr -- | make a dataset in xyplot )
+: make_ds ( addr -- n | make a dataset in xyplot; return set number )
 	FN_MAKE_DS call ;
 
 : get_plot ( i addr -- n | return info on plot i into a structure at addr )

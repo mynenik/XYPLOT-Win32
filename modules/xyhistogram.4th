@@ -93,7 +93,7 @@ DatasetInfo dshist
 	    2 dshist DatasetInfo->Size !
 	    hist 8 + dshist DatasetInfo->Data !
 
-	    dshist make_ds	
+	    dshist make_ds drop
 	    
 	  then
 	else

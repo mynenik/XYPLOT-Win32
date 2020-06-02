@@ -59,7 +59,7 @@ variable ynm_pts
 	        ynm_pts @ ds3 DatasetInfo->Npts !
 	        2 ds3 DatasetInfo->Size !
 	        ynm cell+ cell+ ds3 DatasetInfo->Data !
-		ds3 make_ds
+		ds3 make_ds drop
 
 	      then
 	    else

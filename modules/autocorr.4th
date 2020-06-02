@@ -69,7 +69,7 @@ fvariable fcorrnorm
 	    2 ds_acorr DatasetInfo->Size !
 	    acorrbuf ds_acorr DatasetInfo->Data !
 
-	    ds_acorr make_ds
+	    ds_acorr make_ds drop
 		 
 	  then
 	else

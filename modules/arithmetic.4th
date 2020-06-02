@@ -24,7 +24,7 @@ DatasetInfo ds3
 2 8000 fmatrix result
 
 
-: make_result ( ^name  -- | make dataset resulting from an arithmetic operation )
+: make_result ( ^name  -- n | make dataset resulting from an arithmetic operation )
 	
 	\ Set up the info structure for a new dataset
 
@@ -116,22 +116,22 @@ variable ar_operator
  
 : add_ds ( -- | add the operand set and the active set )
 	['] f+ do_arithmetic
-	if c" Sum" make_result then ;
+	if c" Sum" make_result drop then ;
 
    
 : sub_ds ( -- | add the operand set and the active set )
 	['] f- do_arithmetic
-	if c" Difference" make_result then ;
+	if c" Difference" make_result drop then ;
    	   
      	        
 : mul_ds ( -- | add the operand set and the active set )
 	['] f* do_arithmetic
-	if c" Product" make_result then ;
+	if c" Product" make_result drop then ;
 
    
 : div_ds ( -- | add the operand set and the active set )
 	['] f/ do_arithmetic
-	if c" Quotient" make_result then ;
+	if c" Quotient" make_result drop then ;
    
 
 \ add xyplot math menu items

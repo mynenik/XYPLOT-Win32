@@ -116,7 +116,7 @@ variable map_type
 	    map_data mat_size@ drop dsmap DatasetInfo->Npts !
 	    2 dsmap DatasetInfo->Size !
 
-	    dsmap make_ds
+	    dsmap make_ds drop
 	  then
 	else
 	  drop
