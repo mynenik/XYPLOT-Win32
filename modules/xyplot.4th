@@ -155,12 +155,12 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 4 constant SFSIZE	\ size in bytes of single precision float
 
 
-
+\ kForth libraries and utilities
 include ans-words.4th
 include strings.4th
 include files.4th
+include utils.4th
 include struct.4th
-
 
 \ Save Options structure
 \   HeaderType: 0=none, 1=xyplot format, 2=user-defined line prefix

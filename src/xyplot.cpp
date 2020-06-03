@@ -825,7 +825,7 @@ int get_plot ()
 	      *pl_info++ = nSet;  // dataset index number
 	      *pl_info++ = 0;     // set zero for the plot type
 	      *pl_info++ = p->GetSymbol();  // plot symbol
-	      *pl_info = p->GetColor();   // plot color
+	      *pl_info = p->GetColor();   // (COLOREF RGB value)
 	      *GlobalSp = 0;
 	    }
 	  else
@@ -866,8 +866,8 @@ int make_plot ()
 		  {
 		    Symbol nSym = (enum Symbol) *pl_info++;
 		    p->SetSymbol(nSym);
-		    int nColor = *pl_info;
-		    p->SetColor(nColor);
+		    unsigned int uRGB_Color = *pl_info;
+		    p->SetColor(uRGB_Color);
 		  }
 	      }
 	  }

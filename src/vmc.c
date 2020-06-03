@@ -27,11 +27,11 @@ Revisions:
 // #include<sys/types.h>
 // #include<sys/time.h>
 // #include<sys/timeb.h>
-// #include<sys/stat.h>
+#include<sys/stat.h>
 // #include<termios.h>
 #include<stdio.h>
 #include<time.h>
-// #include<fcntl.h>
+#include<fcntl.h>
 #include<stdlib.h>
 #include<math.h>
 #include<windows.h>
@@ -160,7 +160,7 @@ int C_open ()
     {
       pname = *((char**)GlobalSp);
       ++pname;
-//      if (flags & O_CREAT) mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+      if (flags & O_CREAT) mode = _S_IREAD | _S_IWRITE ;
       fd = open (pname, flags, mode);
       *GlobalSp-- = fd;
       *GlobalTp-- = OP_IVAL;
