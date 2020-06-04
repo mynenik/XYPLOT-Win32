@@ -924,13 +924,12 @@ void CPlotWindow::OnPick()
 {
 
     int nsets = m_pDb->Nsets();
-	if (nsets == 0)
-	{
-	    AfxMessageBox ("There are no datasets in the database.");
-	    return;
-	}
+    if (nsets == 0) {
+      AfxMessageBox ("There are no datasets in the database.");
+      return;
+    }
 
-	CPickDataDialog::m_nSets = nsets;
+    CPickDataDialog::m_nSets = nsets;
 
     char** sp = new char* [nsets];
     int i;
@@ -944,22 +943,25 @@ void CPlotWindow::OnPick()
         CPickDataDialog::m_szDataList[i] = sp[i];
     }
 
-	CPickDataDialog pick(this);
+    CPickDataDialog pick(this);
 
-	if (pick.DoModal() != IDCANCEL)
-    {
-	    if (CPickDataDialog::m_nSelection != LB_ERR)
-	    {
-	        int n = CPickDataDialog::m_nSelection;
-	        CDataset* ds = m_pDb->FindInList(sp[n]);
-            m_pDi->MakePlot(ds, 0);
-            OnReset();
-	    }
+    if (pick.DoModal() != IDCANCEL) {
+      if (CPickDataDialog::m_nSelection != LB_ERR) {
+	int nsel = CPickDataDialog::m_nSelection;
+	// CDataset* ds = m_pDb->FindInList(sp[n]);
+	if ((nsel >= 0) && (nsel < nsets)) {
+	  CDataset* ds = (*m_pDb)[nsel];
+          m_pDi->MakePlot(ds, 0);
+          OnReset();
 	}
+	else {
+	  AfxMessageBox("Selection Error.");
+	}
+      }
+    }
 
-	for (i = 0; i < nsets; i++) delete [] sp[i];
+    for (i = 0; i < nsets; i++) delete [] sp[i];
     delete [] sp;
-
 }
 //---------------------------------------------------------------
 
