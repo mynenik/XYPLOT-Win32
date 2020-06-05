@@ -13,8 +13,8 @@
 \ Provided under the GNU Affero General Public License
 \
 
-   20  constant  MAXSETS
-   20  constant  MAXPLOTS
+   32  constant  MAXSETS
+   32  constant  MAXPLOTS
 65536  constant  MAXGRACEPTS
 16384  constant  MAXHDRSIZE
 
