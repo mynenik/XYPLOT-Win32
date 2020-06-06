@@ -1,15 +1,11 @@
 // CDataset.cpp
 //
-// Copyright 1995--2003 Krishna Myneni
+// Copyright 1995--2020 Krishna Myneni
 // Creative Consulting for Research & Education
 //
 // This software is provided under the terms of the GNU
-// General Public License.
+// Affero General Public License (AGPL), v3.0 or later.
 //
-// Revisions:
-//    2-20-1999
-//    7-13-2001 fixed Find for 2 pt dataset and Limits for unordered set.  KM
-//    2002-01-01 fixed iterator usage problems for g++ 3.2  KM
 
 #include <string.h>
 #include <math.h>
