@@ -20,7 +20,7 @@ JAVAC		= sj
 MAKE		= SMAKE
 RC		= RCC
 HC		= HC31
-ASM		= SC
+# ASM		= SC
 DISASM		= OBJ2ASM
 LNK		= LINK
 DLLS		= 
@@ -145,7 +145,9 @@ HELPFILES	=
 
 BATS		= 
 
-.SUFFIXES: .C .CP .CPP .CXX .CC .H .HPP .HXX .COM .EXE .DLL .LIB .RTF .DLG .ASM .RES .RC .OBJ 
+# .SUFFIXES: .C .CP .CPP .CXX .CC .H .HPP .HXX .COM .EXE .DLL .LIB .RTF .DLG .ASM .RES .RC .OBJ 
+.SUFFIXES: .C .CP .CPP .CXX .CC .H .HPP .HXX .COM .EXE .DLL .LIB .RTF .DLG .RES .RC .OBJ 
+
 
 .C.OBJ:
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$*.obj $*.c
@@ -186,8 +188,8 @@ BATS		=
 .CC.EXP:
 	$(CPP) $(CFLAGS) $(DEFINES) $(INCLUDES)  $*.cc  -o$*.lst
 
-.ASM.EXP:
-	$(CPP) $(CFLAGS) $(DEFINES) $(INCLUDES) $*.asm -o$*.lst
+# .ASM.EXP:
+#	$(CPP) $(CFLAGS) $(DEFINES) $(INCLUDES) $*.asm -o$*.lst
 
 .OBJ.COD:
 	$(DISASM) $*.OBJ -c
@@ -261,8 +263,8 @@ xyplot.DEF;
 .RTF.HLP:
 	$(HC) $(HELPFLAGS) $*.HPJ
 
-.ASM.OBJ:
-	$(ASM) $(AFLAGS) $(DEFINES) $(INCLUDES) -o$*.obj $*.asm
+# .ASM.OBJ:
+#	$(ASM) $(AFLAGS) $(DEFINES) $(INCLUDES) -o$*.obj $*.asm
 
 .RC.RES: 
 	$(RC) $(RCDEFINES) $(RESFLAGS) $(INCLUDES) $*.rc -o$*.res

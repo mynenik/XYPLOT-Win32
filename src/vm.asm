@@ -135,8 +135,10 @@ E_NOT_ADDR      equ     1
 E_DIV_ZERO      equ     4
 E_RET_STK_CORRUPT equ   5
 E_UNKNOWN_OP    equ     6
+E_DIV_OVERFLOW  equ    20
 
 _DATA SEGMENT PUBLIC FLAT
+NDPcw     dd  0
 FCONST_180 dq 180.
 _GlobalSp dd 0
 _GlobalTp dd 0
@@ -150,9 +152,11 @@ _BottomOfReturnTypeStack dd 0
 _vmEntryRp dd 0
 _Base dd 0
 _State dd 0
+_Precision dd 0
 _pTIB dd 0
 _TIB db 256 dup 0
 _WordBuf db 256 dup 0
+_ParseBuf db 1024 dup 0
 _NumberCount dd 0
 _NumberBuf db 256 dup 0
 
@@ -222,35 +226,255 @@ _JumpTable dd L_false, L_true, L_cells, L_cellplus ; 0 -- 3
           dd _CPP_repeat, _CPP_until, _CPP_again, _CPP_bye ; 252 -- 255
 _DATA ENDS
 
+_TEXT   SEGMENT PUBLIC  FLAT
+
 public _L_depth, _L_abort, _L_quit, _L_tick, _L_ret, _L_dabs
 public _L_2dup, _L_2drop, _L_dminus, _L_mstarslash
 public _vm
 
-_TEXT   SEGMENT PUBLIC  FLAT
+LDSP     MACRO  mov ebx, _GlobalSp  #EM
+STSP     MACRO  mov _GlobalSp, ebx  #EM
+INC_DSP  MACRO  add ebx, WSIZE      #EM
+DEC_DSP  MACRO  sub ebx, WSIZE      #EM
+INC2_DSP MACRO  add ebx, 2*WSIZE    #EM
+INC_DTSP MACRO  inc _GlobalTp       #EM
+DEC_DTSP MACRO  dec _GlobalTp       #EM
+INC2_DTSP MACRO add _GlobalTp, 2    #EM
+
+STD_IVAL MACRO  
+  mov edx, _GlobalTp
+  mov B[edx], OP_IVAL
+  dec _GlobalTp
+#EM
+
+STD_ADDR MACRO
+  mov edx, _GlobalTp
+  mov B[edx], OP_ADDR
+  dec _GlobalTp
+#EM
+
+UNLOOP MACRO
+  add _GlobalRp, 3*WSIZE
+  add _GlobalRtp, 3
+#EM
+
+NEXT MACRO
+	inc ebp
+	mov _GlobalIp, ebp
+	mov al, B[ebp]
+	shl eax, 2
+	mov ecx, offset _JumpTable
+	add ecx, eax
+	xor eax, eax
+	jmp [ecx]
+#EM
+
+DROP MACRO
+	INC_DSP
+	STSP
+	INC_DTSP
+#EM
+
+_DUP MACRO
+	mov ecx, [ebx + WSIZE]
+	mov [ebx], ecx
+	DEC_DSP
+	STSP
+	mov ecx, _GlobalTp
+	mov al, B [ecx + 1]
+	mov [ecx], al
+	xor eax, eax
+	DEC_DTSP
+#EM
+
+_NOT MACRO  not [ebx + WSIZE]  #EM
+
+STOD MACRO
+	LDSP
+	mov ecx, WSIZE
+	mov eax, [ebx + WSIZE]
+	cdq
+	mov [ebx], edx
+	sub ebx, ecx
+	STSP
+	STD_IVAL
+	xor eax, eax
+#EM
+
+DPLUS MACRO
+	LDSP
+	INC2_DSP
+	mov eax, [ebx]
+	clc
+	add eax, [ebx + 2*WSIZE]
+	mov [ebx + 2*WSIZE], eax
+	mov eax, [ebx + WSIZE]
+	adc eax, [ebx - WSIZE]
+	mov [ebx + WSIZE], eax
+	STSP
+	INC2_DTSP
+	xor eax, eax
+#EM
+
+DMINUS MACRO
+	LDSP
+	INC2_DSP
+	mov eax, [ebx + 2*WSIZE]
+	clc
+	sub eax, [ebx]
+	mov [ebx + 2*WSIZE], eax
+	mov eax, [ebx + WSIZE]
+	sbb eax, [ebx - WSIZE]
+	mov [ebx + WSIZE], eax
+	STSP
+	INC2_DTSP
+	xor eax, eax
+#EM
+
+
+FETCH MACRO
+      mov ebx, _GlobalTp
+      inc ebx
+      mov al, B[ebx]
+      cmp al, OP_ADDR
+      jnz E_NOT_ADDR
+      mov B[ebx], #1
+      LDSP
+      INC_DSP
+      mov eax, [ebx]
+      mov eax, [eax]
+      mov [ebx], eax
+      xor eax, eax
+#EM
+
+SWAP MACRO
+	LDSP
+	INC_DSP
+	mov eax, [ebx]
+	INC_DSP
+	mov ecx, [ebx]
+	mov [ebx], eax
+	mov [ebx - WSIZE], ecx
+	mov ebx, _GlobalTp
+	inc ebx
+	mov al, B[ebx]
+	inc ebx
+	mov cl, B[ebx]
+	mov B[ebx] al
+	mov B[ebx-1], cl
+	xor eax, eax
+#EM
+
+OVER MACRO
+	LDSP
+	mov eax, [ebx + 2*WSIZE]
+	mov [ebx], eax
+	DEC_DSP
+	STSP
+	mov ebx, _GlobalTp
+	mov al, B[ebx + 2]
+	mov B[ebx], al
+	dec _GlobalTp
+	xor eax, eax
+#EM
+
+FDUP MACRO
+	LDSP
+	mov ecx, ebx
+	INC_DSP
+	mov edx, [ebx]
+	INC_DSP
+	mov eax, [ebx]
+	mov ebx, ecx
+	mov [ebx], eax
+	DEC_DSP
+	mov [ebx], edx
+	DEC_DSP
+	STSP
+	mov ebx, _GlobalTp
+	inc ebx
+	mov ax, W[ebx]
+	sub ebx, 2
+	mov W[ebx], ax
+	dec ebx
+	mov _GlobalTp, ebx
+	xor eax, eax
+#EM
+
+FDROP MACRO
+	mov eax, 2*WSIZE
+	add _GlobalSp, eax
+	INC2_DTSP
+	xor eax, eax
+#EM
+
+FSWAP MACRO
+#EM
+
+FOVER MACRO
+#EM
+
+PUSH_R MACRO
+#EM
+
+POP_R MACRO
+#EM
+
+; Dyadic Logic operators
+
+; Error jumps
+E_notaddr:
+	mov eax, E_NOT_ADDR
+	ret
+
+E_retstkcorrupt:
+	mov eax, E_RET_STK_CORRUPT
+	ret
+
+E_divzero:
+	mov eax, E_divzero
+	ret
+
+E_divoverflow:
+	mov eax, E_DIV_OVERFLOW
+	ret
+
+; set kForth's default fpu settings
+L_initfpu:
+	mov ebx, _GlobalSp
+	fnstcw offset NDPcw
+	mov ecx, NDPcw
+	and ch, 240
+	or  ch, 2
+	mov [ebx], ecx
+	fldcw [ebx]
+	ret
+
+
 _vm     proc    near
 ;
         push ebp
         push ebx
         push ecx
         push edx
-	  push _GlobalIp
-	  push _vmEntryRp
+	push _GlobalIp
+	push _vmEntryRp
         mov ebp, esp
-        mov ebx, [ebp+28]      ; load the Forth instruction pointer
-        mov _GlobalIp, ebx
-	  mov eax, _GlobalRp
-	  mov _vmEntryRp, eax
-	  xor eax, eax
+        mov ebp, [ebp+28]      ; load the Forth instruction pointer
+        mov _GlobalIp, ebp
+	mov eax, _GlobalRp
+	mov _vmEntryRp, eax
+	xor eax, eax
 next:
-        mov al, [ebx]		  ; get the opcode
+        mov al, [ebp]		; get the opcode
         shl eax, 2              ; determine offset of opcode
         mov ebx, offset _JumpTable
         add ebx, eax            ; address of machine code
         xor eax, eax            ; clear error code
         call [ebx]              ; call the word
-	  mov ebx, _GlobalIp
-	  inc ebx			  ; increment the Forth instruction ptr
-	  mov _GlobalIp, ebx
+	mov ebp, _GlobalIp
+	inc ebp			; increment the Forth instruction ptr
+	mov _GlobalIp, ebp
         cmp al, 0               ; check for error
         jz next                 ;
 exitloop:
@@ -258,94 +482,138 @@ exitloop:
         jnz vmexit
         xor eax, eax            ; clear the error
 vmexit:
-	  pop _vmEntryRp
-	  pop _GlobalIp 
-	  pop edx
+	pop _vmEntryRp
+	pop _GlobalIp 
+	pop edx
         pop ecx
         pop ebx
         pop ebp
         ret
+
+_L_ret:
+	mov eax, _vmEntryRp	; Return Stack Ptr on entry to VM
+	mov ecx, _GlobalRp
+	cmp ecx, eax
+	jl ret1
+	mov eax, OP_RET		; exhausted the return stack so exit 
+	ret
+ret1:
+	add ecx, WSIZE
+	mov _GlobalRp, ecx
+	inc _GlobalRtp
+	mov ebx, _GlobalRtp
+	mov al, [ebx]
+        cmp al, OP_ADDR
+        jnz E_RET_STK_CORRUPT
+	mov eax, [ecx]   
+        mov _GlobalIp, eax	; reset the instruction ptr
+        xor eax, eax
+retexit:
+        ret
+
 L_nop:
         mov eax, E_UNKNOWN_OP   ; unknown operation
         ret
+
 _L_quit:
         mov eax, _BottomOfReturnStack   ; clear the return stacks
         mov _GlobalRp, eax
-	  mov _vmEntryRp, eax
+	mov _vmEntryRp, eax
         mov eax, _BottomOfReturnTypeStack
         mov _GlobalRtp, eax
         mov eax, 8              ; exit the virtual machine
         ret
+
 _L_abort:
         mov eax, _BottomOfStack
         mov _GlobalSp, eax
         mov eax, _BottomOfTypeStack
         mov _GlobalTp, eax
         jmp _L_quit
+
 L_base:
-        mov ebx, _GlobalSp
-        mov eax, offset _Base
-        mov [ebx], eax
-        sub ebx, WSIZE
-        mov _GlobalSp, ebx
-        mov ebx, _GlobalTp
-        mov B[ebx], OP_ADDR
-        dec _GlobalTp
-        xor eax, eax
+        LDSP
+        mov D[ebx], offset _Base
+        DEC_DSP
+        STSP
+	STD_ADDR
+	xor eax, eax
         ret
+
+L_precision:
+	LDSP
+	mov ecx, _Precision
+	mov [ebx], ecx
+	DEC_DSP
+	STSP
+	STD_IVAL
+	xor eax, eax
+	ret
+
+L_setprecision:
+	LDSP
+	DROP
+	mov ecx, [ebx]
+	mov _Precision, ecx
+	ret
+
 L_binary:
         mov _Base, 2
         ret
+
 L_decimal:
         mov _Base, 10
         ret
+
 L_hex:
         mov _Base, 16
         ret
+
 L_false:
-        mov ebx, _GlobalSp
+        LDSP
         mov D[ebx], 0
-        sub ebx, WSIZE
-        mov _GlobalSp, ebx
-        mov ebx, _GlobalTp
-        mov B[ebx], OP_IVAL
-        dec _GlobalTp
+        DEC_DSP
+        STSP
+        STD_IVAL
         ret
+
 L_true:
-        mov ebx, _GlobalSp
+        LDSP
         mov D[ebx], -1
-        sub ebx, WSIZE
-        mov _GlobalSp, ebx
-        mov ebx, _GlobalTp
-        mov B[ebx], OP_IVAL
-        dec _GlobalTp
+        DEC_DSP
+        STSP
+        STD_IVAL
         ret
+
 L_cells:
-        mov ebx, _GlobalSp
+        LDSP
         add ebx, WSIZE
         mov eax, [ebx]
         sal eax, 2
         mov [ebx], eax
         xor eax, eax
         ret
+
 L_cellplus:
-        mov ebx, _GlobalSp
+        LDSP
         add ebx, WSIZE
         mov eax, [ebx]
         add eax, WSIZE
         mov [ebx], eax
         xor eax, eax
         ret
+
 L_dfloats:
-        mov ebx, _GlobalSp
+        LDSP
         add ebx, WSIZE
         mov eax, [ebx]
         sal eax, 3
         mov [ebx], eax
         xor eax, eax
         ret
+
 L_dfloatplus:
-        mov ebx, _GlobalSp
+        LDSP
         add ebx, WSIZE
         mov eax, [ebx]
         add eax, WSIZE
@@ -353,42 +621,17 @@ L_dfloatplus:
         mov [ebx], eax
         xor eax, eax
         ret
+
 L_bl:
-        mov ebx, _GlobalSp
+        LDSP
         mov D[ebx], 32
-        sub ebx, WSIZE
-        mov _GlobalSp, ebx
-        mov ebx, _GlobalTp
-        mov B[ebx], OP_IVAL
-        dec _GlobalTp
+        DEC_DSP
+        STSP
+        STD_IVAL
         ret
-_L_ret:
-	  mov eax, _vmEntryRp	; Return Stack Ptr on entry to VM
-	  mov ebx, _GlobalSp
-	  mov ecx, _GlobalRp
-	  cmp ecx, eax
-	  jl ret1
-	  mov eax, OP_RET		; exhausted the return stack so exit 
-	  ret
-ret1:
-	  add ecx, WSIZE
-	  mov _GlobalRp, ecx
-	  inc _GlobalRtp
-	  mov ebx, _GlobalRtp
-	  mov al, [ebx]
-        cmp al, OP_ADDR
-        jz ret2
-        mov eax, E_RET_STK_CORRUPT   ; indicate return stack corrupted
-        jmp retexit
-ret2:
-	  mov ebx, ecx   
-        mov eax, [ebx]
-        mov _GlobalIp, eax	; reset the instruction ptr
-        xor eax, eax
-retexit:
-        ret
+
 _L_tick:
-        mov ebx, _GlobalSp
+        LDSP
         mov D[ebx], 32
         sub _GlobalSp, WSIZE
         dec _GlobalTp
@@ -396,9 +639,10 @@ _L_tick:
         call _CPP_find
         call L_drop
         ret
+
 L_tobody:
-	mov ebx, _GlobalSp
-	add ebx, WSIZE
+	LDSP
+	INC_DSP
 	mov ecx, [ebx]	; code address
 	inc ecx		; the data address is offset by one
 	mov ecx, [ecx]
@@ -409,7 +653,7 @@ L_tobody:
 ; Use USLEEP when task can be put to sleep and reawakened by OS
 ;
 L_usleep:
-	  mov eax, WSIZE
+	mov eax, WSIZE
         add _GlobalSp, eax
         inc _GlobalTp
         mov ebx, _GlobalSp
@@ -422,6 +666,7 @@ L_usleep:
         ; pop eax
         xor eax, eax
         ret
+
 L_ms:
         mov ebx, _GlobalSp
         add ebx, WSIZE
@@ -430,6 +675,7 @@ L_ms:
         mov [ebx], eax
         call L_usleep
         ret
+
 L_fill:
         call L_swap
         mov eax, WSIZE
@@ -894,6 +1140,16 @@ L_jmp:
         mov _GlobalIp, ebx      ; set instruction ptr
         xor eax, eax
         ret
+
+L_calladdr:
+	inc ebp
+	mov ecx, ebp
+	add ebp, 3
+	mov _GlobalIp, ebp
+;	call *[ecx]
+	mov ebp, _GlobalIp
+	ret
+
 L_count:
         mov ebx, _GlobalTp
         mov al, B[ebx + 1]
@@ -2651,5 +2907,4 @@ L_fpow:
 _vm     endp
 _TEXT ENDS
 end
-
 
