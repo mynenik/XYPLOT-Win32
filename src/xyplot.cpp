@@ -13,7 +13,7 @@ Contributions by:
 
 Created: 2-1-94
 
-System: Windows 95/98/NT/XP
+System: Windows 95/98/NT/XP/7/8/10
 Developed under Symantec C++ v7.5, using MFC 4.2
 */
 
@@ -57,14 +57,15 @@ extern "C" int *GlobalSp;
 extern "C" byte *GlobalTp;
 
 #define MAX_COLORS 32
-extern COLORREF color_table[];
-extern char* color_list[];
+extern COLORREF colors_rgb_table[];
+extern char* color_names[];
 
 int debug = FALSE;                   // global variable for debug mode
 volatile int InputData;
 
 // Forth interface constant function pointers
 
+const void* FN_GET_COLOR_MAP  =  get_color_map;
 const void* FN_GET_ACTIVE_SET =  get_active_set;
 const void* FN_GET_OPERAND_SET = get_operand_set;
 const void* FN_GET_ACTIVE_PLOT = get_active_plot;
@@ -98,10 +99,10 @@ CPlotWindow* pMainWnd;
 CXyplotApp XyPlot;
 
 BEGIN_MESSAGE_MAP (CPlotWindow, CFrameWnd)
-	ON_WM_PAINT ()
-	ON_WM_MOUSEMOVE ()
-	ON_WM_LBUTTONDOWN ()
-	ON_WM_RBUTTONDOWN ()
+    ON_WM_PAINT ()
+    ON_WM_MOUSEMOVE ()
+    ON_WM_LBUTTONDOWN ()
+    ON_WM_RBUTTONDOWN ()
     ON_COMMAND (ID_FILE_NEW, OnFileNew)
     ON_COMMAND (ID_FILE_OPEN, OnFileOpen)
     ON_COMMAND (ID_FILE_PRINT, OnPrint)
@@ -416,8 +417,8 @@ COLORREF LookupColor (char* color_name)
 
     for (int i = 0; i < MAX_COLORS; i++)
       {
-        if (strcmp(color_name, strupr(color_list[i])) == 0)
-            return color_table[i];
+        if (strcmp(color_name, strupr(color_names[i])) == 0)
+            return colors_rgb_table[i];
       }
       return RGB(0,0,0);
 }
@@ -513,8 +514,10 @@ void InitForthInterface ()
   char* cs = " constant ";
   int esrc, ec, lnum;
 
-  sprintf (s, "%lu%sFN_GET_ACTIVE_SET\n", FN_GET_ACTIVE_SET, cs);
+  sprintf (s, "%lu%sFN_GET_COLOR_MAP\n", FN_GET_COLOR_MAP, cs);
   strcpy (fs, s);
+  sprintf (s, "%lu%sFN_GET_ACTIVE_SET\n", FN_GET_ACTIVE_SET, cs);
+  strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_OPERAND_SET\n", FN_GET_OPERAND_SET, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_ACTIVE_PLOT\n", FN_GET_ACTIVE_PLOT, cs);
@@ -607,11 +610,10 @@ int LoadForthFile(char* fname)
   ostrstream* pSS = new ostrstream(out_s, 255);
   esrc = ExecuteForthExpression (s, pSS, &ec, &lnum);
 
-if (esrc)
-    {
-      pMainWnd->MessageBox(out_s); // pMainWnd->MessageBox (out_s);
-    }
-    // else pMainWnd->MessageBox("Successfully read xyplot.4th");
+  if (esrc)
+  {
+      pMainWnd->MessageBox(out_s);
+  }
   delete pSS;
 
   return ec;
@@ -625,6 +627,42 @@ if (esrc)
 //  Forth environment only.
 //
 //----------------------------------------------------------------
+
+int get_color_map ()
+{
+   // Fill in the xyplot color rgb values and names in the
+   // data arrays
+   // stack: ( acolorref acolornames max-name-len max-colors -- ncolors )
+   ++GlobalSp; ++GlobalTp;
+   int maxcolors = *GlobalSp;
+   if (maxcolors <= 0) return 0;
+   if (maxcolors > MAX_COLORS) maxcolors = MAX_COLORS;
+   ++GlobalSp; ++GlobalTp;
+   int max_name_len = *GlobalSp;
+   ++GlobalSp; ++GlobalTp;
+   if (*GlobalTp != OP_ADDR) return( -1 ); // invalid array
+   char* pcolornames = (char*)(*GlobalSp);
+   ++GlobalSp; ++GlobalTp;
+   if (*GlobalTp != OP_ADDR) return( -1 ); // invalid array
+   COLORREF* colorrefs = (COLORREF*)(*GlobalSp);
+
+   *GlobalTp-- = OP_IVAL;
+   int i, n;
+   char *p = pcolornames;
+   for (i = 0; i < maxcolors; i++) {
+     *colorrefs = colors_rgb_table[i];
+     ++colorrefs;
+     char* name = color_names[i];
+     n = strlen(name);
+     if (n >= max_name_len) n = max_name_len-1;
+     strncpy(p, name, n);
+     *(p + n) = (char) 0;
+     p += max_name_len;
+   }
+   *GlobalSp-- = maxcolors;
+   return 0;
+}
+// --------------------------------------------------------------
 
 int get_active_set ()
 {

@@ -122,7 +122,7 @@ COLORREF CPlotList::NextColor()
 // Return the first unused color in the color table
 
     PlotListNode* node = m_pHead;
-    COLORREF c = color_table[0];
+    COLORREF c = colors_rgb_table[0];
 
     if (node)
     {
@@ -130,12 +130,12 @@ COLORREF CPlotList::NextColor()
         {
             while (node)
             {
-                if (node->Plot->GetColor() == color_table[i]) break;
+                if (node->Plot->GetColor() == colors_rgb_table[i]) break;
                 node = node->Next;
             }
             if (node == NULL)
             {
-                c = color_table[i];
+                c = colors_rgb_table[i];
                 break;
             }
         }

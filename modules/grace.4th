@@ -1,6 +1,6 @@
 \ grace.4th
 \
-\ Generate a Grace project file for grace version 5.1.10
+\ Generate a Grace project file for grace version 5.1.x
 \   from within xyplot.
 \
 \ Grace is a program for generating publication quality scientific 
@@ -95,8 +95,10 @@ variable nplots_for_set
     nplots_for_set @
 ;
 
-\ Grace color map tables
-16 constant MAXGRCOLORS
+\ Color mapping for Grace file output
+
+16 constant MAX_XYCOLORS        \ must be at least 16
+16 constant MAX_COLORNAME_LEN
 
 : RGB>COLORREF ( ur ug ub -- ucolorref | pack RGB values into colorref value)
     16 lshift >r 8 lshift or r> or ;
@@ -106,41 +108,49 @@ variable nplots_for_set
     dup  8 rshift 255 and >r
     255 and r> r> ; 
 
-255 255 255  RGB>COLORREF  \ white
-  0   0   0  RGB>COLORREF  \ black
-  0   0 255  RGB>COLORREF  \ blue
-255   0   0  RGB>COLORREF  \ red
-  0 128   0  RGB>COLORREF  \ green
- 64 224 208  RGB>COLORREF  \ turquoise
-255   0 255  RGB>COLORREF  \ magenta
-160  82  45  RGB>COLORREF  \ sienna
-255 215   0  RGB>COLORREF  \ gold
-128   0 128  RGB>COLORREF  \ purple
-255 165   0  RGB>COLORREF  \ orange
- 46 139  87  RGB>COLORREF  \ sea green
-112 128 144  RGB>COLORREF  \ slate gray
-255 127  80  RGB>COLORREF  \ coral
-127 255 212  RGB>COLORREF  \ aqua marine
- 70 130 180  RGB>COLORREF  \ steel blue
-MAXGRCOLORS table gr_rgb
+create xy_rgb[ MAX_XYCOLORS cells allot
+create xy_colors[ MAX_XYCOLORS MAX_COLORNAME_LEN * allot
 
-s" 'white'"        rep(',")
-s" 'black'"        rep(',")
-s" 'blue'"         rep(',")
-s" 'red'"          rep(',")
-s" 'green'"        rep(',")
-s" 'turquoise'"    rep(',")
-s" 'magenta'"      rep(',")
-s" 'sienna'"       rep(',")
-s" 'gold'"         rep(',")
-s" 'purple'"       rep(',")
-s" 'orange'"       rep(',")
-s" 'seagreen'"     rep(',")
-s" 'slategray'"    rep(',")
-s" 'coral'"        rep(',")
-s" 'aquamarine'"   rep(',")
-s" 'steelblue'"    rep(',")
-MAXGRCOLORS 16 $table gr_colors
+: default_xy_colormap ( -- )
+    s" white"      255 255 255
+    s" black"        0   0   0
+    s" blue"         0   0 255
+    s" red"        255   0   0
+    s" green"        0 128   0
+    s" turquoise"   64 224 208
+    s" magenta"    255   0 255
+    s" sienna"     160  82  45
+    s" gold"       255 215   0
+    s" purple"     128   0 128
+    s" orange"     255 165   0
+    s" seagreen"    46 139  87
+    s" slategray"  112 128 144
+    s" coral"      255 127  80
+    s" aquamarine" 127 255 212
+    s" steelblue"   70 130 180
+    0 MAX_XYCOLORS 1-  DO
+      RGB>COLORREF xy_rgb[ I cells + !
+      xy_colors[ I MAX_COLORNAME_LEN * + swap cmove
+    -1 +LOOP
+;
+
+\ Setup Grace output color map using XYPLOT colors
+: setup-output-colors ( -- )
+    \ White and black should always be in output color map for Grace.
+    s" white"  255 255 255 RGB>COLORREF
+    s" black"    0   0   0 RGB>COLORREF
+    xy_rgb[ 1 cells + ! xy_colors[ MAX_COLORNAME_LEN + swap cmove
+    xy_rgb[ 0 cells + ! xy_colors[ swap cmove
+
+    \ Get XYPLOT's current color map
+    xy_rgb[ 2 cells + 
+    xy_colors[ 2 MAX_COLORNAME_LEN * +
+    MAX_COLORNAME_LEN MAX_XYCOLORS 2- get_color_map
+    MAX_XYCOLORS 2- < IF
+      default_xy_colormap  \ Use a default color map on error for GET_COLOR_MAP
+    THEN ;
+
+setup-output-colors
 
 variable rgb1
 variable rgb2
@@ -162,11 +172,11 @@ variable rgb2
 variable idx_nearest
 fvariable distance
    
-: nearest_grace_color ( ucolorref -- idx )
+: nearest_xyplot_color ( ucolorref -- idx )
     255 dup * 3 * s>f fsqrt distance f!
     0 idx_nearest !
-    MAXGRCOLORS 0 DO
-      dup gr_rgb I cells + @ color-distance
+    MAX_XYCOLORS 0 DO
+      dup xy_rgb[ I cells + @ color-distance
       fdup distance f@ f< IF distance f! I idx_nearest ! ELSE  fdrop  THEN
     LOOP
     drop
@@ -178,17 +188,18 @@ fvariable distance
     s" @page background fill on" >grfile
 ;
 
-: write_grace_colormap ( -- )
-    MAXGRCOLORS 0 DO
+: write_xyplot_colormap ( -- )
+    MAX_XYCOLORS 0 DO
       s" @map color " I u>$ strcat s"  to (" strcat
-      gr_rgb I cells + @ COLORREF>RGB >r >r
+      xy_rgb[ I cells + @ COLORREF>RGB >r >r
       u>$ strcat s" ," strcat
       r> u>$ strcat s" ," strcat
-      r> u>$ strcat s" ), " strcat
-      I gr_colors strcat >grfile
+      r> u>$ strcat s" ), '" strcat
+      xy_colors[ I MAX_COLORNAME_LEN * + dup strlen strcat
+      s" '" strcat rep(',") >grfile
     LOOP ;
 
-: write_grace_window ( -- )
+: write_xyplot_window ( -- )
     get_window_limits ymax f! xmax f! ymin f! xmin f!
     s" @    world xmin " xmin f@ 6 f>$  strcat >grfile
     s" @    world xmax " xmax f@ 6 f>$  strcat >grfile
@@ -197,14 +208,14 @@ fvariable distance
 ;
 
 \ XYPLOT exported Grace files will contain a single graph, G0.
-: write_grace_graph ( -- )
+: write_xyplot_graph ( -- )
     s" @g0 on"           >grfile
     s" @g0 type XY"      >grfile
     s" @with g0"         >grfile
     s" @g0 hidden false" >grfile
 ;
 
-: write_grace_axes ( -- )
+: write_xyplot_axes ( -- )
     s" @    xaxis on"      >grfile
     s" @    xaxis tick on" >grfile
     s" @    xaxis tick major "
@@ -267,7 +278,7 @@ s" # @xyplot s?? " xy_set_label swap cmove
 \ ucolor is an rgb value
 : write_symbol_info ( nsymbol ucolor -- )
     \ get index of closest matching color in grace colormap
-    nearest_grace_color
+    nearest_xyplot_color
     $gr_set s" symbol size " strcat
     2over drop sym_BIG_POINT = IF
       s" 0.6" ELSE s" 0.2" THEN  strcat >grfile
@@ -284,7 +295,7 @@ s" # @xyplot s?? " xy_set_label swap cmove
 
 \ Write the Grace set's line properties
 : write_line_info ( nsymbol ucolor -- )
-    nearest_grace_color
+    nearest_xyplot_color
     $gr_set s" linestyle " strcat
     2over drop sym_DASHED = IF 3 ELSE 1 THEN
     u>$ strcat >grfile
@@ -402,10 +413,10 @@ DatasetInfo ds1
     s" @version 50114"     >grfile
 
     write_grace_pageinfo
-    write_grace_colormap
-    write_grace_graph
-    write_grace_window
-    write_grace_axes
+    write_xyplot_colormap
+    write_xyplot_graph
+    write_xyplot_window
+    write_xyplot_axes
     write_datasets_info
     write_datasets_xydata
 ;
@@ -686,12 +697,9 @@ variable xyp_symbol
 
     map_grace_attr IF
       pl1 PlotInfo->Type   !
-      cells gr_rgb + @ pl1 PlotInfo->Color  !
+      cells xy_rgb[ + @ pl1 PlotInfo->Color  !  \ need to parse grace colormap!!
       pl1 PlotInfo->Symbol !
       pl1 make_plot
-      \ Color maps used by xyplot and Grace are different, so we
-      \ look up by color name.
-      \ get_grace_color strpck set_plot_color
     THEN
 ;
 

@@ -10,8 +10,7 @@
 
 #define MAX_COLORS 32
 
-COLORREF color_table[] =
-{
+COLORREF colors_rgb_table[] = {
     RGB(0,0,255),    // blue
     RGB(255,0,0),    // red
     RGB(0,128,0),    // green
@@ -46,7 +45,7 @@ COLORREF color_table[] =
     RGB(255,255,255)   // white
 };
 
-char* color_list[] =
+char* color_names[] =
   {"blue", "red", "green", "turquoise",
    "magenta", "sienna", "gold", "purple",
    "orange", "seagreen", "slategray", "coral",

@@ -36,6 +36,7 @@ COLORREF LookupColor(char*);
 // the C++ functions and the Forth environment. They
 // should not be called by C, C++, or assembler routines.
 //
+int get_color_map();
 int get_active_set();
 int get_operand_set();
 int get_active_plot();

@@ -15,6 +15,7 @@
 \
 \ Defined below are words to execute the C++ interface functions:
 \
+\  get_color_map  ( acolorref acolornames maxlen maxcolors -- ncolors )
 \  get_active_set ( -- n ) Return the set number for the active plot.
 \  get_operand_set ( -- n ) Return the set number for the operand plot.
 \  ?active ( -- n )	synonymous with get_active_set.
@@ -64,6 +65,10 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 4  constant  sym_LINE_PLUS_POINT
 5  constant  sym_STICK
 6  constant  sym_HISTOGRAM
+
+: get_color_map ( acolorref acolornames maxlen maxcolors -- ncolors )
+    \ Return number of colors in the map; ncolors < 0 indicates error
+   FN_GET_COLOR_MAP call ;
 
 : get_active_set ( -- n | return the active dataset number )
 	\ n less than zero indicates an error.
