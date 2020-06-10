@@ -2,9 +2,10 @@
 //
 // Header file for class CTransform
 //
-// Copyright 1995--1999 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 11-8-99
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 //
 // Base class for coordinate transformations and some
 //   transformation classes

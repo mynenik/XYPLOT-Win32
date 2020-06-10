@@ -1,5 +1,5 @@
 ORIGIN		= Digital Mars C++
-ORIGIN_VER	= Version 8.43
+ORIGIN_VER	= Version 8.57
 VERSION		= RELEASE
 
 !IFDEF SUB_DEBUG
@@ -109,7 +109,7 @@ PAR		= PROJS BATS OBJS
 
 RCDEFINES	= 
 
-INCLUDES	= -ID:\dm\include;D:\dm\stl 
+INCLUDES	= -ID:\dm\stlport\stlport 
 
 INCLUDEDOBJS	=  VM.OBJ 
 

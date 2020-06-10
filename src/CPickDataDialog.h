@@ -2,9 +2,10 @@
 //
 // Header file for class CPickDataDialog
 //
-// Copyright 1995--1997 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 4-26-97
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CPICKDATADIALOG_H__
 #define __CPICKDATADIALOG_H__
@@ -13,18 +14,18 @@
 
 class CPickDataDialog : public CModalDialog {
 public:
-	static CString m_szDataList[MAX_SETS];
-	static int m_nSelection;
-	static int m_nSets;
+    static CString m_szDataList[MAX_SETS];
+    static int m_nSelection;
+    static int m_nSets;
     CPickDataDialog (CWnd* pWndParent = NULL) :
     CModalDialog ("PickDataDialog", pWndParent) {}
 
-	BOOL OnInitDialog ();
+    BOOL OnInitDialog ();
     afx_msg void OnOK ();
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 
-	CListBox& DListBox() {return *(CListBox*)GetDlgItem(IDC_PICK_LIST);}
+    CListBox& DListBox() {return *(CListBox*)GetDlgItem(IDC_PICK_LIST);}
 };
 
 

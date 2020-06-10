@@ -2,9 +2,10 @@
 //
 // Header file for class CInputDialog
 //
-// Copyright 1995 Creative Consulting for Research & Education
+// Copyright 1995-2020 Krishna Myneni
 //
-// Last Revised: 2-25-96
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CINPUTDIALOG_H__
 #define __CINPUTDIALOG_H__

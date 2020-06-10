@@ -3,10 +3,10 @@ xyplot.h
 
 Header file for XYPLOT (C++/Windows 95 version)
 
-Copyright (c) 1995--2003 Creative Consulting for Research & Education
+Copyright (c) 1995--2020 Krishna Myneni
 
-Created: 21-Mar-93
-Last Update: 6-29-2003
+Provided under the terms of the GNU Affero General Public
+License (AGPL) v 3.0 or later.
 */
 
 #define ANNOTATION_PREFIX "==XYPLOT==> "
@@ -29,7 +29,7 @@ int AddToHeader (char*, char*, bool);
 void LoadInitializationFile();
 void InitForthInterface ();
 int LoadForthFile(char*);
-int ExecuteForthExpression (char*, ostrstream*, int*, int*);
+int ExecuteForthExpression (char*, ostringstream*, int*, int*);
 COLORREF LookupColor(char*);
 
 // The following functions provide the interface between

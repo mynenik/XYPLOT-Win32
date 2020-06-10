@@ -2,8 +2,10 @@
 //
 // Default colors for xyplot
 //
-// Created: 10-17-97
+// Copyright (c) 1997--2020 Krishna Myneni
 //
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __COLORTABLE_H__
 #define __COLORTABLE_H__

@@ -1,13 +1,9 @@
 // CPlotList.h
 //
-// Copyright (c) 1996-2001 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright (c) 1996-2020 Krishna Myneni
 //
 // This software is provided under the terms of the
-// GNU General Public License
-//
-// Created: 9-5-96
-// Last Revised: 1-28-2001
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
 
 #ifndef __CPLOTLIST_H__

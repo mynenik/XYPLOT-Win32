@@ -2,10 +2,10 @@
 //
 // Header file for class C3D_Transform
 //
-// Copyright 1995--1997 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 6-25-97
-//
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __C3DTRANSFORM_H__
 #define __C3DTRANSFORM_H__

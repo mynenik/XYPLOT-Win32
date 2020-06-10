@@ -1,20 +1,18 @@
 // CPlotWindow.cpp
 //
-// Copyright 1996--2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1996--2020 Krishna Myneni
 //
 // This software is provided under the terms of the
-// GNU General Public License
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
-// Last Revised: 8-22-2003
-
 #include "stdafx.h"
 #include "consts.h"
 #include <math.h>
-#include <strstrea.h>
-#include <fstream.h>
+#include <sstream>
+#include <fstream>
 #include <vector>
 #include <deque>
+using namespace std;
 #include "CDataset.h"
 #include "CTransform.h"
 #include "CPlotObject.h"
@@ -47,7 +45,7 @@ extern void SortRect (CRect *);
 extern int NumberParse (float*, char*);
 extern COLORREF LookupColor (char*);
 extern int CompileAE (vector<BYTE>*, char* exp);
-extern int ExecuteForthExpression (char*, ostrstream*, int*, int*);
+extern int ExecuteForthExpression (char*, ostringstream*, int*, int*);
 
 vector<char*> GetStartupFileList(char*);
 
@@ -573,7 +571,7 @@ void CPlotWindow::OnForthMenuItem ()
     int error, line;
     char s[4096];
     memset(s, 0, 4096);
-    ostrstream* pOutput = new ostrstream(s, 4095);
+    ostringstream* pOutput = new ostringstream(s, 4095);
 
     ExecuteForthExpression (pCommand, pOutput, &error, &line);
     MessageBox(s);
@@ -721,7 +719,7 @@ void CPlotWindow::OnExpression()
 {
 	char s[256], emsg[256];
     *s = 0;
-    ostrstream* pSS = NULL;
+    ostringstream* pSS = NULL;
     int i, *StackPtr;
     BYTE* TypePtr;
 
@@ -749,7 +747,7 @@ void CPlotWindow::OnExpression()
     {
 	    vector<BYTE> opcodes, prefix;
         delete pSS;
-	    pSS = new ostrstream(emsg, 256);
+	    pSS = new ostringstream(emsg, 256);
 
 	    int ecode = CompileAE (&opcodes, s);
 
@@ -1494,31 +1492,25 @@ int CPlotWindow::LoadForthFile(char* fname)
 
     strcpy (s, "include ");
     strcat (s, fname);
-    istrstream* pSS = new istrstream (s);
-    // ostrstream* pOSS = new ostrstream (s2);
+    istringstream* pSS = new istringstream (s);
 
     vector<BYTE> op;
     SetForthInputStream(*pSS);
     int ec = ForthCompiler (&op, &lnum);
-	delete pSS;
+    delete pSS;
 
-	if (ec)
-	{
-	    AfxMessageBox ("Forth Compiler error");
-	}
-	else
-	{
-        if (op.size())
-        {
-            ec = ForthVM (&op, &sp, &tp);
-            if (ec)
-            {
-                AfxMessageBox ("Forth VM error");
-            }
-        }
+    if (ec) {
+      AfxMessageBox ("Forth Compiler error");
     }
-    // delete pOSS;
-	return ec;
+    else {
+      if (op.size()) {
+         ec = ForthVM (&op, &sp, &tp);
+         if (ec) {
+            AfxMessageBox ("Forth VM error");
+          }
+      }
+    }
+    return ec;
 }
 
 //---------------------------------------------------------------

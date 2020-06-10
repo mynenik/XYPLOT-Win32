@@ -2,15 +2,11 @@
 //
 // Header file for abstract base class CDataset
 //
-// Copyright (c) 1995--2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright (c) 1995--2020 Krishna Myneni
 //
 // This software is provided under the terms of the
-// GNU General Public License
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
-// Revisions:
-//    2-20-1999
-//    2002-01-01  fix namespace resolution for g++ 3.2
 
 #ifndef __CDATASET_H__
 #define __CDATASET_H__

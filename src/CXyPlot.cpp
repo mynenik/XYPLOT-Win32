@@ -1,16 +1,13 @@
 // CXyPlot.cpp
 //
-// Copyright 1995--2002 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Revisions:
-//    1-15-1999
-//    7-13-2001 modified DrawLinePlot() to be able to plot between pts. KM
-//    6-14-2002 modified DrawPointPlot() to specify point size;
-//                added DrawHistogram()  KM
-
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
+//
 #include "stdafx.h"
 #include <vector>
+using namespace std;
 #include "CDataset.h"
 #include "CTransform.h"
 #include "CPlotObject.h"

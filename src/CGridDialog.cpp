@@ -1,13 +1,14 @@
 // CGridDialog.cpp
 //
-// Copyright 1997--2003 Krishna Myneni,
-// Creative Consulting for Research & Education
+// Copyright 1997--2020 Krishna Myneni,
 //
-// Last Revised: 2003-08-22
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include "stdafx.h"
 #include <stdlib.h>
 #include <vector>
+using namespace std;
 #include "resource.h"
 #include "CDataset.h"
 #include "CTransform.h"

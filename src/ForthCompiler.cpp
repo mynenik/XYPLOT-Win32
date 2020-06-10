@@ -3,95 +3,21 @@
 // FORTH compiler to generate FORTH Byte Code (FBC) from expressions
 //   or programs
 //
-// Copyright (c) 1998--2003 Krishna Myneni and David P. Wallace,
-//   Creative Consulting for Research and Education
+// Copyright (c) 1998--2020 Krishna Myneni and David P. Wallace,
 //
-// This software is provided under the terms of the General Public License.
+// This software is provided under the terms of the GNU Affero
+// General Public License (AGPL) v 3.0 or later.
 //
-// Revisions:
-// 	9-12-1998
-//	9-15-1998 added SP@, RP@, +!
-//      9-16-1998 added -ROT, PICK, ROLL, A@
-//	9-18-1998 error checking for incomplete structures at end of definition
-//	10-6-1998 added ?DUP
-//	10-14-1998 fixed COUNT
-//	10-19-1998 added 0<, 0=, 0>, TRUE, FALSE, INVERT
-//      02-09-1999 added EXECUTE, ' (tick)
-//      03-01-1999 added OPEN, LSEEK, CLOSE, READ, WRITE
-//      03-02-1999 added IOCTL
-//      03-03-1999 added USLEEP
-//      03-07-1999 added FILL, CMOVE
-//      03-27-1999 added +LOOP, UNLOOP
-//      03-31-1999 added CMOVE>, KEY
-//      05-06-1999 added FLOOR, FROUND
-//      05-24-1999 added FATAN2, LSHIFT, RSHIFT
-//      05-27-1999 added ACCEPT
-//      05-29-1999 added QUIT, BASE, BINARY, DECIMAL, HEX, U<, U.
-//      06-02-1999 added */, */MOD, NUMBER?
-//      06-05-1999 added CHAR (ASCII)
-//      06-09-1999 function IsInt now calls Forth's NUMBER?
-//      06-16-1999 fixed to allow multiple LEAVEs within single DO-LOOP
-//      07-18-1999 added FIND
-//      08-24-1999 compiler reports redefinition of words
-//      09-06-1999 added use of global ptr pTIB to permit implemetation of TICK, WORD, etc.
-//      09-12-1999 added SYSTEM
-//      10-2-1999  used precedence byte to determine execution of non-deferred words
-//      10-4-1999 added CREATE, VARIABLE, FVARIABLE as intrinsic words
-//      10-6-1999 added CONSTANT, FCONSTANT as intrinsic words
-//      10-7-1999 added CHDIR
-//      10-8-1999 added ERASE, [']
-//      10-9-1999 added TIME&DATE, MS, ?, 2@, 2!, BL
-//      10-20-1999 moved global input and output stream pointers into
-//                   this module from ForthVM.cpp; added >FILE, CONSOLE
-//      10-28-1999 added KEY?
-//      11-16-1999 added RECURSE
-//      12-14-1999 fixed ExtractName for case of null string
-//      12-24-1999 added U>, F0=, F0<, S>D, D>F, F>D
-//      12-25-1999 added CELLS, CELL+, CHAR+, DFLOATS, DFLOAT+, SFLOATS, SFLOAT+
-//      12-27-1999 added BYE
-//      1-13-2000  added ?ALLOT
-//      1-23-2000  added 0<>, .R, U.R, [CHAR]; removed ASCII
-//      1-24-2000  added LITERAL, made '"' and '."' immediate words
-//      2-14-2000  added M*, UM*, FM/MOD
-//      2-26-2000  added SM/REM, UM/MOD
-//      3-1-2000   display VM errors
-//      3-5-2000   changed DO, LEAVE, BEGIN, WHILE, REPEAT, UNTIL, AGAIN,
-//                   IF, ELSE, THEN, RECURSE, and '(' from compiler directives
-//                   to actual words.
-//      3-7-2000   ensure control stacks are cleared after VM error.
-//      5-17-2000  added DOES>
-//      6-11-2000  added CASE, ENDCASE, OF, ENDOF
-//      6-15-2000  added ?DO, ABORT"
-//      8-08-2000  added default directory search for include files  DPW
-//      9-05-2000  added M/, M+, D.
-//      11-29-2000 added DABS, DNEGATE, M*/
-//      04-22-2001 added D+, D-
-//      04-24-2001 added 2>R, 2R>
-//      05-13-2001 added .(, D<, D=, D0=
-//      05-20-2001 added <#, #, #S, #>, SIGN, HOLD
-//      05-30-2001 modified loop code to handle ?DO
-//      09-03-2001 added >BODY, IMMEDIATE, NONDEFERRED, POSTPONE; fixed
-//                   immediate execution of defined words.
-//      12-08-2001 added EVALUATE
-//      02-10-2002 made .( a non-deferred word
-//      08-01-2002 added \ as a word; added STATE; fixed behavior of
-//                   POSTPONE for non-immediate words; added MS@;
-//                   code cleanup in ForthCompiler()
-//      09-25-2002 updated include statements and added "using" directives
-//                   to resolve std namespace definitions for gcc 3.2
-//      09-29-2002 added IMMEDIATE as a regular word; cleaned up logic
-//                   for INCLUDE
-//      04-11-2003 changed F>S to FROUND>S
-//      04-15-2003 added FTRUNC and FTRUNC>S
 
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include "fbc.h"
 #include <vector>
 #include <stack>
+using namespace std;
 #include "ForthCompiler.h"
 
 extern int debug;
@@ -948,14 +874,14 @@ int ForthCompiler (vector<byte>* pOpCodes, int* pLc)
 		  ifstream f(filename);
 		  if (!f)
 		  {
-		      if(!strchr(filename,'/'))
+		      if (getenv("XYPLOT_DIR"))
 		      {
 			char temp[256];
-			if (getenv("XYPLOT_DIR"))
-			  strcpy(temp, getenv("XYPLOT_DIR"));
+			strcpy(temp, getenv("XYPLOT_DIR"));
 			strcat(temp, "\\");
 			strcat(temp, filename);
 			strcpy(filename, temp);
+			f.clear();   // Clear the previous error
 			f.open(filename);
 			if (f)
 			  {

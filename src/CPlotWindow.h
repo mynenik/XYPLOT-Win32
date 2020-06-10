@@ -4,12 +4,10 @@ CPlotWindow.h
 Header file for the CPlotWindow class
 
 Copyright (c) 1995--2020 Krishna Myneni
-Creative Consulting for Research & Education
 
 This software is provided under the terms of the
 GNU Affero General Public License 3.0 or later
 
-Created: 11-11-95
 */
 
 #ifndef __CPLOTWINDOW_H__

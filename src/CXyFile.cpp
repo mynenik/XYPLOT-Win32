@@ -1,13 +1,14 @@
 // CXyFile.cpp
 //
-// Copyright 1995--2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 2003-08-22
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include <stdio.h>
-#include <fstream.h>
+#include <fstream>
 #include <vector>
+using namespace std;
 #include "consts.h"
 #include "saveopts.h"
 #include "CDataset.h"

@@ -1,9 +1,9 @@
 // Include file used by XYPLOT.RC
 //
-// Copyright (c) 1996--2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright (c) 1996--2020 Krishna Myneni
 //
-// Last Revised: 8-13-2003
+// Provided under the terms of the GNU Affero General Public
+// License (AGPL) v 3.0 or later.
 
 #define ID_SAVE_OPTS		10
 

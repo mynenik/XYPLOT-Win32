@@ -1,15 +1,14 @@
 // CDataset.cpp
 //
 // Copyright 1995--2020 Krishna Myneni
-// Creative Consulting for Research & Education
 //
 // This software is provided under the terms of the GNU
-// Affero General Public License (AGPL), v3.0 or later.
+// Affero General Public License (AGPL), v 3.0 or later.
 //
-
 #include <string.h>
 #include <math.h>
 #include <vector>
+using namespace std;
 #include "CDataset.h"
 
 CDataset::CDataset(int nLength, int nPoints, char* name, char* hdr) :

@@ -1,16 +1,13 @@
 // CWorkspace41.cpp
 //
-// Copyright 1995--1999 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
 // This software is provided under the terms of the GNU
-// General Public License
+// Affero General Public License (AGPL) v 3.0 or later.
 //
-// Revisions:
-//	12-2-95, 8-24-1998, 2-4-1999
-
 #include <string.h>
-#include <fstream.h>
+#include <fstream>
+using namespace std;
 #include "xyp41.h"
 #include "CWorkspace41.h"
 

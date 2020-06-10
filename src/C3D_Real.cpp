@@ -1,8 +1,9 @@
 // C3D_Real.cpp
 //
-// Copyright 1995--1997 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 9-14-97
+// Provided under the terms of GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include <string.h>
 #include "ExpressionCompiler.h"

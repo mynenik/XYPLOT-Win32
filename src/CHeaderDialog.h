@@ -2,25 +2,26 @@
 //
 // Header file for class CHeaderDialog
 //
-// Copyright 1997 Creative Consulting for Research & Education
+// Copyright 1997--2020 Krishna Myneni
 //
-// Last Revised: 9-7-97
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CHEADERDIALOG_H__
 #define __CHEADERDIALOG_H__
 
 class CHeaderDialog : public CModalDialog {
-	CEdit* m_pNameField;
-	CEdit* m_pHeaderField;
-	BOOL m_bNameModified;
-	BOOL m_bHeaderModified;
+    CEdit* m_pNameField;
+    CEdit* m_pHeaderField;
+    BOOL m_bNameModified;
+    BOOL m_bHeaderModified;
 public:
     char m_szName [256];
     char m_szHeader [8192];
     CHeaderDialog (CWnd* pWndParent = NULL) :
     CModalDialog ("HeaderDialog", pWndParent) {}
 
-	BOOL OnInitDialog ();
+    BOOL OnInitDialog ();
     afx_msg void OnOK();
 
     void SetHeader (char*);

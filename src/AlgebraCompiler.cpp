@@ -1,17 +1,15 @@
 // AlgebraCompiler.cpp
 //
-// Copyright (c) 1998--1999 Krishna Myneni
-// Creative Consulting for Research and Education
+// Copyright (c) 1998--2020 Krishna Myneni
 //
 // This software is provided under the terms of the
-// GNU General Public License
-//
-// Last Revised: 11-12-1999
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
 #include <vector>
 #include <stack>
 #include <deque>
 #include <ctype.h>
+using namespace std;
 #include "fbc.h"
 #define byte unsigned char
 

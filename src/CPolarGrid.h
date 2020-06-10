@@ -2,9 +2,10 @@
 //
 // Header file for class CPolarGrid
 //
-// Copyright 1996 Creative Consulting for Research & Education
+// Copyright 1996--2020 Krishna Myneni
 //
-// Last Revised: 6-29-96
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CPOLARGRID_H__
 #define __CPOLARGRID_H__

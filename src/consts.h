@@ -1,10 +1,11 @@
 // consts.h
 //
-// Header file for various constants needed by XYPLOT classes
+// Header file containing various constants needed by XYPLOT classes
 //
-// Copyright 1995--1997 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 7-23-97
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CONSTS_H__
 #define __CONSTS_H__

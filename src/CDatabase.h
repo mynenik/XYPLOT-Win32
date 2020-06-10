@@ -2,16 +2,11 @@
 //
 // Header file for class CDatabase
 //
-// Copyright 1995-2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1995-2020 Krishna Myneni
 //
-// This software is provided under the terms of the GNU General
-// Public License.
+// This software is provided under the terms of the GNU Affero General
+// Public License (AGPL) v 3.0 or later.
 //
-// Revisions: 
-//     2-19-1999
-//     2003-01-01  fixes for g++ 3.2  KM
-
 #ifndef __CDATABASE_H__
 #define __CDATABASE_H__
 

@@ -2,72 +2,20 @@
 //
 // The FORTH Virtual Machine (FVM) to execute Forth byte code.
 //
-// Copyright (c) 1996--2003 Krishna Myneni, Creative Consulting for
-//   Research & Education
+// Copyright (c) 1996--2020 Krishna Myneni
 //
-// This software is provided under the General Public License.
+// This software is provided under the GNU Affero General Public
+// License (AGPL) v 3.0 or later.
 //
-// Created: 2-24-96
-// Revisions:
-//       10-14-1998
-//       4-28-1999  increased stack size to 32768 and ret stack to 4096  KM
-//       5-29-1999  moved ABORT to vm.s; added abort/quit error code;
-//       6-06-1999  created C++ functions which can be called from vm  KM
-//       9-06-1999  implemented CPP_word  KM
-//       9-07-1999  initialize State in OpenForth  KM
-//       10-2-1999  initialize precedence byte for non-deferred words  KM
-//       10-4-1999  added CPP_create, CPP_variable, CPP_fvariable  KM
-//       10-6-1999  added CPP_constant, CPP_fconstant  KM
-//       10-10-1999 initialize precedence for immediate words;
-//                    added CPP_char, CPP_brackettick, CPP_forget, CPP_cold  KM
-//       10-20-1999 moved global input and output stream pointers to
-//                    ForthCompiler.cpp; added CPP_tofile and CPP_console  KM
-//       12-14-1999 modified CPP_tofile to use default file when not specified  KM
-//       1-13-2000  added CPP_queryallot  KM
-//       1-23-2000  added CPP_dotr, CPP_udotr, CPP_bracketchar, and changed
-//                    behavior of CPP_char for ANSI compatible behavior  KM
-//       1-24-2000  added CPP_literal, CPP_quote, CPP_dotquote  KM
-//       3-5-2000   added CPP_lparen, CPP_do, CPP_leave, CPP_begin,
-//                    CPP_while, CPP_repeat, CPP_until, CPP_again,
-//                    CPP_if, CPP_else, CPP_then, CPP_recurse  KM
-//       3-7-2000   added ClearControlStacks; perform after VM error  KM
-//       5-17-2000  added CPP_does  KM
-//       6-12-2000  added CPP_case, CPP_endcase, CPP_of, CPP_endof  KM
-//       6-15-2000  added CPP_abortquote  KM
-//       9-05-2000  added CPP_ddot KM
-//       4-01-2001  cast pointers for delete [] in RemoveLastWord  KM
-//       4-22-2001  modified CPP_lparen to handle multiline comments  KM
-//       5-13-2001  added CPP_dotparen KM
-//       5-20-2001  added CPP_bracketsharp, CPP_sharp, CPP_sharps, CPP_hold,
-//                    CPP_sign, CPP_sharpbracket, and CPP_uddot  KM
-//       5-29-2001  wrote CPP_querydo  KM
-//       9-02-2001  fixed CPP_find to return the code pointer  KM
-//       9-03-2001  added CPP_immediate and CPP_nondeferred  KM
-//       9-21-2001  modified CPP_word to skip initial space  KM
-//       9-26-2001  fixed CPP_dotr and CPP_udotr to not print trailing space,
-//                    using new fundamental word CPP_udot0  KM
-//      12-10-2001  added CPP_evaluate, [ and ]  km
-//      07-30-2002  fixed CPP_evaluate problems; added CPP_backslash;
-//                    incr. line counters in CPP_lparen and CPP_dotparen  km
-//      09-09-2002  fixed CPP_evaluate for VM reentrancy problem  km
-//      09-26-2002  revised include statements and added "using"
-//                    declarations to resolve C++ std namespace defs;
-//                    fixed g++ 3.2 complaints about iterator usage;
-//                    use C linkage for CPP_x functions; replace istrstream
-//                    class with istringstream class; modified CPP_dots to
-//                    check for stack underflow; also check for stack underflow
-//                    on return from VM   km
-//      09-29-2002  fixed CPP_word to remove delimiter from input stream  km
-//      04-11-2003  fixed problems with CPP_word and added CPP_source and
-//                    CPP_refill  km
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <strstrea.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include "fbc.h"
 #include <vector>
+using namespace std;
 #include "ForthCompiler.h"
 #include "ForthVM.h"
 
@@ -1688,10 +1636,10 @@ int CPP_evaluate ()
       s[nc] = 0;
       if (*s)
 	{
-	  istrstream* pSS = NULL;
+	  istringstream* pSS = NULL;
 	  istream* pOldStream = pInStream;  // save old input stream
 	  strcpy (s2, pTIB);  // save remaining part of input line in TIB
-	  pSS = new istrstream(s);
+	  pSS = new istringstream(s);
 	  SetForthInputStream(*pSS);
 	  vector<byte> op, *pOps, *pOldOps;
 	  int e;

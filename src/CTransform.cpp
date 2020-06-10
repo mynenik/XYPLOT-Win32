@@ -1,16 +1,14 @@
 // CTransform.cpp
 //
-// Copyright 1995--2001 Krishna Myneni,
-// Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni,
 //
 // This software is provided under the terms of the
-// GNU General Public License.
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
-// Last Revised: 3-5-2001
-
 #include "stdafx.h"
 #include <math.h>
 #include <vector>
+using namespace std;
 #include "CTransform.h"
 
 //---------------------------------------------------------------

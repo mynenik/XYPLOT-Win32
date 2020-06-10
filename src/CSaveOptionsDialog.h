@@ -2,9 +2,10 @@
 //
 // Header file for class CSaveOptionsDialog
 //
-// Copyright 1998 Creative Consulting for Research & Education
+// Copyright 1998--2020 Krishna Myneni
 //
-// Last Revised: 10-11-1998
+// Provided under the terms of the GNU Affero Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CSAVEOPTIONSDIALOG_H__
 #define __CSAVEOPTIONSDIALOG_H__
@@ -16,10 +17,10 @@ public:
     CSaveOptionsDialog (SaveOptions* p, CWnd* pWndParent = NULL) :
     CModalDialog ("SaveOptionsDialog", pWndParent) {m_pSaveOptions = p;}
 
-	BOOL OnInitDialog ();
+    BOOL OnInitDialog ();
     afx_msg void OnOK ();
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 
 };
 

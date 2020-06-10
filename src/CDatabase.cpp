@@ -1,21 +1,15 @@
 // CDatabase.cpp
 //
-// Copyright 1995--2002 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
 // This software is provided under the terms of the GNU
-// General Public License
-//
-// Revisions:
-// 
-// 2001-03-04
-// 2002-12-30  modified MakeDataSet (int* ds_info)  to handle 
-//               datasets > MAX_POINTS in size.  KM
+// Affero General Public License (AGPL) v 3.0 or later.
 //
 #include <stdlib.h>
 #include <string.h>
-#include <fstream.h>
+#include <fstream>
 #include <vector>
+using namespace std;
 #include "consts.h"
 #include "saveopts.h"
 #include "xyp41.h"
@@ -23,7 +17,6 @@
 #include "CXyFile.h"
 #include "CWorkspace41.h"
 #include "CDatabase.h"
-
 //---------------------------------------------------------------
 
 CDatabase::CDatabase()

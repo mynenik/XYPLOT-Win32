@@ -1,9 +1,10 @@
 /*
 XYPLOT.CPP
 
-Copyright (c) 1995--2020 Creative Consulting for Research & Education
+Copyright (c) 1995--2020 Krishna Myneni
 
-Provided under the terms of the GNU General Public License.
+Provided under the terms of the GNU Affero General Public License
+(AGPL) v 3.0 or later.
 
 Written by:
         Krishna Myneni
@@ -11,18 +12,16 @@ Contributions by:
         John Kielkopf
         Bryan Frazar
 
-Created: 2-1-94
-
 System: Windows 95/98/NT/XP/7/8/10
-Developed under Symantec C++ v7.5, using MFC 4.2
 */
 
 #include "stdafx.h"
 #include <math.h>
 #include <vector>
 #include <deque>
-#include <strstrea.h>
-#include <fstream.h>
+#include <sstream>
+#include <fstream>
+using namespace std;
 #include "saveopts.h"
 #include "xyp41.h"
 #include "resource.h"
@@ -426,23 +425,16 @@ COLORREF LookupColor (char* color_name)
 
 void LoadInitializationFile ()
 {
-// Load the Forth file xyplot.4th, residing in the
-// user's HOME/.xyplot directory. This file can
-// load other forth files containing initialization scripts.
+// Load the Forth file xyplot.4th, located in the path given by
+// the environment variable, XYPLOT_DIR. The xyplot.4th file can
+// then load other forth files containing initialization scripts.
 
   char start_dir [512];
-  GetCurrentDirectory(511, start_dir); // getcwd (start_dir, 511);
+  GetCurrentDirectory(511, start_dir);
 
-  char* home_dir = start_dir; // char* home_dir = getenv("HOME");
-  char path[512];
-  strcpy (path, home_dir);
-  // strcat (path, "/.xyplot");
-  // if (chdir(path) == 0)
-  //  {
-        LoadForthFile("xyplot.4th");
-  //  }
-  SetCurrentDirectory(start_dir); // chdir(start_dir);
+  LoadForthFile("xyplot.4th");
 
+  SetCurrentDirectory(start_dir);
 }
 //-------------------------------------------------------------
 
@@ -480,11 +472,11 @@ int AddToHeader (char* text, char* hdr, bool prefix)
 }
 //-------------------------------------------------------------
 
-int ExecuteForthExpression (char* s, ostrstream* pOutput, int* pError, int* pLine)
+int ExecuteForthExpression (char* s, ostringstream* pOutput, int* pError, int* pLine)
 {
   // Return zero if no error, 1 if compiler error, 2 if VM error
 
-  istrstream* pSS = new istrstream (s);
+  istringstream* pSS = new istringstream (s);
   int* sp;
   byte* tp;
   vector<byte> op;
@@ -499,7 +491,7 @@ int ExecuteForthExpression (char* s, ostrstream* pOutput, int* pError, int* pLin
 
   if (op.size())
     {
-      SetForthInputStream(cin);
+      // SetForthInputStream(cin);
       *pError = ForthVM (&op, &sp, &tp);
       if (*pError) return 2;
     }
@@ -585,13 +577,17 @@ void InitForthInterface ()
   sprintf (s, "%lu%sMN_HELP\n", 5, cs);
   strcat (fs, s);
 
-  char out_s[256];
-  memset (out_s, 0, 256);
-  ostrstream* pSS = new ostrstream(out_s, 255);
+  char out_s[2048];
+  memset (out_s, 0, 2048);
+  stringstream* pSS = new stringstream(out_s, 2047);
 
-  esrc = ExecuteForthExpression(fs, pSS, &ec, &lnum);
+  esrc = ExecuteForthExpression(fs, (ostringstream*) pSS, &ec, &lnum);
   if (esrc)
     {
+      char s2[256];
+      sprintf(s2, "\nError: %d\n", esrc);
+      pSS->getline(out_s, 2047,0);
+      strcat(out_s, s2);
       pMainWnd->MessageBox(out_s);
     }
   delete pSS;
@@ -600,19 +596,24 @@ void InitForthInterface ()
 
 int LoadForthFile(char* fname)
 {
-  char s[256], out_s[256];
+  char s[512], out_s[1024];
   int esrc, ec, lnum;
 
   strcpy (s, "include ");
   strcat (s, fname);
 
-  memset (out_s, 0, 256);
-  ostrstream* pSS = new ostrstream(out_s, 255);
-  esrc = ExecuteForthExpression (s, pSS, &ec, &lnum);
+  memset (out_s, 0, 1024);
+  stringstream* pSS = new stringstream(out_s, 1023);
+  esrc = ExecuteForthExpression (s, (ostringstream*) pSS, &ec, &lnum);
 
   if (esrc)
   {
+      char s2[256];
+      sprintf(s2, "\nError: %d\n", esrc);
+      pSS->getline(out_s, 1023,0);
+      strcat(out_s, s2);
       pMainWnd->MessageBox(out_s);
+      // pMainWnd->MessageBox("Error loading initialization file!");
   }
   delete pSS;
 

@@ -1,8 +1,9 @@
 // CPickDataDialog.cpp
 //
-// Copyright 1995 Creative Consulting for Research & Education
+// Copyright 1995--2020 Krishna Myneni
 //
-// Last Revised: 11-28-95
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include "stdafx.h"
 #include "resource.h"

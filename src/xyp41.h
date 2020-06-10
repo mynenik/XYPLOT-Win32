@@ -1,9 +1,10 @@
 /*
   xyp41.h
 
- Header file for xyplot 4.1 compatibility
- Copyright (c) 1990-1994 Creative Consulting for Research & Education
- Last Update: 20 Dec 98
+ Header file for xyplot 4.1 (DOS version) compatibility
+ Copyright (c) 1990-2020 Krishna Myneni
+ Provided under the terms of the GNU Affero General Public License
+ (AGPL) v 3.0 or later.
 */
 
 /*--------------------------------------------------------------------*/

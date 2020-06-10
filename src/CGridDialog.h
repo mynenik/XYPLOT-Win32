@@ -2,9 +2,10 @@
 //
 // Header file for class CGridDialog
 //
-// Copyright 1997--1998 Creative Consulting for Research & Education
+// Copyright 1997--2020 Krishna Myneni
 //
-// Last Revised: 1-18-98
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #ifndef __CGRIDDIALOG_H__
 #define __CGRIDDIALOG_H__

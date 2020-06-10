@@ -1,17 +1,15 @@
 // CPlotDisplay.cpp
 //
-// Copyright 1996--2003 Krishna Myneni
-// Creative Consulting for Research & Education
+// Copyright 1996--2020 Krishna Myneni
 //
 // This software is provided under the terms of the
-// GNU General Public License
+// GNU Affero General Public License (AGPL) v 3.0 or later.
 //
-// Last Revised: 6-29-2003
-
 #include "stdafx.h"
-#include <fstream.h>
+#include <fstream>
 #include <vector>
 #include <deque>
+using namespace std;
 #include "CDataset.h"
 #include "CTransform.h"
 #include "CPlotObject.h"

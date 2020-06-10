@@ -1,13 +1,15 @@
 // CPolarGrid.cpp
 //
-// Copyright 1996--1997 Creative Consulting for Research & Education
+// Copyright 1996--2020 Krishna Myneni
 //
-// Last Revised: 12-14-97
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include "stdafx.h"
 #include <math.h>
 #include <string.h>
 #include <vector>
+using namespace std;
 #include "CDataset.h"
 #include "CTransform.h"
 #include "CPlotObject.h"

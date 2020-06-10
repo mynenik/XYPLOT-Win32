@@ -2,9 +2,10 @@
 //
 // Header file for class CPlotObject
 //
-// Copyright 1995-1998 Creative Consulting for Research & Education
+// Copyright 1995-2020 Krishna Myneni
 //
-// Last Revised: 12-14-98
+// Provided under the terms of the GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 
 #ifndef __CPLOTOBJECT_H__

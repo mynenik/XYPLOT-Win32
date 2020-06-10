@@ -1,8 +1,9 @@
 // CVerifyDialog.cpp
 //
-// Copyright 1998 Creative Consulting for Research & Education
+// Copyright 1998--2020 Krishna Myneni
 //
-// Last Revised: 7-15-98
+// Provided under the terms of GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include "stdafx.h"
 #include "resource.h"

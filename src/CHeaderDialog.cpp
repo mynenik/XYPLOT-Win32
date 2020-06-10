@@ -1,8 +1,9 @@
 // CHeaderDialog.cpp
 //
-// Copyright 1997 Creative Consulting for Research & Education
+// Copyright 1997--2020 Krishna Myneni
 //
-// Last Revised: 9-7-97
+// Provided under the terms of GNU Affero General Public License
+// (AGPL) v 3.0 or later.
 
 #include "stdafx.h"
 #include <string.h>

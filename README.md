@@ -24,7 +24,7 @@ The executable, xypw32.exe, will also run on GNU/Linux x86/x86_64 systems under 
 
 Building from the source code is not necessary to use this package, but an advanced user may modify and rebuild the executable (please see the LICENSE file). The current tools needed to build the executable from the source code provided in this package are:
 
-* Digital Mars C/C++ compiler (version 8.43)
+* Digital Mars C/C++ compiler (version 8.57)
 * A386 assembler (version 4.05)
 
 
