@@ -1,5 +1,5 @@
 ORIGIN		= Digital Mars C++
-ORIGIN_VER	= Version 8.38
+ORIGIN_VER	= Version 8.43
 VERSION		= RELEASE
 
 !IFDEF SUB_DEBUG

@@ -314,7 +314,7 @@ void CPlotWindow::OnExtrema ()
 
         if (m_bWinBuffer)
         {
-            double* p = m_pWinBuffer;
+            double* p = (double *) m_pWinBuffer;
             x[0] = *p++;
             x[1] = *p++;
             x[2] = *p++;
@@ -818,7 +818,7 @@ void CPlotWindow::OnGrid()
 
         if (m_bWinBuffer)
         {
-            short int* p = m_pWinBuffer;
+            short int* p = (short int*) m_pWinBuffer;
             int nXtics = *p++;
             int nYtics = *p++;
             int bLines = *p;
@@ -1153,7 +1153,7 @@ BOOL CPlotWindow::OnFileOpen ()
         // Win App requests file to be loaded
 
         if (m_bWinBuffer)
-            strcpy (szf, m_pWinBuffer);
+            strcpy (szf, (char const*) m_pWinBuffer);
         else
             *szf = 0;
 
@@ -1451,15 +1451,15 @@ BOOL CPlotWindow::SaveMetafile(char* name)
     ofstream ofile (name, ios::binary);
     if (! ofile.fail())
     {
-        ofile.write ((void *) &key, 4);
-        ofile.write ((void *) &w, 2);
-        ofile.write ((void *) &x1, 2);
-        ofile.write ((void *) &y1, 2);
-        ofile.write ((void *) &x2, 2);
-        ofile.write ((void *) &y2, 2);
-        ofile.write ((void *) &inch, 2);
-        ofile.write ((void *) &reserved, 4);
-        ofile.write ((void *) &checksum, 2);
+        ofile.write ((char const *) &key, 4);
+        ofile.write ((char const *) &w, 2);
+        ofile.write ((char const *) &x1, 2);
+        ofile.write ((char const *) &y1, 2);
+        ofile.write ((char const *) &x2, 2);
+        ofile.write ((char const *) &y2, 2);
+        ofile.write ((char const *) &inch, 2);
+        ofile.write ((char const *) &reserved, 4);
+        ofile.write ((char const *) &checksum, 2);
 
         char ch;
 
@@ -1567,7 +1567,7 @@ void CPlotWindow::OnReceiveWinDataset()
     if (m_bWinBuffer)
     {
 
-        CDataset* d = m_pDb->MakeDataset (m_pWinBuffer);
+        CDataset* d = m_pDb->MakeDataset ((int*) m_pWinBuffer);
 
         if (d)
         {
@@ -1594,7 +1594,7 @@ void CPlotWindow::OnSendWinDataset()
         {
             // Copy 128 bytes of the header
 
-            strncpy (m_pWinBuffer, d->m_szHeader, 128);
+            strncpy ((char*) m_pWinBuffer, d->m_szHeader, 128);
 
             // Set up the NROWS, NCOLS, NSIZE, and DATA TYPE FIELDS
 
