@@ -2,7 +2,7 @@
 vmc.c
 
 C portion of the kForth virtual machine
-Copyright (c) 1998--2001 Krishna Myneni and David P. Wallace,
+Copyright (c) 1998--2001 Krishna Myneni and David P. Wallace, 
 Creative Consulting for Research and Education
 
 Revisions:
@@ -20,21 +20,18 @@ Revisions:
 	02-19-2001 -- modified C_keyquery function to fix problems with Win/GNU
 	09-19-2001 -- modified C_accept to handle backspace key
 	09-05-2002 -- added C_search, C_compare, and C_msfetch
-    06-28-2003 -- modified C_numberquery for SC++ compiler
 */
-// #include<sys/poll.h>
-
-// #include<sys/types.h>
-// #include<sys/time.h>
-// #include<sys/timeb.h>
+#include<sys/types.h>
+#include<sys/time.h>
+#include<sys/timeb.h>
 #include<sys/stat.h>
-// #include<termios.h>
 #include<stdio.h>
 #include<time.h>
 #include<fcntl.h>
 #include<stdlib.h>
 #include<math.h>
 #include<windows.h>
+#include<conio.h>
 
 #define OP_IVAL 'I'
 #define OP_ADDR 'A'
@@ -56,11 +53,11 @@ extern byte* BottomOfTypeStack;
 extern byte* BottomOfReturnTypeStack;
 extern int Base;
 
-unsigned long ForthStartTime;
+// struct timeval ForthStartTime;
+unsigned long int ForthStartTime;
 double* pf;
 double f;
 char temp_str[256];
-char key_query_char = 0;
 
 int C_ftan ()
 {
@@ -72,7 +69,7 @@ int C_ftan ()
 int C_facos ()
 {
 	pf = (double*)(GlobalSp + 1);
-	*pf = acos(*pf);
+	*pf = acos(*pf);	
 	return 0;
 }
 
@@ -107,7 +104,7 @@ int C_fln ()
 int C_flog ()
 {
 	pf = (double*)(GlobalSp + 1);
-	*pf = log10(*pf);
+	*pf = log10(*pf);	
 	return 0;
 }
 
@@ -120,7 +117,7 @@ int C_fpow ()
 	GlobalSp += 2;
 	GlobalTp += 2;
 	return 0;
-}
+}				
 
 int C_fmin ()
 {
@@ -160,6 +157,7 @@ int C_open ()
     {
       pname = *((char**)GlobalSp);
       ++pname;
+//      if (flags & O_CREAT) mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
       if (flags & O_CREAT) mode = _S_IREAD | _S_IWRITE ;
       fd = open (pname, flags, mode);
       *GlobalSp-- = fd;
@@ -169,7 +167,7 @@ int C_open ()
   else
     return 1;  /* not an address error */
 }
-
+      
 int C_lseek ()
 {
   /* stack: ( fd offset mode -- error | set file position in fd ) */
@@ -204,7 +202,7 @@ int C_read ()
   ++GlobalSp; ++GlobalTp;
   count = *GlobalSp++; ++GlobalTp;
   if (*GlobalTp == OP_ADDR)
-    {
+    {      
       buf = *((void**)GlobalSp);
       ++GlobalSp; ++GlobalTp;
       fd = *GlobalSp;
@@ -239,160 +237,101 @@ int C_write ()
 
 int C_ioctl ()
 {
-//  stack: ( fd request addr -- err | device control function )
-//  int fd, request;
-//  char* argp;
-//
-//  ++GlobalSp; ++GlobalTp;
-//  argp = *((char**) GlobalSp);  /* don't do type checking on argp 
-//  ++GlobalSp; ++GlobalTp;
-//  request = *GlobalSp++;
-//  fd = *GlobalSp;
-//  *GlobalSp-- = 0; /* ioctl(fd, request, argp);
-return 0;
+  /* stack: ( fd request addr -- err | device control function ) */
+  int fd, request;
+  char* argp;
+
+  ++GlobalSp; ++GlobalTp;
+  argp = *((char**) GlobalSp);  /* don't do type checking on argp */
+  ++GlobalSp; ++GlobalTp;
+  request = *GlobalSp++;
+  fd = *GlobalSp;
+  *GlobalSp-- = -1; // ioctl(fd, request, argp);
+  return 0;
 }
 /*----------------------------------------------------------*/
 
 int C_key ()
 {
-//  stack: ( -- n | wait for keypress and return key code ) 
-//
-//  char ch;
-//  int n;
-//  struct termios t1, t2;
-//
-//  if (key_query_char)
-//    {
-//      ch = key_query_char;
-//      key_query_char = 0;
-//    }
-//  else
-//    {
-//      tcgetattr(0, &t1);
-//      t2 = t1;
-//      t2.c_lflag &= ~ICANON;
-//      t2.c_lflag &= ~ECHO;
-//      t2.c_cc[VMIN] = 1;
-//      t2.c_cc[VTIME] = 0;
-//      tcsetattr(0, TCSANOW, &t2);
-//
-//      do {
-//	n = read(0, &ch, 1);
-//      } while (n != 1);
-//
-//      tcsetattr(0, TCSANOW, &t1);
-//    }
-//
-//  *GlobalSp-- = ch;
-//  *GlobalTp-- = OP_IVAL;
-//
-return 0;
+  /* stack: ( -- n | wait for keypress and return key code ) */
+
+  HANDLE hStdIn;
+  INPUT_RECORD inBuf;
+  unsigned long ch, n=0;
+
+  hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+   while (n < 1) {
+     if (ReadConsoleInput( hStdIn, &inBuf, 1, &n )) {
+       if ((inBuf.EventType == KEY_EVENT) && 
+           (inBuf.Event.KeyEvent.bKeyDown))
+          ch = (unsigned long) inBuf.Event.KeyEvent.uChar.AsciiChar;
+        else
+          n = 0;
+     }
+   }
+   *GlobalSp-- = ch;
+   *GlobalTp-- = OP_IVAL;
+ 
+   return 0;
 }
 /*----------------------------------------------------------*/
 
 int C_keyquery ()
 {
-//  stack: ( a -- b | return true if a key is available ) 
-//
-//  int result;
-//  char ch = 0;
-//  struct termios t1, t2;
-//  int nread;
-//  struct pollfd pfds[1];
-//
-//  if (key_query_char)
-//    {
-//      *GlobalSp-- = -1;
-//    }
-//  else
-//    {
-//      tcgetattr(0, &t1);
-//      t2 = t1;
-//      t2.c_lflag &= ~ICANON;
-//      t2.c_lflag &= ~ECHO;
-//      t2.c_lflag &= ~ISIG;
-//      t2.c_lflag &= ~IEXTEN;
-//      t2.c_lflag |= O_NDELAY;
-//      t2.c_cc[VMIN] = 0;
-//      t2.c_cc[VTIME] = 0;
-//      tcsetattr(0, TCSANOW, &t2);
-//
-//      added by DPW  2-19-2001 so that key? works in Windows
-//      also added   struct pollfd pfds[1];  in C_keyquery declarations
-//      also added #include<sys/poll.h> in include section of vmc.c
-//
-//      pfds[0].fd=0;
-//      pfds[0].events=POLLIN;
-//      poll(pfds,1,0);
-//      if(pfds[0].revents && POLLIN)
-//          nread = read(0, &ch, 1) ;
-//      else
-//          nread=0;
-//      *GlobalSp-- = nread ? -1 : 0;
-//      end of code added by DPW  2-19-2001 
-//
-//      //*GlobalSp-- = read(0, &ch, 1) ? -1 : 0;
-//      if (ch) key_query_char = ch;
-//      tcsetattr(0, TCSANOW, &t1);
-//    }
-//
-//  *GlobalTp-- = OP_IVAL;
-return 0;
-}
+  /* stack: ( -- b | return true if a key is available ) */
+
+  HANDLE hStdIn;
+  INPUT_RECORD inBuf;
+  unsigned long n, key_available;
+
+  hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+  PeekConsoleInput( hStdIn, &inBuf, 1, &n );
+  key_available = ((inBuf.EventType == KEY_EVENT) &&
+      (inBuf.Event.KeyEvent.bKeyDown));
+
+  *GlobalSp-- = key_available ? -1 : 0;
+  *GlobalTp-- = OP_IVAL;
+  return 0;
+}      
 /*----------------------------------------------------------*/
 
 int C_accept ()
 {
-//  stack: ( a n1 -- n2 | wait for n characters to be received )
-//
-//  char ch, *cp, *cpstart, *bksp = "\010 \010";
-//  int n1, n2, nr;
-//  struct termios t1, t2;
-//
-//  ++GlobalSp; ++GlobalTp;
-//  n1 = *GlobalSp++; ++GlobalTp;
-//  if (*GlobalTp != OP_ADDR) return 1;
-//  cp = *((char**)GlobalSp);
-//  cpstart = cp;
-//
-//  tcgetattr(0, &t1);
-//  t2 = t1;
-//  t2.c_lflag &= ~ICANON;
-//  t2.c_lflag &= ~ECHO;
-//  t2.c_cc[VMIN] = 1;
-//  t2.c_cc[VTIME] = 0;
-//  tcsetattr(0, TCSANOW, &t2);
-//
-//  n2 = 0;
-//  while (n2 < n1)
-//    {
-//      nr = read (0, cp, 1);
-//      if (nr == 1)
-//	{
-//	  if (*cp == 10)
-//	    break;
-//	  else if (*cp == 8)
-//	    {
-//	      --cp; --n2;
-//	      if ((cp < cpstart) || (n2 < 0))
-//		{
-//		  n2 = 0;
-//		  cp = cpstart;
-//		}
-//	      else
-//		write (0, bksp, 3);
-//	    }
-//	  else
-//	    {
-//	      write (0, cp, 1);
-//	      ++n2; ++cp;
-//	    }
-//	}
-//    }
-//  *GlobalSp-- = n2;
-//  *GlobalTp-- = OP_IVAL;
-//  tcsetattr(0, TCSANOW, &t1);
-return 0;
+  /* stack: ( a n1 -- n2 | wait for n characters to be received ) */
+
+  char ch, *cp, *cpstart, *bksp = "\010 \010";
+  int n1, n2, nr;
+
+  ++GlobalSp; ++GlobalTp;
+  n1 = *GlobalSp++; ++GlobalTp;
+  if (*GlobalTp != OP_ADDR) return 1;
+  cp = *((char**)GlobalSp);
+  cpstart = cp;
+
+  n2 = 0;
+  while (n2 < n1)
+    {
+      C_key();
+      *cp = *(++GlobalSp); ++GlobalTp;
+      if (*cp == 10) 
+ 	break;
+      else if (*cp == 8) {
+        --cp; --n2;
+        if ((cp < cpstart) || (n2 < 0))  { 
+	  n2 = 0;
+	  cp = cpstart;
+	}
+	else
+	  write (0, bksp, 3);
+       }
+       else {
+	  write (0, cp, 1);
+	  ++n2; ++cp;
+        }
+    }
+  *GlobalSp-- = n2;
+  *GlobalTp-- = OP_IVAL;
+  return 0;
 }
 
 /*----------------------------------------------------------*/
@@ -403,7 +342,7 @@ int C_numberquery ()
 
   char *token, *pStr, *endp;
   int b, sign;
-  int n;
+  unsigned u;
 
   ++GlobalSp; ++GlobalTp;
   if (GlobalSp > BottomOfStack) return 7; /* stack underflow */
@@ -411,7 +350,7 @@ int C_numberquery ()
   token = *((char**)GlobalSp);
   ++token;
   pStr = token;
-  n = 0;
+  u = 0;
   sign = FALSE;
   b = FALSE;
 
@@ -421,24 +360,24 @@ int C_numberquery ()
       if (*pStr == '-') {sign = TRUE;}
       ++pStr;
       while (isdigit(*pStr) || (isalpha(*pStr) && (Base > 10) &&
-				((*pStr - 55) < Base)))
+				((*pStr - 55) < Base)))	    
 	{
 	  ++pStr;
 	}
       if (*pStr == 0)
         {
-	      n = strtol(token, &endp, Base);
-	      b = TRUE;
+	  u = strtoul(token, &endp, Base);
+	  b = TRUE;
         }
 
     }
 
-  *GlobalSp-- = n;
+  *GlobalSp-- = u;
   *GlobalTp-- = OP_IVAL;
   *GlobalSp-- = sign;
   *GlobalTp-- = OP_IVAL;
   *GlobalSp-- = b;
-  *GlobalTp-- = OP_IVAL;
+  *GlobalTp-- = OP_IVAL;  
   return 0;
 }
 /*----------------------------------------------------------*/
@@ -508,13 +447,19 @@ void set_start_time ()
   /* this is not a word in the Forth dictionary; it is
      used by the initialization routine on startup     */
 
+  // gettimeofday (&ForthStartTime, NULL);
   ForthStartTime = GetTickCount();
+
 }
 
 int C_msfetch ()
 {
   /* stack: ( -- msec | return msec elapsed since start of Forth ) */
-
+  
+  // struct timeval tv;
+  // gettimeofday (&tv, NULL);
+  // *GlobalSp-- = (tv.tv_sec - ForthStartTime.tv_sec)*1000 + 
+  // (tv.tv_usec - ForthStartTime.tv_usec)/1000;
   *GlobalSp-- = GetTickCount() - ForthStartTime;
   *GlobalTp-- = OP_IVAL;
   return 0;
@@ -536,7 +481,7 @@ int C_search ()
   n_needle = n;
   n_haystack = *GlobalSp++; ++GlobalTp;  // size of search buffer
   if (*GlobalTp != OP_ADDR) return E_V_NOTADDR;
-  str1 = (char*)(*GlobalSp);
+  str1 = (char*)(*GlobalSp);  
   n_rem = n_haystack;
   n_off = 0;
   cp = str1;
