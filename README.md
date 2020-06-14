@@ -1,4 +1,4 @@
-# XYPLOT-WIN32
+# XYPLOT-Win32
 Extensible Plotting and Data Analysis Program for 32-bit Windows
 
 ## Introduction
