@@ -100,7 +100,7 @@ MFLAGS		= MASTERPROJ=$(PROJ)
 LIBFLAGS	=  /C 
 RESFLAGS	=  -32 
 DEBUGGERFLAGS	=  
-AFLAGS		= $(CFLAGS) 
+# AFLAGS	= $(CFLAGS) 
 HELPFLAGS	= 
 
 MODEL		= N
@@ -111,7 +111,7 @@ RCDEFINES	=
 
 INCLUDES	= -ID:\dm\stlport\stlport 
 
-INCLUDEDOBJS	=  VM.OBJ 
+INCLUDEDOBJS	=  VM32.OBJ 
 
 OBJS		= CDatabase.OBJ \
 		CDataset.OBJ \
@@ -217,7 +217,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
@@ -249,7 +249,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
@@ -316,7 +316,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
@@ -347,7 +347,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
@@ -404,7 +404,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
@@ -435,7 +435,7 @@ CTransform.OBJ+
 AlgebraCompiler.OBJ+
 CVerifyDialog.OBJ+
 CSaveOptionsDialog.OBJ+
-VM.OBJ+
+VM32.OBJ+
 vmc.OBJ+
 ForthCompiler.OBJ+
 ForthVM.OBJ
