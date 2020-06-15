@@ -37,6 +37,7 @@ HEADERS		= fbc.h \
 		CPlotObject.h \
 		CTransform.h \
 		xyplot.h \
+		kfmacros.h \
 		ForthVM.h \
 		ForthCompiler.h  \
 		CSaveOptionsDialog.h \
