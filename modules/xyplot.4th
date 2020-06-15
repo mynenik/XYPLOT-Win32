@@ -166,6 +166,7 @@ include strings.4th
 include files.4th
 include utils.4th
 include struct.4th
+include struct-ext.4th
 
 \ Save Options structure
 \   HeaderType: 0=none, 1=xyplot format, 2=user-defined line prefix
@@ -233,9 +234,18 @@ end-struct PlotInfo%
 \ Load all of the forth files that provide basic functions
 \ and menu items
 
+0 [IF]
+\ Modules from the Forth Scientific Library (FSL, kForth-port)
+include fsl/fsl-util
+include fsl/dynmem
+include fsl/complex
+[ELSE]
+cr .( Older matrix package will soon be obsoleted in favor of FSL.) cr
 include matrix
+[THEN]
+
+\ XYPLOT modules ( ver >= 1.1.4 )
 include xutils
-\ include signal
 include xypolyfit
 include arithmetic
 include abs
