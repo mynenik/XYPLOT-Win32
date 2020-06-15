@@ -557,14 +557,14 @@ void CPlotWindow::OnForthMenuItem ()
 
     if (id < 0)
     {
-      AfxMessageBox("Invalid Function Number");
+      MessageBox("Invalid Function Number");
       return;
     }
 
     char* pCommand = ForthMenuCommandList[id];
     if (pCommand == NULL)
     {
-        AfxMessageBox("Null Function");
+        MessageBox("Null Function");
         return;
     }
 
@@ -574,7 +574,7 @@ void CPlotWindow::OnForthMenuItem ()
     ostringstream* pOutput = new ostringstream(s, 4095);
 
     ExecuteForthExpression (pCommand, pOutput, &error, &line);
-    AfxMessageBox(s);
+    MessageBox(s);
     // WriteOutput(s);
     delete pOutput;
 }
