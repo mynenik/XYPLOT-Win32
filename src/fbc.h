@@ -136,7 +136,7 @@
 #define OP_OR          124
 #define OP_COMPARE     125
 #define OP_NOT         126
-
+#define OP_MOVE        127
 #define OP_FSIN        128
 #define OP_FCOS        129
 #define OP_FTAN        130
@@ -181,7 +181,7 @@
 #define OP_TWOMINUS    169
 #define OP_CFETCH      170
 #define OP_CSTORE      171
-#define OP_WFETCH      172
+#define OP_SWFETCH     172
 #define OP_WSTORE      173
 #define OP_DFFETCH     174
 #define OP_DFSTORE     175

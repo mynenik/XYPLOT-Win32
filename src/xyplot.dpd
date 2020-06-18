@@ -124,6 +124,8 @@ xyplot.obj: \
 	CVerifyDialog.h \
 	CSaveOptionsDialog.h \
 	fbc.h \
+	kfmacros.h \
+	ForthWords.h \
 	ForthCompiler.h \
 	ForthVM.h 
 cgriddialog.obj: \
@@ -154,13 +156,17 @@ csaveoptionsdialog.obj: \
 	saveopts.h 
 vmc.obj: \
 	vmc.c
-forthcompiler.obj: \
-	forthcompiler.cpp \
+ForthCompiler.obj: \
+	ForthCompiler.cpp \
 	fbc.h \
+	ForthWords.h \
+	kfmacros.h \
 	ForthCompiler.h 
-forthvm.obj: \
-	forthvm.cpp \
+ForthVM.obj: \
+	ForthVM.cpp \
 	fbc.h \
+	ForthWords.h \
+	kfmacros.h \
 	ForthCompiler.h \
 	ForthVM.h 
 xyplot.res: \
