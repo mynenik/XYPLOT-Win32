@@ -76,14 +76,43 @@ int C_flnp1 () { DOUBLE_FUNC(log1p) return 0; }
 int C_flog  () { DOUBLE_FUNC(log10) return 0; }
 // int C_falog () { DOUBLE_FUNC(exp10) return 0; }
 
+// powA  is copied from the source of the function pow() in paranoia.c,
+//   at  http://www.math.utah.edu/~beebe/software/ieee/
+double powA(double x, double y) /* return x ^ y (exponentiation) */
+{
+    double xy, ye;
+    long i;
+    int ex, ey = 0, flip = 0;
+
+    if (!y) return 1.0;
+
+    if ((y < -1100. || y > 1100.) && x != -1.) return exp(y * log(x));
+
+    if (y < 0.) { y = -y; flip = 1; }
+    y = modf(y, &ye);
+    if (y) xy = exp(y * log(x));
+    else xy = 1.0;
+    /* next several lines assume >= 32 bit integers */
+    x = frexp(x, &ex);
+    if ((i = (long)ye, i)) for(;;) {
+        if (i & 1) { xy *= x; ey += ex; }
+        if (!(i >>= 1)) break;
+        x *= x;
+        ex *= 2;
+        if (x < .5) { x *= 2.; ex -= 1; }
+    }
+    if (flip) { xy = 1. / xy; ey = -ey; }
+    return ldexp(xy, ey);
+}
+
 int C_fpow ()
 {
 	pf = (double*)(GlobalSp + 1);
 	f = *pf;
 	++pf;
-	*pf = pow (*pf, f);
+	*pf = powA (*pf, f);
 	GlobalSp += 2;
-	GlobalTp += 2;
+	INC2_DTSP
 	return 0;
 }				
 
@@ -205,16 +234,23 @@ int C_write ()
 
 int C_ioctl ()
 {
-  /* stack: ( fd request addr -- err | device control function ) */
-  int fd, request;
-  char* argp;
-
+  /* stack: ( handle request ain nbin aout nbout -- err | device control function ) */
+  HANDLE handle;
+  unsigned long request, nbin, nbout, nbret;
+  int success;
+  char *inbuf, *outbuf;
+  
   ++GlobalSp; ++GlobalTp;
-  argp = *((char**) GlobalSp);  /* don't do type checking on argp */
-  ++GlobalSp; ++GlobalTp;
-  request = *GlobalSp++;
-  fd = *GlobalSp;
-  *GlobalSp-- = -1; // ioctl(fd, request, argp);
+  nbout = *GlobalSp++; GlobalTp++;
+  outbuf  = *((char**) GlobalSp);
+  GlobalSp++;GlobalTp++;
+  nbin  = *GlobalSp++; GlobalTp++;
+  inbuf = *((char**) GlobalSp);
+  GlobalSp++; GlobalTp++;
+  request = *GlobalSp++; GlobalTp++;
+  handle = (HANDLE) *GlobalSp;
+  success = DeviceIoControl(handle, request, inbuf, nbin, outbuf, nbout, &nbret, NULL);
+  *GlobalSp-- = !success;
   return 0;
 }
 /*----------------------------------------------------------*/
@@ -457,10 +493,14 @@ int C_numberquery ()
 
 int C_system ()
 {
-  /* stack: ( ^str -- n | n is the return code for the command in ^str ) */
+  /* stack: ( ^str -- n )
+   *  n is the exit code for the process, or -1 if process
+   *  could not be launched or its exit code could not be obtained. */
 
   char* cp;
-  int nc, nr;
+  int nc, nr, ec;
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
 
   ++GlobalSp; ++GlobalTp;
   if (*GlobalTp != OP_ADDR) return 1;     /* VM error: not an address */
@@ -468,8 +508,26 @@ int C_system ()
   nc = *cp;
   strncpy (temp_str, cp+1, nc);
   temp_str[nc] = 0;
-  nr = WinExec(temp_str, SW_SHOW);
-  *GlobalSp-- = nr;
+  // nr = WinExec(temp_str, SW_SHOW);
+  // ec = (nr > 31) ? 0 : -1;    /* WinExec return code > 31 means no error */
+
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  ZeroMemory(&pi, sizeof(pi));
+  nr = CreateProcess(NULL, temp_str,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi);
+  if (nr) {
+    /* Process creation succeeded; wait for child exit */
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    nr = GetExitCodeProcess(pi.hProcess, (unsigned long *) &ec);
+    if (nr == 0) ec = -1;
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+  }
+  else
+    ec = -1;
+    
+  *GlobalSp-- = ec;
   *GlobalTp-- = OP_IVAL;
   return 0;
 }
