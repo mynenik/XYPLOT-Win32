@@ -89,6 +89,8 @@ const void* FN_SET_WINDOW_LIMITS = set_window_limits;
 const void* FN_ADD_MENU_ITEM = add_menu_item;
 const void* FN_SET_BACKGROUND = set_background;
 const void* FN_SET_FOREGROUND = set_foreground;
+const void* FN_MESSAGE_BOX = message_box;
+const void* FN_FILE_OPEN = file_open_dialog;
 const void* FN_GET_INPUT = get_input;
 
 int nForthMenuItems = 0;
@@ -555,6 +557,10 @@ void InitForthInterface ()
   sprintf (s, "%lu%sFN_SET_BACKGROUND\n", FN_SET_BACKGROUND, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_FOREGROUND\n", FN_SET_FOREGROUND, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_MESSAGE_BOX\n", FN_MESSAGE_BOX, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_FILE_OPEN\n", FN_FILE_OPEN, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_INPUT\n", FN_GET_INPUT, cs);
   strcat (fs, s);
@@ -1186,6 +1192,47 @@ int set_foreground ()
 }
 //----------------------------------------------------------------
 
+int file_open_dialog ()
+{
+    /* stack: ( ^filter -- ^filename flag ) */
+	
+    CFileDialog fd(TRUE);
+    CString LoadFileName;
+    static char szFileName[256];
+    char szFilter[256], *cpFilter;
+    unsigned nLen;
+
+    ++GlobalSp; ++GlobalTp;
+    if (*GlobalTp == OP_ADDR) {
+	    cpFilter = *((char**) GlobalSp);
+	    unsigned nLen = min((unsigned) *cpFilter, 255);
+	    strncpy(szFilter, cpFilter+1, nLen);
+	    szFilter[nLen] = (char) 0; 
+            for (int i = 0; i < nLen; ++i)
+              if (szFilter[i] == '|') szFilter[i] = '\0';
+            fd.m_ofn.lpstrFilter = szFilter;
+
+            if (fd.DoModal() == IDCANCEL) {
+	      --GlobalSp; --GlobalTp;
+	      *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
+            }
+            else {
+              LoadFileName = fd.GetFileName();
+              szFileName[0] = (unsigned char) LoadFileName.GetLength();
+              strcpy (szFileName+1, (const char *) LoadFileName);
+              *GlobalSp-- = (int) szFileName; --GlobalTp;
+	      *GlobalSp-- = -1; *GlobalTp-- = OP_IVAL;
+            }
+       }
+       else {
+	       --GlobalSp; --GlobalTp;
+	       *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
+       }
+
+    return 0;
+}
+//----------------------------------------------------------------
+
 int get_input ()
 {
   char* prompt;
@@ -1223,3 +1270,22 @@ int get_input ()
   *GlobalTp-- = OP_IVAL;
   return 0;
 }
+// -----------------------------------------------------------------
+
+int message_box ()
+{
+    // stack: a u --
+    ++GlobalSp; ++GlobalTp;
+    int nc = *GlobalSp;
+    ++GlobalSp; ++GlobalTp;
+    if (*GlobalTp == OP_ADDR)
+    {
+        char message[4096];
+        if (nc > 4095) nc = 4095;
+        strncpy(message, *((char**) GlobalSp), nc);
+        message[nc] = 0;
+        pMainWnd->MessageBox(message);
+    }
+    return 0;
+}
+

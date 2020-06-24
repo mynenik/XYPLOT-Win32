@@ -61,4 +61,6 @@ int set_window_limits();
 int add_menu_item();
 int set_background();
 int set_foreground();
+int message_box();
+int file_open_dialog();
 int get_input();

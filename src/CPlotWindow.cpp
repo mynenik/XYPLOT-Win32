@@ -1143,7 +1143,7 @@ void CPlotWindow::OnAbout()
 
 BOOL CPlotWindow::OnFileOpen ()
 {
-	static char szf[256];
+    static char szf[256];
     MSG msg = *GetCurrentMessage();
 
     if (msg.lParam == 1)

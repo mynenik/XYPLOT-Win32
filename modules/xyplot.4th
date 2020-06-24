@@ -37,6 +37,8 @@
 \  clear_window ( -- )	Clear the plot window.
 \  draw_window ( -- ) 	Draw the plot window.
 \  reset_window ( -- ) 	Reset the plot window.
+\  message_box ( a u -- ) Popup a message window to display text.
+\  file_open_dialog ( ^filter -- ^filename flag ) Provide file selection dialog.
 \  get_input ( ^prompt -- ^resp flag ) Provide dialog for text input.
 \  get_window_limits ( -- fxmin fymin fxmax fymax ) Return window extrema.
 \  set_window_limits ( fxmin fymin fxmax fymax -- ) Set window extrema.
@@ -149,10 +151,11 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_foreground ( colorname -- | set plot window foreground color )
 	FN_SET_FOREGROUND call ;
 
-\ stub to implement in xyplot.cpp
 : message_box ( a u -- | pop up a message window to display text )
-       \ FN_MESSAGE_BOX call ;
-;
+       FN_MESSAGE_BOX call ;
+
+: file_open_dialog ( ^filter -- ^filename flag )
+	FN_FILE_OPEN call ;
 
 : get_input ( ^prompt -- ^resp flag | get text input from dialog box )
 	FN_GET_INPUT call ;
