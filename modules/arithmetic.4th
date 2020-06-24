@@ -7,12 +7,6 @@
 \ This software is released under the terms of the GNU
 \ General Public License
 \ 
-\ Revisions: 
-\	1-18-2000
-\	6-21-2000 updated for new features of kforth  KM
-\ 	5-29-2020 implement linear interpolation when abscissas not equal
-\                 in overlap region between two datasets KM 
-\
 \ Requires:
 \
 \	matrix.4th
@@ -21,15 +15,19 @@
 
 DatasetInfo ds3
 
-2 8000 fmatrix result
-
+2 16384 fmatrix result
 
 : make_result ( ^name  -- n | make dataset resulting from an arithmetic operation )
 	
 	\ Set up the info structure for a new dataset
 
-	1+                    ds3 DatasetInfo->Name !
-	c"  " 1+              ds3 DatasetInfo->Header !
+	dup 1+                ds3 DatasetInfo->Name !
+	count s"  of " strcat
+	ds1 DatasetInfo->Name a@ dup strlen strcat
+	s"  and " strcat
+	ds2 DatasetInfo->Name a@ dup strlen strcat
+	strpck 1+ 	      ds3 DatasetInfo->Header !
+
 	REAL_DOUBLE           ds3 DatasetInfo->Type !
 	result mat_size@ drop ds3 DatasetInfo->Npts !
 	2                     ds3 DatasetInfo->Size !
@@ -37,6 +35,15 @@ DatasetInfo ds3
 		 	      
 	ds3 make_ds ;
 
+PlotInfo pl3
+: plot_result ( n -- | make plot of result using new dataset number)
+    pl3  PlotInfo->Set !
+    0 pl3 PlotInfo->Type !
+    sym_LINE pl3 PlotInfo->Symbol !
+    2 pl3 PlotInfo->Color !
+
+    pl3 make_plot
+;
 
 : ?interpolate ( fx1 idx -- flag | return TRUE if interpolation is needed )
     ds2 @xy fdrop f= invert ;
@@ -81,8 +88,8 @@ true ordering2 !
 variable rcntr
 variable ar_operator
 
-: do_arithmetic ( n1 n2 addr -- flag | loop over index range n1 to n2 and apply operator )
-	ar_operator !			\ store execution address of operator 
+: do_arithmetic ( xt -- flag | apply operator over index range )
+	ar_operator !
 	1 rcntr !
 	index_range
 	2dup <>
@@ -116,28 +123,28 @@ variable ar_operator
  
 : add_ds ( -- | add the operand set and the active set )
 	['] f+ do_arithmetic
-	if c" Sum" make_result drop then ;
+	IF c" Sum" make_result plot_result THEN ;
 
    
 : sub_ds ( -- | add the operand set and the active set )
 	['] f- do_arithmetic
-	if c" Difference" make_result drop then ;
+	IF c" Difference" make_result plot_result THEN ;
    	   
      	        
 : mul_ds ( -- | add the operand set and the active set )
 	['] f* do_arithmetic
-	if c" Product" make_result drop then ;
+	IF c" Product" make_result plot_result THEN ;
 
    
 : div_ds ( -- | add the operand set and the active set )
 	['] f/ do_arithmetic
-	if c" Quotient" make_result drop then ;
+	IF c" Quotient" make_result plot_result THEN ;
    
 
 \ add xyplot math menu items
 
-MN_MATH c" Add"		c" add_ds" add_menu_item
-MN_MATH c" Subtract"	c" sub_ds" add_menu_item
-MN_MATH c" Multiply"	c" mul_ds" add_menu_item
-MN_MATH c" Divide"	c" div_ds" add_menu_item
+MN_MATH c" Add"		c" add_ds reset_window" add_menu_item
+MN_MATH c" Subtract"	c" sub_ds reset_window" add_menu_item
+MN_MATH c" Multiply"	c" mul_ds reset_window" add_menu_item
+MN_MATH c" Divide"	c" div_ds reset_window" add_menu_item
 
