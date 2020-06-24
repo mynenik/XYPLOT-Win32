@@ -802,7 +802,7 @@ variable xyp_symbol
 : import_grace ( -- | prompt user for filename and import grace file )
         c" Grace Files(*.agr)|*.agr|All Files(*.*)|*.*|" 
 	file_open_dialog IF
-          count \ 2dup ." Importing Grace file, " type cr
+          count
           R/O open-file 0< IF drop
             ." Unable to open input file!"
           ELSE

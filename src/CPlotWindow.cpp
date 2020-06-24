@@ -568,15 +568,23 @@ void CPlotWindow::OnForthMenuItem ()
         return;
     }
 
-    int error, line;
-    char s[4096];
-    memset(s, 0, 4096);
-    ostringstream* pOutput = new ostringstream(s, 4095);
+    int nError, line;
+    char out_s[4096];
+    memset(out_s, 0, 4096);
+    stringstream ForthOutput;
 
-    ExecuteForthExpression (pCommand, pOutput, &error, &line);
-    MessageBox(s);
-    // WriteOutput(s);
-    delete pOutput;
+    ExecuteForthExpression (pCommand, (ostringstream*) &ForthOutput, &nError, &line);
+    ForthOutput.getline(out_s, 4095, 0);
+    if (nError) {
+	char s[64];
+	if (nError & 0x100)
+	   sprintf (s, "Compiler Error %d, line %d\n", nError & 0xFF, line);
+	else
+	   sprintf (s, "VM Error %d\n", nError);
+
+	 strcat(out_s, s);
+     }
+     if (strlen(out_s)) MessageBox(out_s);
 }
 //---------------------------------------------------------------
 
