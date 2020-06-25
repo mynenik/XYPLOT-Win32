@@ -8,7 +8,7 @@
 \ This software is provided under the terms of the 
 \ GNU Affero General Public License (AGPL), v3.0 or later.
 \
-\ Requires: xypw32.exe version >= 1.1.4
+\ Requires: xypw32.exe version >= 1.1.6
 \
 \ XYPLOT defines Forth constants which contain pointers to
 \ C++ functions that interface with the Forth environment.
@@ -28,6 +28,7 @@
 \  set_ds_extrema ( i -- ) Recompute the extrema for dataset i.
 \  make_ds ( addr -- )	Make a dataset according to info in structure.
 \  get_plot ( i addr -- n ) Return info on plot i into a structure.
+\  drop_plot ( -- )  Drop the active plot.
 \  make_plot ( addr -- ) Make a plot according to info in structure.
 \  set_plot_symbol ( symbolname -- ) set active plot symbol.
 \  set_plot_color ( colorname -- ) set active plot color.
@@ -109,6 +110,9 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 	\ n less than zero indicates an error.
 	FN_GET_PLOT call ;
 
+: drop_plot ( addr -- | drop the active plot )
+        FN_DROP_PLOT call ;
+
 : make_plot ( addr -- | make a plot in xyplot )
 	FN_MAKE_PLOT call ;
 
@@ -160,8 +164,7 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : get_input ( ^prompt -- ^resp flag | get text input from dialog box )
 	FN_GET_INPUT call ;
 
-4 constant SFSIZE	\ size in bytes of single precision float
-
+1 SFLOATS constant SFLOAT       \ size in bytes of single precision float
 
 \ kForth libraries and utilities
 include ans-words.4th
@@ -224,12 +227,12 @@ end-struct PlotInfo%
 \ test1 and test2, contained in test.4th.
 
 : @xy ( i addr -- fx fy | retrieve the i^th x, y pair )
-	dup DatasetInfo->Size @ SFSIZE * rot * swap DatasetInfo->Data a@
-	swap + dup >r sf@ r> SFSIZE + sf@ ; 
+	dup DatasetInfo->Size @ SFLOAT * rot * swap DatasetInfo->Data a@
+	swap + dup >r sf@ r> SFLOAT + sf@ ; 
 
 : !xy ( fx fy i addr -- | store the i^th x, y pair )
-	dup DatasetInfo->Size @ SFSIZE * rot * swap DatasetInfo->Data a@
-	swap + dup >r SFSIZE + sf! r> sf! ; 
+	dup DatasetInfo->Size @ SFLOAT * rot * swap DatasetInfo->Data a@
+	swap + dup >r SFLOAT + sf! r> sf! ; 
 
 
 \ see the file test.4th for examples of usage

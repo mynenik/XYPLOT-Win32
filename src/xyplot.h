@@ -47,6 +47,7 @@ int get_ds();
 int set_ds_extrema();
 int make_ds();
 int get_plot();
+int drop_plot();
 int make_plot();
 int set_plot_symbol();
 int set_plot_color();

@@ -75,6 +75,7 @@ const void* FN_GET_DS = get_ds;
 const void* FN_SET_DS_EXTREMA = set_ds_extrema;
 const void* FN_MAKE_DS = make_ds;
 const void* FN_GET_PLOT = get_plot;
+const void* FN_DROP_PLOT = drop_plot;
 const void* FN_MAKE_PLOT = make_plot;
 const void* FN_SET_PLOT_SYMBOL = set_plot_symbol;
 const void* FN_SET_PLOT_COLOR = set_plot_color;
@@ -530,6 +531,8 @@ void InitForthInterface ()
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_PLOT\n", FN_GET_PLOT, cs);
   strcat (fs, s);
+  sprintf (s, "%lu%sFN_DROP_PLOT\n", FN_DROP_PLOT, cs);
+  strcat (fs, s);
   sprintf (s, "%lu%sFN_MAKE_PLOT\n", FN_MAKE_PLOT, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_PLOT_SYMBOL\n", FN_SET_PLOT_SYMBOL, cs);
@@ -887,6 +890,14 @@ int get_plot ()
       pMainWnd->MessageBox("Invalid parameter for get_plot");
     }
   return 0;
+}
+//-----------------------------------------------------------------
+
+int drop_plot ()
+{
+   // Drop the active plot
+   pMainWnd->OnDrop();
+   return 0;
 }
 //-----------------------------------------------------------------
 
