@@ -1258,7 +1258,7 @@ int get_input ()
     }
   CString p, response;
   if (nc > 0) p = prompt;
-  static char rs[128];
+  static char rs[256];
   int retcode;
   if (pMainWnd->GetInput(p, &response) == IDOK)
   {

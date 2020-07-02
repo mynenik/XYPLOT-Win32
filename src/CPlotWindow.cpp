@@ -44,6 +44,7 @@ extern CString wClass;
 extern void SortRect (CRect *);
 extern int NumberParse (float*, char*);
 extern COLORREF LookupColor (char*);
+extern COLORREF colors_rgb_table[];
 extern int CompileAE (vector<BYTE>*, char* exp);
 extern int ExecuteForthExpression (char*, ostringstream*, int*, int*);
 
@@ -990,15 +991,18 @@ void CPlotWindow::OnColor()
 	        c = *((COLORREF*)m_pWinBuffer);
 	}
 	else
-    {
-	    CColorDialog color(RGB(0,0,0), 0, this);
-	    if (color.DoModal() == IDOK)
-		    c = color.GetColor();
+    	{
+	    CColorDialog cd;
+	    cd.m_cc.Flags |= CC_PREVENTFULLOPEN;
+	    cd.m_cc.rgbResult = RGB(0,0,0);
+	    cd.m_cc.lpCustColors = &colors_rgb_table[0];
+	    if (cd.DoModal() == IDOK)
+		    c = cd.GetColor();
 	}
 
 	if (c)
 	{
-        m_pDi->SetColor(c);
+        	m_pDi->SetColor(c);
 		Invalidate();
 	}
 }

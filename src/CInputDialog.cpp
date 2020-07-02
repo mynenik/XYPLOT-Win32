@@ -25,9 +25,9 @@ BOOL CInputDialog::OnInitDialog()
 
 void CInputDialog::OnOK()
 {
-	char s[255];
+	char s[256];
 
-	InputField()->GetLine(0, s, 254);
+	InputField()->GetLine(0, s, 255);
 	s[InputField()->LineLength()] = '\0';
 	// int l = strlen (s);
 	m_szResponseString = s;
