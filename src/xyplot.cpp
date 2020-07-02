@@ -79,9 +79,12 @@ const void* FN_DROP_PLOT = drop_plot;
 const void* FN_MAKE_PLOT = make_plot;
 const void* FN_SET_PLOT_SYMBOL = set_plot_symbol;
 const void* FN_SET_PLOT_COLOR = set_plot_color;
+const void* FN_SET_PLOT_RGBCOLOR = set_plot_rgbcolor;
 const void* FN_DRAW_PLOT = draw_plot;
 const void* FN_SET_GRID_TICS = set_grid_tics;
 const void* FN_SET_GRID_LINES = set_grid_lines;
+const void* FN_GET_WINDOW_TITLE = get_window_title;
+const void* FN_SET_WINDOW_TITLE = set_window_title;
 const void* FN_CLEAR_WINDOW = clear_window;
 const void* FN_DRAW_WINDOW = draw_window;
 const void* FN_RESET_WINDOW = reset_window;
@@ -92,6 +95,7 @@ const void* FN_SET_BACKGROUND = set_background;
 const void* FN_SET_FOREGROUND = set_foreground;
 const void* FN_MESSAGE_BOX = message_box;
 const void* FN_FILE_OPEN = file_open_dialog;
+const void* FN_FILE_SAVE = file_save_dialog;
 const void* FN_GET_INPUT = get_input;
 
 int nForthMenuItems = 0;
@@ -539,11 +543,17 @@ void InitForthInterface ()
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_PLOT_COLOR\n", FN_SET_PLOT_COLOR, cs);
   strcat (fs, s);
+  sprintf (s, "%lu%sFN_SET_PLOT_RGBCOLOR\n", FN_SET_PLOT_RGBCOLOR, cs);
+  strcat (fs, s);
   sprintf (s, "%lu%sFN_DRAW_PLOT\n", FN_DRAW_PLOT, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_GRID_TICS\n", FN_SET_GRID_TICS, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_GRID_LINES\n", FN_SET_GRID_LINES, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_GET_WINDOW_TITLE\n", FN_GET_WINDOW_TITLE, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_SET_WINDOW_TITLE\n", FN_SET_WINDOW_TITLE, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_CLEAR_WINDOW\n", FN_CLEAR_WINDOW, cs);
   strcat (fs, s);
@@ -564,6 +574,8 @@ void InitForthInterface ()
   sprintf (s, "%lu%sFN_MESSAGE_BOX\n", FN_MESSAGE_BOX, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_FILE_OPEN\n", FN_FILE_OPEN, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_FILE_SAVE\n", FN_FILE_SAVE, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_INPUT\n", FN_GET_INPUT, cs);
   strcat (fs, s);
@@ -957,6 +969,7 @@ int set_plot_symbol ()
 
 int set_plot_color ()
 {
+  // stack: ( ^color_name -- )
   ++GlobalSp; ++GlobalTp;
   if (*GlobalTp == OP_ADDR)
     {
@@ -971,6 +984,17 @@ int set_plot_color ()
     {
       pMainWnd->MessageBox("Invalid parameter for set_plot_color");
     }
+  return 0;
+}
+//------------------------------------------------------------------
+
+int set_plot_rgbcolor ()
+{
+  // stack: ( COLORREF -- )
+  ++GlobalSp; ++GlobalTp;
+  COLORREF c = *((unsigned long *) GlobalSp);
+  pMainWnd->m_pDi->GetActivePlot()->SetColor(c);
+  pMainWnd->Invalidate();
   return 0;
 }
 //------------------------------------------------------------------
@@ -997,6 +1021,7 @@ int draw_plot ()
 
 int set_grid_tics ()
 {
+  // stack: ( nx ny -- )
   ++GlobalSp; ++GlobalTp;
   int ny = *GlobalSp++; ++GlobalTp;
   int nx = *GlobalSp;
@@ -1008,6 +1033,7 @@ int set_grid_tics ()
 
 int set_grid_lines ()
 {
+  // stack: ( bx by -- | bx and by are flags )
   ++GlobalSp; ++GlobalTp;
   bool by = *GlobalSp++; ++GlobalTp;
   bool bx = *GlobalSp;
@@ -1017,11 +1043,49 @@ int set_grid_lines ()
 }
 
 //------------------------------------------------------------------
+int get_window_title ()
+{
+  // stack: ( abuf nmax -- abuf nret )
+  char* buf;
+  ++GlobalSp; ++GlobalTp;
+  int nmax = *((unsigned long *)GlobalSp);
+  ++GlobalSp; ++GlobalTp;
+  if (*GlobalTp == OP_ADDR) {
+    char* buf = *((char**)GlobalSp);
+    int nret = pMainWnd->GetWindowText(buf, nmax);
+    nret = min(nmax-1, nret);
+    buf[nret] = (char) 0;
+    --GlobalSp; --GlobalTp;
+    *GlobalSp-- = nret; --GlobalTp;
+  }
+  else {
+    --GlobalSp; --GlobalTp;
+    *GlobalSp-- = 0; --GlobalTp;
+    AfxMessageBox("get_window_title buffer address error!");
+  }
+  return 0;
+}  
+
+int set_window_title ()
+{
+  // stack: ( c-addr u -- )
+  ++GlobalSp; ++GlobalTp;
+  int ulen = *GlobalSp;
+  ++GlobalSp; ++GlobalTp;
+  if (*GlobalTp == OP_ADDR) {
+    char* buf = *((char**)GlobalSp);
+    buf[ulen] = (char) 0;
+    pMainWnd->SetWindowText(buf);
+  }
+  else {
+    AfxMessageBox("set_window_title buffer address error!");
+  }
+  return 0;
+}
 
 int clear_window ()
 {
-  // Clear the plot window
-
+  // stack: ( -- )
   pMainWnd->Clear();
   return 0;
 }
@@ -1029,7 +1093,6 @@ int clear_window ()
 int reset_window ()
 {
   // Reset the plot window
-
   pMainWnd->OnReset();
   return 0;
 }
@@ -1037,18 +1100,15 @@ int reset_window ()
 int draw_window ()
 {
   // Force drawing of the plot window
-
   pMainWnd->Invalidate();
   pMainWnd->OnPaint();
-
   return 0;
 }
 //-----------------------------------------------------------------
 
 int get_window_limits ()
 {
-
-  // Return x1, y1, x2, y2 on top of the stack
+  // stack: ( -- x1 y1 x2 y2 )
 
   vector<float> e = pMainWnd->m_pDi->GetExtrema();
 
@@ -1072,7 +1132,7 @@ int get_window_limits ()
 
 int set_window_limits ()
 {
-  // Set the plot window limits
+  // stack: ( x1 y1 x2 y2 -- )
 
   vector<float> e(4);
   ++GlobalSp;
@@ -1096,10 +1156,10 @@ int set_window_limits ()
 int add_menu_item ()
 {
   // Add item to the specified menu.
-  // Stack: ( menu item_name forth_command -- )
+  // Stack: ( menu ^itemname ^forthcommand -- )
   //   menu is the menu widget id (e.g. MN_MATH)
-  //   item_name is the address of a Forth counted string
-  //   forth_command is the address of a Forth counted string
+  //   itemname is address of a counted string
+  //   forthcommand is address of a counted string
 
   char name[256];
   char* emsg1 = "add_menu_item: Invalid parameter";
@@ -1155,7 +1215,7 @@ int add_menu_item ()
 
 int set_background ()
 {
-  // Stack: ( addr -- | counted string contains color name )
+  // stack: ( ^colorname -- )
 
   char color_name[256];
 
@@ -1180,7 +1240,7 @@ int set_background ()
 
 int set_foreground ()
 {
-  // Stack: ( addr -- | counted string contains color name )
+  // Stack: ( ^colorname -- )
 
   char color_name[256];
 
@@ -1205,39 +1265,76 @@ int set_foreground ()
 
 int file_open_dialog ()
 {
-    /* stack: ( ^filter -- ^filename flag ) */
-	
-    CFileDialog fd(TRUE);
-    CString LoadFileName;
-    static char szFileName[256];
-    char szFilter[256], *cpFilter;
+    // stack: ( ^filter -- ^filename flag )
+
+    char szFileName[256];
+    static char szf[256], *cpFilter;
     unsigned nLen;
 
     ++GlobalSp; ++GlobalTp;
     if (*GlobalTp == OP_ADDR) {
 	    cpFilter = *((char**) GlobalSp);
 	    unsigned nLen = min((unsigned) *cpFilter, 255);
-	    strncpy(szFilter, cpFilter+1, nLen);
-	    szFilter[nLen] = (char) 0; 
-            for (int i = 0; i < nLen; ++i)
-              if (szFilter[i] == '|') szFilter[i] = '\0';
-            fd.m_ofn.lpstrFilter = szFilter;
-
-            if (fd.DoModal() == IDCANCEL) {
+	    strncpy(szf, cpFilter+1, nLen);
+	    szf[nLen] = (char) 0; 
+	    if (pMainWnd->FileOpenDialog( (const char*) szf, szFileName )) {
+	      nLen = strlen(szFileName);
+	      strncpy( szf+1, szFileName, nLen);
+	      szf[0] = nLen;
+	      szf[nLen+1] = (char) 0;
+              *GlobalSp-- = (int) szf; --GlobalTp;
+	      *GlobalSp-- = -1; *GlobalTp-- = OP_IVAL;
+	    }
+	    else {
 	      --GlobalSp; --GlobalTp;
 	      *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
-            }
-            else {
-              LoadFileName = fd.GetFileName();
-              szFileName[0] = (unsigned char) LoadFileName.GetLength();
-              strcpy (szFileName+1, (const char *) LoadFileName);
-              *GlobalSp-- = (int) szFileName; --GlobalTp;
-	      *GlobalSp-- = -1; *GlobalTp-- = OP_IVAL;
             }
        }
        else {
 	       --GlobalSp; --GlobalTp;
 	       *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
+       }
+
+    return 0;
+}
+//----------------------------------------------------------------
+
+int file_save_dialog ()
+{
+    // stack: ( ^filter -- ^filename flag )
+
+    CFileDialog fd(TRUE);
+    CString SaveFileName;
+    static char szFileName[256];
+    char szFilter[256], *cpFilter;
+    unsigned nLen;
+
+    ++GlobalSp; ++GlobalTp;
+    if (*GlobalTp == OP_ADDR) {
+            cpFilter = *((char**) GlobalSp);
+            unsigned nLen = min((unsigned) *cpFilter, 255);
+            strncpy(szFilter, cpFilter+1, nLen);
+            szFilter[nLen] = (char) 0;
+            for (int i = 0; i < nLen; ++i)
+              if (szFilter[i] == '|') szFilter[i] = '\0';
+            fd.m_ofn.lpstrFilter = szFilter;
+	    fd.m_ofn.lpstrTitle = "Save to File";
+
+            if (fd.DoModal() == IDCANCEL) {
+              --GlobalSp; --GlobalTp;
+              *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
+            }
+            else {
+              SaveFileName = fd.GetFileName();
+              szFileName[0] = (unsigned char) SaveFileName.GetLength();
+              strcpy (szFileName+1, (const char *) SaveFileName);
+              *GlobalSp-- = (int) szFileName; --GlobalTp;
+              *GlobalSp-- = -1; *GlobalTp-- = OP_IVAL;
+            }
+       }
+       else {
+               --GlobalSp; --GlobalTp;
+               *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
        }
 
     return 0;

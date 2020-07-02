@@ -48,15 +48,15 @@ public:
     int m_nFontPointSize;
     char* m_szFontName;
 
-	CGrid ();
-	~CGrid ();
-	void SetTics (int, int);
-	void GetTics (int*, int*);
+    CGrid ();
+    ~CGrid ();
+    void SetTics (int, int);
+    void GetTics (int*, int*);
     void SetLines (bool, bool);
     void SetAxes (bool);
 
-	virtual void Labels (CDC*) = 0;
-	virtual void Draw (CDC*) = 0;
+    virtual void Labels (CDC*) = 0;
+    virtual void Draw (CDC*) = 0;
 };
 
 class CCartesianGrid : public CGrid

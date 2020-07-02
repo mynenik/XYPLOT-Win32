@@ -69,7 +69,8 @@ public:
         afx_msg void OnReceiveWinDataset();
         afx_msg void OnSendWinDataset();
 
-        BOOL LoadFile (char*);
+	BOOL FileOpenDialog (const char*, char*);
+	BOOL LoadFile (char*);
         BOOL SaveFile (char*);
         void LoadDatasetFile (char*, char*);
         void SelectColumns (char*, int);

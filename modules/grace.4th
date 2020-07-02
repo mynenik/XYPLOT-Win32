@@ -799,14 +799,19 @@ variable xyp_symbol
     AGAIN ;
 
 
+create grace_title 64 allot
+
 : import_grace ( -- | prompt user for filename and import grace file )
+	grace_title 64 erase
         c" Grace Files(*.agr)|*.agr|All Files(*.*)|*.*|" 
 	file_open_dialog IF
-          count
+          count 
+          2dup 63 min grace_title swap cmove
           R/O open-file 0< IF drop
             ." Unable to open input file!"
           ELSE
             gr_fid ! read_grace_file
+	    grace_title 63 set_window_title
           THEN
         ELSE drop
         THEN ;

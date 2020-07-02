@@ -1131,31 +1131,56 @@ void CPlotWindow::OnHeader ()
 
 BOOL CPlotWindow::OnFileNew ()
 {
-	if (m_pDi != NULL) delete m_pDi;
+   if (m_pDi != NULL) delete m_pDi;
 // AfxMessageBox("Deleted display");
-	if (m_pDb != NULL) delete m_pDb;
+   if (m_pDb != NULL) delete m_pDb;
 // AfxMessageBox("Deleted database");
-	m_pDb = new CDatabase();	// create database and display
+   m_pDb = new CDatabase();	// create database and display
 // AfxMessageBox("Created new database");
-	m_pDi = new CPlotDisplay();
+   m_pDi = new CPlotDisplay();
 // AfxMessageBox("Created new display");
     m_pStatusBar->SetPaneText (0, "Workspace cleared.");
+    this->SetWindowText("XYPLOT");
 
     OnReset();
-	return TRUE;
+    return TRUE;
 }
 //---------------------------------------------------------------
 
 void CPlotWindow::OnAbout()
 {
-	CModalDialog about("AboutBox", NULL);
-	about.DoModal();
+    CModalDialog about("AboutBox", NULL);
+    about.DoModal();
 }
 //---------------------------------------------------------------
 
+BOOL CPlotWindow::FileOpenDialog(const char* strFilter, char* strFileName)
+{
+    CFileDialog fd(TRUE);
+    CString LoadFileName;
+    static char szf[256];
+    int n = strlen(strFilter);
+    if (n > 255) {
+      AfxMessageBox("Filter string too long!");
+      return FALSE;
+    }
+    strncpy (szf, strFilter, n);
+    szf[n] = (char) 0;
+
+    for (int i = 0; i < n; ++i)
+       if (szf[i] == '|') szf[i] = '\0';
+
+    fd.m_ofn.lpstrFilter = szf;
+    fd.m_ofn.lpstrTitle = "Open File";
+    if (fd.DoModal() == IDCANCEL) return FALSE;
+    LoadFileName = fd.GetFileName();
+    strcpy (strFileName, (const char *) LoadFileName);
+    return TRUE;
+}
+
 BOOL CPlotWindow::OnFileOpen ()
 {
-    static char szf[256];
+    char szf[256];
     MSG msg = *GetCurrentMessage();
 
     if (msg.lParam == 1)
@@ -1166,29 +1191,16 @@ BOOL CPlotWindow::OnFileOpen ()
             strcpy (szf, (char const*) m_pWinBuffer);
         else
             *szf = 0;
-
+	return LoadFile(szf);
     }
     else
     {
-        CFileDialog fd(TRUE);
-        CString LoadFileName;
-
-	    // szFilter.LoadString(IDS_FILTERSTRING);
-	    strcpy (szf, (const char *) szFilter);
-
-	    for (int i = 0; i < szFilter.GetLength(); ++i)
-	    if (szf[i] == '|') szf[i] = '\0';
-
-	    fd.m_ofn.lpstrFilter = szf;
-
-        if (fd.DoModal() == IDCANCEL) return FALSE;
-
-        LoadFileName = fd.GetFileName();
-        strcpy (szf, (const char *) LoadFileName);
+	char s[256];
+	strcpy(s, (const char*) szFilter);
+	if (FileOpenDialog( s, szf ))
+	  return LoadFile(szf);
     }
-
-    return LoadFile(szf);
-
+    return FALSE;
 }
 //---------------------------------------------------------------
 
@@ -1197,7 +1209,7 @@ void CPlotWindow::SelectColumns (char* fname, int nCols)
 // Provide dialog box to select columns to load from input file
 //   Return number of columns selected
 
-	CString cs, prompt;
+    CString cs, prompt;
     char s[255];
     float x[8];
     int i, nSel = 0;
@@ -1210,9 +1222,7 @@ void CPlotWindow::SelectColumns (char* fname, int nCols)
     {
         strcpy (s, (const char *) cs);
         LoadDatasetFile (fname, s);
-	}
-
-
+     }
 }
 //---------------------------------------------------------------
 

@@ -35,6 +35,8 @@
 \  draw_plot ( flag -- ) draw the active plot.
 \  set_grid_tics ( nx ny -- ) set number of tics for x and y axes
 \  set_grid_lines ( flagx flagy -- ) set grid lines on/off for x and y axes 
+\  get_window_title ( c-addr umax -- c-addr uret ) get title of window.
+\  set_window_title ( c-addr u -- )  set title of window.
 \  clear_window ( -- )	Clear the plot window.
 \  draw_window ( -- ) 	Draw the plot window.
 \  reset_window ( -- ) 	Reset the plot window.
@@ -130,6 +132,12 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 
 : set_grid_lines ( flagx flagy -- | set grid lines on/off on x and y axes )
 	FN_SET_GRID_LINES call ;
+
+: get_window_title ( c-addr umax -- uret )
+	FN_GET_WINDOW_TITLE call ;
+
+: set_window_title ( c-addr u -- )
+	FN_SET_WINDOW_TITLE call ;
 
 : clear_window ( -- | clear the plot window )
 	FN_CLEAR_WINDOW call ;
