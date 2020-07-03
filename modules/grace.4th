@@ -461,7 +461,8 @@ create grace_pattrs[[ MAXPLOTS NATTRIBUTES * cells allot   \ plot attributes
 : ]]pattrs ( a row col -- a2 ) >r NATTRIBUTES * r> + cells + ;
  
 create  grace_set_names  MAXSETS  80 * allot  \ buffer to store set names
-create  grace_color_map  MAXPLOTS 32 * allot  \ buffer to store color names
+create  grace_rgb[       MAXPLOTS cells allot \ buffer to store colorref values
+create  grace_colors[    MAXPLOTS 32 * allot  \ buffer to store color names
 create  grace_headers    MAXHDRSIZE MAXSETS * allot  \ buffer to store headers
 
 : set_default_world_coords ( -- )
@@ -520,22 +521,38 @@ create  grace_headers    MAXHDRSIZE MAXSETS * allot  \ buffer to store headers
                   ELSE  drop s" Grace Dataset"
                   THEN ;
 
-: parse_color_name ( a u -- | parse and store color name )
-    -trailing 10 /string parse_token $>s >r
-    s" ), " search IF
-       4 /string 1- 31 min  \ a2 u2  ( color name substring )
-       r@ MAXPLOTS < IF
-         r> 32 * grace_color_map +
-         dup 32 erase
-         swap cmove
-       THEN
-    ELSE 2drop r> drop
+variable color_idx
+
+: parse_colormap_color ( a u -- | parse and store rgb value and color name )
+    -trailing 10 /string parse_token $>s color_idx !
+    s" (" search IF
+      1 /string bl skip
+      0 0 2swap >number  [char] , skip bl skip
+      0 0 2swap >number  [char] , skip bl skip
+      0 0 2swap >number  2>r 
+      d>s >r d>s >r d>s r> r>  RGB>COLORREF
+      grace_rgb[ color_idx @ MAXPLOTS 1- min cells + !  \ store colorref
+      2r> s" ), " search IF
+        4 /string 1- 31 min  \ a2 u2  ( color name substring )
+        color_idx @ MAXPLOTS 1- min 32 * grace_colors[ +
+        dup 32 erase swap cmove
+      ELSE 2drop
+      THEN
+    ELSE 2drop
     THEN
+;
+
+\ For diagnostics
+: show_grace_colormap ( -- )
+    16 0 do
+      I cells grace_rgb[ + @ 8 .r 2 spaces
+      I 32 * grace_colors[ + dup strlen type cr
+   LOOP
 ;
 
 : get_grace_color ( n -- a u | retrieve color name of color n from map)
     dup MAXPLOTS < IF
-      32 * grace_color_map + dup strlen
+      32 * grace_colors[ + dup strlen
     ELSE
       drop s" black"  \ default color for unknown
     THEN ;
@@ -697,7 +714,8 @@ variable xyp_symbol
 
     map_grace_attr IF
       pl1 PlotInfo->Type   !
-      cells xy_rgb[ + @ pl1 PlotInfo->Color  !  \ need to parse grace colormap!!
+      cells grace_rgb[ + @ nearest_xyplot_color  \ index in xyp colormap
+      cells xy_rgb[ + @  pl1 PlotInfo->Color  !  \ use closest xyplot color
       pl1 PlotInfo->Symbol !
       pl1 make_plot
     THEN
@@ -761,7 +779,7 @@ variable xyp_symbol
     2dup ?grace-comment-line 0= IF
       2dup s" @default"     search IF 2drop 2drop EXIT   ELSE 2drop THEN
       2dup s" @    line "   search IF 2drop 2drop EXIT   ELSE 2drop THEN
-      2dup s" @map color"   search IF parse_color_name   ELSE 2drop THEN
+      2dup s" @map color"   search IF parse_colormap_color  ELSE 2drop THEN
       2dup s"   world"      search IF parse_world_coords ELSE 2drop THEN
       2dup s" hidden "      search IF parse_visibility   ELSE 2drop THEN
       2dup s" comment"      search IF parse_grace_name   ELSE 2drop THEN
@@ -812,6 +830,7 @@ create grace_title 64 allot
           ELSE
             gr_fid ! read_grace_file
 	    grace_title 63 set_window_title
+	    \ show_grace_colormap
           THEN
         ELSE drop
         THEN ;
