@@ -146,7 +146,7 @@ create xy_colors[ MAX_XYCOLORS MAX_COLORNAME_LEN * allot
     s" brown"        165  42  42
     s" crimson"      220  20  60
     s" springgreen"    0 255 127
-    s" indianred"    205  92  92
+    s" chestnut"     205  92  92
     s" deepskyblue"    0 191 255
     s" lightgray"    211 211 211
     s" wheat"        245 222 179
@@ -186,11 +186,9 @@ create xy_colors[ MAX_XYCOLORS MAX_COLORNAME_LEN * allot
     default_gr_colormap
 
     \ Get current XYPLOT color map
-    xy_rgb[ 2 cells + 
-    xy_colors[ 2 MAX_COLORNAME_LEN * +
-    MAX_COLORNAME_LEN MAX_XYCOLORS 2- get_color_map
-    MAX_XYCOLORS 2- < IF
-      default_xy_colormap  \ Use a default color map on error for GET_COLOR_MAP
+    xy_rgb[  xy_colors[  MAX_COLORNAME_LEN MAX_XYCOLORS get_color_map
+    MAX_XYCOLORS < IF
+      default_xy_colormap  \ Use a default color map on error
     THEN
 
     \ For each of the plots in the PlotList, look up the xyplot
