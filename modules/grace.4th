@@ -260,13 +260,24 @@ variable nplots_for_set
       default_xy_colormap  \ Use a default color map on error
     THEN ;
 
+create plot_list_colors[ MAXPLOTS cells allot
 
+\ Retrieve the colors of the plots in XYPLOT's plot list, into
+\ the array plot_list_colors[ and return the number of plots.
+: get_plot_list_colors ( -- u )
+    get_plot_list
+    dup 0 DO  
+      PlotList[ I ]PInfo PlotInfo->Color @
+      plot_list_colors[ I cells + !
+    LOOP ;
+    
 \ =================================================
 \ Export XYPLOT environment to Grace file 
 \ =================================================
  
 \ Setup output Grace color map -- only needed for export.
 variable gr_idx
+variable nplots
 : setup_grace_colormap ( -- )
     gr_colors[ MAX_GRCOLORS MAX_COLORNAME_LEN * erase
     default_gr_colormap
@@ -277,20 +288,32 @@ variable gr_idx
     \ the xyplot color map. Copy the color map entry into the
     \ grace color map, if it does not already exist in the map.
     MAX_GRCOLORS 1- gr_idx !
-    get_plot_list
+    get_plot_list_colors dup nplots !
     0 ?DO
-      PlotList[ I ]PInfo PlotInfo->Color @ 
-      nearest_xyplot_color  \ -- n
-      dup gr_rgb[ MAX_GRCOLORS color-in-array? IF
+      plot_list_colors[ I cells + @ nearest_xyplot_color  \ -- n
+      xy_rgb[ over cells + @ gr_rgb[ MAX_GRCOLORS color-in-array? IF
+        \ Color entry exists in grace color map; no need to copy it.
         drop
       ELSE
-        xy_rgb[ over cells + @ gr_rgb[ gr_idx @ cells + !
+        \ Find an index in the grace color map, below or equal to the
+        \ current index,  which does not contain any of the plot list colors.
+        BEGIN
+          gr_rgb[ gr_idx @ cells + @
+          plot_list_colors[ nplots @ color-in-array?
+          gr_idx @ 1 > and
+        WHILE
+          -1 gr_idx +!
+        REPEAT
+        gr_idx @ 1 = IF drop leave THEN  \ no more space in grace color map
+        xy_rgb[    over cells + @ gr_rgb[ gr_idx @ cells + !
         xy_colors[ over MAX_COLORNAME_LEN * + 
-        gr_colors[ gr_idx @ MAX_COLORNAME_LEN * + MAX_COLORNAME_LEN cmove
+        gr_colors[ gr_idx @ MAX_COLORNAME_LEN * + 
+        MAX_COLORNAME_LEN cmove
+        drop
         -1 gr_idx +!
       THEN
-      gr_idx @ 2 = IF leave THEN \ don't overwrite first two colors
-    LOOP ;
+    LOOP 
+;
 
 : write_grace_pageinfo ( -- )
     s" @page size 792, 612"      >grfile
