@@ -78,13 +78,25 @@ variable rgb2
     - dup * +
     s>f fsqrt ;
 
+\ Return true if a colorref value already exists in an array
+\ of colorref values, with maximum array length, umaxcolors.
+: color-in-array? ( ucoloref acolorref umaxcolors -- flag )
+    0 ?DO  
+      2dup @ = IF 
+        2drop true 
+        unloop EXIT 
+      THEN 
+      cell+
+    LOOP
+    2drop false ;
+
 variable idx_nearest
 fvariable distance
 
 \ Find the nearest matching color to ucolorref in an array of
 \ colorrefs, acolorref, with maximum array length, umaxcolors;
 \ return index in array.
-: nearest_color ( ucolorref acolorref umaxcolors -- idx )
+: nearest-color ( ucolorref acolorref umaxcolors -- idx )
      255 dup * 3 * s>f fsqrt distance f!
      0 idx_nearest !
      0 DO      \ -- ucolorref a
@@ -188,10 +200,10 @@ create xy_colors[ MAX_XYCOLORS MAX_COLORNAME_LEN * allot
 ;
 
 : nearest_xyplot_color ( ucolorref -- idx )
-    xy_rgb[ MAX_XYCOLORS nearest_color ;
+    xy_rgb[ MAX_XYCOLORS nearest-color ;
 
 : nearest_grace_color ( ucolorref -- idx )
-    gr_rgb[ MAX_GRCOLORS nearest_color ;
+    gr_rgb[ MAX_GRCOLORS nearest-color ;
 
 
 \ Common definitions for import and export
@@ -241,7 +253,7 @@ variable nplots_for_set
     nplots_for_set @
 ;
 
-\ Get current XYPLOT colormap or the default one.
+\ Get current XYPLOT color map or the default one.
 : setup_xyplot_colormap ( -- )
     xy_rgb[  xy_colors[  MAX_COLORNAME_LEN MAX_XYCOLORS get_color_map
     MAX_XYCOLORS < IF
@@ -253,7 +265,7 @@ variable nplots_for_set
 \ Export XYPLOT environment to Grace file 
 \ =================================================
  
-\ Setup output grace color map -- only needed for export.
+\ Setup output Grace color map -- only needed for export.
 variable gr_idx
 : setup_grace_colormap ( -- )
     gr_colors[ MAX_GRCOLORS MAX_COLORNAME_LEN * erase
@@ -262,18 +274,22 @@ variable gr_idx
 
     \ Obtain the current XYPLOT plot list. For each plot in the 
     \ plot list, retrieve its rgb color, and find its index in
-    \ the xyplot colormap; copy the colormap entry to the output
-    \ grace colormap, starting at index 2.
-    2 gr_idx !
+    \ the xyplot color map. Copy the color map entry into the
+    \ grace color map, if it does not already exist in the map.
+    MAX_GRCOLORS 1- gr_idx !
     get_plot_list
     0 ?DO
       PlotList[ I ]PInfo PlotInfo->Color @ 
-      nearest_xyplot_color  \ -- n 
-      xy_rgb[ over cells + @ gr_rgb[ gr_idx @ cells + !
-      xy_colors[ over MAX_COLORNAME_LEN * + 
-      gr_colors[ gr_idx @ MAX_COLORNAME_LEN * + MAX_COLORNAME_LEN cmove
-      1 gr_idx +!
-      gr_idx @ MAX_GRCOLORS = IF leave THEN
+      nearest_xyplot_color  \ -- n
+      dup gr_rgb[ MAX_GRCOLORS color-in-array? IF
+        drop
+      ELSE
+        xy_rgb[ over cells + @ gr_rgb[ gr_idx @ cells + !
+        xy_colors[ over MAX_COLORNAME_LEN * + 
+        gr_colors[ gr_idx @ MAX_COLORNAME_LEN * + MAX_COLORNAME_LEN cmove
+        -1 gr_idx +!
+      THEN
+      gr_idx @ 2 = IF leave THEN \ don't overwrite first two colors
     LOOP ;
 
 : write_grace_pageinfo ( -- )
