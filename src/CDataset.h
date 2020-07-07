@@ -35,7 +35,8 @@ public:
 	void CopyData (float*, int, int);
 	void CopyFromXY (float*, float*, int);
 	void CopyFromXY (float*, float*, int, int);
-	void CopyToBuffer (float* a);
+	void CopyToBuffer (float* );
+	bool AppendToHeader (char* );
 	vector<float>::iterator Find(float);
 	int IsOverlapping (float, float);
 	vector<vector<float>::iterator> Limits (float, float, int&);

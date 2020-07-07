@@ -726,90 +726,80 @@ void CPlotWindow::OnTemplate()
 
 void CPlotWindow::OnExpression()
 {
-	char s[256], emsg[256];
+    char s[256], emsg[256];
     *s = 0;
     ostringstream* pSS = NULL;
-    int i, *StackPtr;
+    int i, len, *StackPtr;
     BYTE* TypePtr;
 
     MSG msg = *GetCurrentMessage();
-    if (msg.lParam == 1)
-    {
+    if (msg.lParam == 1) {
         // expression set up by another Win application
-
-        if (m_bWinBuffer)
-            strcpy (s, (char*) m_pWinBuffer);
-
+        if (m_bWinBuffer) strcpy (s, (char*) m_pWinBuffer);
     }
-    else
-    {
-	    CString math_exp, prompt;
-	    prompt = "Enter the math expression:";
-	    if (GetInput(prompt, &math_exp) == IDCANCEL) return;
-	    math_exp.MakeUpper();
-	    strcpy (s, (const char*) math_exp);
-	}
+    else {
+      CString math_exp, prompt;
+      prompt = "Enter the math expression:";
+      if (GetInput(prompt, &math_exp) == IDCANCEL) return;
+      math_exp.MakeUpper();
+      len = math_exp.GetLength();
+      if (len > 253) {
+	AfxMessageBox("Expression too long!");
+	return;
+      }
+      strcpy (s, (const char*) math_exp);
+    }
 
-    // AfxMessageBox(s);
-
-    if (*s)
-    {
-	    vector<BYTE> opcodes, prefix;
+    if (*s) {
+	vector<BYTE> opcodes, prefix;
         delete pSS;
-	    pSS = new ostringstream(emsg, 256);
+	pSS = new ostringstream(emsg, 256);
 
-	    int ecode = CompileAE (&opcodes, s);
+	int ecode = CompileAE (&opcodes, s);
 
         // OutputForthByteCode (&opcodes, *pSS);
         // AfxMessageBox(emsg);
 
-	    if (ecode)
-	    {
-	        sprintf (emsg, "%s %d", "Expression Compiler Error:", ecode);
-	        AfxMessageBox (emsg);
-	    }
-	    else
-	    {
+	if (ecode) {
+	  sprintf (emsg, "%s %d", "Expression Compiler Error:", ecode);
+	  AfxMessageBox (emsg);
+	}
+	else  {
+          // Perform the operation
+	  CDataset* d = m_pDi->GetActiveSet();
+          int npts = d->NumberOfPoints();
+          int nsize = d->SizeOfDatum();
+          float *p = d->begin();
+          BYTE *bp = (BYTE*) &p;
+          prefix.push_back(OP_ADDR);
+          for (i = 0; i < sizeof(void*); i++) prefix.push_back(*(bp + i));
+          bp = (BYTE*) &nsize;
+          prefix.push_back(OP_IVAL);
+          for (i = 0; i < sizeof(int); i++) prefix.push_back(*(bp + i));
+          bp = (BYTE*) &npts;
+          prefix.push_back(OP_IVAL);
+          for (i = 0; i < sizeof(int); i++) prefix.push_back(*(bp + i));
+          // prefix.push_back(OP_DOTS);
+          prefix.push_back(OP_RET);
+          SetForthOutputStream(*pSS);
+	  ecode = ForthVM (&prefix, &StackPtr, &TypePtr);
+	  if (ecode) {
+	    sprintf (emsg, "%s %d", "Execution Error:", ecode);
+	    AfxMessageBox (emsg);
+	  }
+	  ecode = ForthVM (&opcodes, &StackPtr, &TypePtr);
+	  if (ecode) {
+	    sprintf (emsg, "%s %d", "Execution Error:", ecode);
+	    AfxMessageBox (emsg);
+	  }
+	  
+	  if (!d->AppendToHeader(strcat(s,"\n")))
+            AfxMessageBox("Unable to append expression to header!");
 
-            // Perform the rescale operation
-
-
-	        CDataset* d = m_pDi->GetActiveSet();
-            int npts = d->NumberOfPoints();
-            int nsize = d->SizeOfDatum();
-            float *p = d->begin();
-            BYTE *bp = (BYTE*) &p;
-            prefix.push_back(OP_ADDR);
-            for (i = 0; i < sizeof(void*); i++)
-                prefix.push_back(*(bp + i));
-            bp = (BYTE*) &nsize;
-            prefix.push_back(OP_IVAL);
-            for (i = 0; i < sizeof(int); i++)
-                prefix.push_back(*(bp + i));
-            bp = (BYTE*) &npts;
-            prefix.push_back(OP_IVAL);
-            for (i = 0; i < sizeof(int); i++)
-                prefix.push_back(*(bp + i));
-            // prefix.push_back(OP_DOTS);
-            prefix.push_back(OP_RET);
-            SetForthOutputStream(*pSS);
-	        ecode = ForthVM (&prefix, &StackPtr, &TypePtr);
-	        if (ecode)
-	        {
-	            sprintf (emsg, "%s %d", "Execution Error:", ecode);
-	            AfxMessageBox (emsg);
-	        }
-	        ecode = ForthVM (&opcodes, &StackPtr, &TypePtr);
-	        if (ecode)
-	        {
-	            sprintf (emsg, "%s %d", "Execution Error:", ecode);
-	            AfxMessageBox (emsg);
-	        }
-	        d->SetExtrema();
-            m_pDi->ResetExtrema();
-            Invalidate();
-
-	    }
+	  d->SetExtrema();
+          m_pDi->ResetExtrema();
+          Invalidate();
+	}
     }
 }
 //--------------------------------------------------------------
