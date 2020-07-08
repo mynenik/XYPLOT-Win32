@@ -27,4 +27,22 @@ Building from the source code is not necessary to use this package, but an advan
 * Digital Mars C/C++ compiler (version 8.57)
 * A386 assembler (version 4.05)
 
+## Installation Instructions
+
+1. Download the ZIP file for the master or release version you want. The master will contain the most recent features, but a release version will usually be more stable.
+
+2. Extract the files from the ZIP file. They will extract into a separate folder, such as XYPLOT-Win32-master.
+
+3. The executabe, xypw32.exe, is found in the sub-folder, bin/. Create a shortcut for the executable and drag the shortcut onto your desktop for easy access.
+
+4. The exe file must be able to find its Forth modules, which are located in the subfolder, modules/ of the extracted files. Create an environment variable, XYPLOT_DIR, to specify the location of the module files (.4th). Follow the steps below to set the environment variable.
+
+5. Go to the Windows toolbar search field and type, "env". Then, select "Edit the environment variables for your account."
+
+6. Under "User Variables for [your account name]", click on "New". Then, set the variable name to XYPLOT_DIR and the variable value to the full path specifying the location of the modules. Click "OK".
+
+7. When you launch XYPLOT from its desktop shortcut, it will open up an empty graph. If the labels on the graph are blacked out, this means that XYPLOT cannot find its modules. Check the environment variable setting.
+
+8. Follow the User's Guide to learn how to create a graph by loading data into XYPLOT from text files or other file types. The distribution's sub-folder, example-data/ , contains several examples of different types of files which may be displayed.
+
 
