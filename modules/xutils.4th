@@ -4,12 +4,8 @@
 \
 \ Copyright (c) 1999-2020 Krishna Myneni
 \
-\ This software is provided under the terms of the GNU
-\ General Public License
-\
-\ Revisions:
-\
-\
+\ This software is provided under the terms of the
+\ GNU Affero General Public License (AGPL) v3.0 or later.
 \
 
 : tdstring ( -- a u | return a date and time string )
@@ -23,6 +19,38 @@
         rot 0 <# # # #>                   strcat
 ;
 
+
+: is-path-delim? ( c -- flag )
+    dup dup 
+    [char] \ = >r 
+    [char] / = >r
+    [char] : = 
+    r> or r> or ;
+
+\ Split a string containing a path+filename into a path name and 
+\ a file name.
+
+: split-path ( c-addr u -- c-pathaddr u1 c-fileaddr u2 )
+    ?dup IF
+      2dup 1- + 1  \ -- c-addr u  {c-addr+u-1} 1
+      begin
+        over c@ is-path-delim? 0= >r
+        dup 3 pick <= r> and
+      while
+        1+ >r 1- r>
+      repeat
+      \ -- c-addr u  c-addr2 u2
+      ?dup IF
+        1 /string   \ c-addr u c-fileaddr u2
+        2dup 2>r nip
+        -  2r>
+      ELSE
+        2>r drop 0 2r>
+      THEN
+    ELSE
+      0 2dup
+    THEN ;
+ 
 
 DatasetInfo ds1
 DatasetInfo ds2

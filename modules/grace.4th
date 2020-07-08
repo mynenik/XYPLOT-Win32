@@ -37,6 +37,8 @@
 : dos2unix-line ( a u -- a u2 )
     2dup 1- + c@ 13 = IF 1- THEN ;
 
+create xyplot_window_title 128 allot  \ new xyplot window title
+
 variable gr_fid
 variable grace_line_count
 
@@ -557,15 +559,19 @@ variable nplots
     write_datasets_xydata ;
 
 : export_grace ( -- | prompt user for filename and export grace file )
+    xyplot_window_title 128 erase
     c" Enter the Grace (.agr) filename:" get_input
     IF
-      count 2dup ." Exporting Grace file, " type cr
+      count 
+      2dup ." Exporting Grace file, " type cr
+      2dup split-path xyplot_window_title swap 127 min cmove 2drop
       W/O create-file 0< IF
         ." Unable to create output file!" cr
       ELSE
         gr_fid ! write_grace_file
         gr_fid @ close-file drop
         ." Grace file successfully written." cr
+        xyplot_window_title 127 set_window_title
       THEN
     THEN
 ;
@@ -935,19 +941,18 @@ variable xyp_symbol
     AGAIN ;
 
 
-create grace_title 64 allot
 
 : import_grace ( -- | prompt user for filename and import grace file )
-	grace_title 64 erase
+	xyplot_window_title 128 erase
         c" Grace Files(*.agr)|*.agr|All Files(*.*)|*.*|" 
 	file_open_dialog IF
           count 
-          2dup 63 min grace_title swap cmove
+          2dup 127 min xyplot_window_title swap cmove
           R/O open-file 0< IF drop
             ." Unable to open input file!"
           ELSE
             gr_fid ! read_grace_file
-	    grace_title 63 set_window_title
+	    xyplot_window_title 127 set_window_title
 	    \ show_grace_colormap
           THEN
         ELSE drop
