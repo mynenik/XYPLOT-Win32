@@ -258,7 +258,7 @@ cr .( Older matrix package will soon be obsoleted in favor of FSL.) cr
 include matrix
 [THEN]
 
-\ XYPLOT modules ( ver >= 1.1.4 )
+\ XYPLOT modules ( ver >= 1.1.7 )
 include xutils
 include xypolyfit
 include arithmetic
@@ -279,6 +279,7 @@ include peak_search
 \ include xymap
 \ include yn_vs_ym
 include grace
+include xyswap
 
 \ You can put some initialization stuff here, for example
 \  to set the background and foreground colors.
