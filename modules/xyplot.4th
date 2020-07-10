@@ -33,6 +33,7 @@
 \  set_plot_symbol ( symbolname -- ) set active plot symbol.
 \  set_plot_color ( colorname -- ) set active plot color.
 \  draw_plot ( flag -- ) draw the active plot.
+\  get_grid ( -- nXtics nYtics bXLines bYLines bXaxis bYaxis ) get grid params.
 \  set_grid_tics ( nx ny -- ) set number of tics for x and y axes
 \  set_grid_lines ( flagx flagy -- ) set grid lines on/off for x and y axes 
 \  get_window_title ( c-addr umax -- c-addr uret ) get title of window.
@@ -126,6 +127,9 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 
 : draw_plot ( flag -- | draw active plot, if flag = false use bkg color )
 	FN_DRAW_PLOT call ;
+
+: get_grid ( -- nXtics nYtics bXlines bYlines bXaxis bYaxis )
+	FN_GET_GRID call ;
 
 : set_grid_tics ( nx ny -- | set number of tics on x and y axes )
 	FN_SET_GRID_TICS call ;

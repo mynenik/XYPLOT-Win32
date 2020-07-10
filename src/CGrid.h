@@ -12,7 +12,6 @@
 #define __CGRID_H__
 
 const int MAX_TICS = 100;
-
 int nXtics;
 int nYtics;
 int nXt [MAX_TICS];
@@ -21,21 +20,22 @@ int nYt [MAX_TICS];
 class CGridFrame : public CPlotObject
 {
 public:
-    CGridFrame (int xtics, int ytics);
     void Draw (CDC*);
 };
 
 class CGridLines : public CPlotObject
 {
 public:
-    static bool m_bHorizontal;
-    static bool m_bVertical;
+    bool m_bHorizontal;
+    bool m_bVertical;
     void Draw (CDC*);
 };
 
 class CAxes : public CPlotObject
 {
 public:
+    bool m_bXaxis;
+    bool m_bYaxis;
     void Draw (CDC*);
 };
 
@@ -53,7 +53,9 @@ public:
     void SetTics (int, int);
     void GetTics (int*, int*);
     void SetLines (bool, bool);
-    void SetAxes (bool);
+    void GetLines (bool*, bool*);
+    void SetAxes (bool, bool);
+    void GetAxes (bool*, bool*);
 
     virtual void Labels (CDC*) = 0;
     virtual void Draw (CDC*) = 0;

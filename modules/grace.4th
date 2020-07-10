@@ -350,20 +350,36 @@ variable nplots
     s" @g0 hidden false" >grfile
 ;
 
+variable nXtics
+variable nYtics
+variable bXlines
+variable bYlines
+variable bXaxis
+variable bYaxis
+
+: write_xyplot_grid ( -- )
+;
+
 : write_xyplot_axes ( -- )
+    get_grid bYaxis ! bXaxis ! bYlines ! bXlines ! nYtics ! nXtics !
     s" @    xaxis on"      >grfile
     s" @    xaxis tick on" >grfile
     s" @    xaxis tick major "
-    xmax f@ xmin f@ f- 10e f/
+    xmax f@ xmin f@ f- nXtics @ s>f ( 10e) f/ 2e f*
     6 f>$ strcat >grfile
+    bXlines @ IF
+      s" @    xaxis tick major grid on"  >grfile
+    THEN
     s" @    xaxis ticklabel on" >grfile
     s" @    yaxis on"      >grfile
     s" @    yaxis tick on" >grfile
     s" @    yaxis tick major "
-    ymax f@ ymin f@ f- 10e f/
+    ymax f@ ymin f@ f- nYtics @ s>f ( 10e) f/ 2e f*
     6 f>$ strcat >grfile
+    bYlines @ IF
+      s" @    yaxis tick major grid on"  >grfile
+    THEN
     s" @    yaxis ticklabel on" >grfile
-
     s" @    frame type 0"  >grfile
 ;
 

@@ -17,14 +17,15 @@ public:
     CGridDialog (CWnd* pWndParent = NULL) :
     CModalDialog ("GridDialog", pWndParent) {}
 
-	BOOL OnInitDialog ();
-	afx_msg void OnOK();
+    BOOL OnInitDialog ();
+    afx_msg void OnOK();
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 
-    CButton* LinesField() {return (CButton*)GetDlgItem(IDC_GRID_LINES);}
-	CEdit* XticsField() {return (CEdit*)GetDlgItem(IDC_GRID_XTICS);}
-	CEdit* YticsField() {return (CEdit*)GetDlgItem(IDC_GRID_YTICS);}
+    CButton* HorLinesField() {return (CButton*)GetDlgItem(IDC_HOR_GRID_LINES);}
+    CButton* VerLinesField() {return (CButton*)GetDlgItem(IDC_VER_GRID_LINES);}
+    CEdit* XticsField() {return (CEdit*)GetDlgItem(IDC_GRID_XTICS);}
+    CEdit* YticsField() {return (CEdit*)GetDlgItem(IDC_GRID_YTICS);}
 };
 
 

@@ -52,6 +52,7 @@ HEADERS		= fbc.h \
 		CPlot.h \
 		CPlotList.h \
 		CPlotDisplay.h \
+		CPlotView.h \
 		CPickDataDialog.h  \
 		resource.h \
 		CInputDialog.h
@@ -122,6 +123,7 @@ OBJS		= CDatabase.OBJ \
 		CTransform.OBJ \
 		CPlotObject.OBJ \
 		CPlotList.OBJ \
+		CPlotView.OBJ \
 		CPlotDisplay.OBJ \
 		CPlotWindow.OBJ \
 		CXyPlot.OBJ \
@@ -204,6 +206,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+
@@ -236,6 +239,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+
@@ -303,6 +307,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+
@@ -334,6 +339,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+
@@ -391,6 +397,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+
@@ -422,6 +429,7 @@ CDataset.OBJ+
 CGrid.OBJ+
 CInputDialog.OBJ+
 CPickDataDialog.OBJ+
+CPlotView.OBJ+
 CPlotDisplay.OBJ+
 CPlotList.OBJ+
 CPlotObject.OBJ+

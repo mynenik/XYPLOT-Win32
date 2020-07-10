@@ -24,6 +24,7 @@ using namespace std;
 #include "xyp41.h"
 #include "CWorkspace41.h"
 #include "CDatabase.h"
+#include "CPlotView.h"
 #include "CPlotDisplay.h"
 #include "resource.h"
 #include "CInputDialog.h"
@@ -108,15 +109,15 @@ CPlotWindow::CPlotWindow()
     }
 */
 
-	m_pDb = NULL;
-	m_pDi = NULL;
+    m_pDb = NULL;
+    m_pDi = NULL;
 
     m_pWinBuffer = NULL; // pointer to the shared memory buffer for Win apps
     m_bWinBuffer = FALSE; // indicate ptr is uninitialized
 
     // OpenForth();        // initialize the Forth virtual machine
 
-	OnFileNew();
+    OnFileNew();
 
     if (FileList.size() > 1)
     {
@@ -128,28 +129,25 @@ CPlotWindow::CPlotWindow()
         }
     }
 
-	szFilter.LoadString(IDS_FILTERSTRING);  // Load the file filters
+    szFilter.LoadString(IDS_FILTERSTRING);  // Load the file filters
 }
 
 //---------------------------------------------------------------
 
 CPlotWindow::~CPlotWindow()
 {
-	// Cleanup
-
     CloseForth();
     // delete m_pForthConsole;
     delete m_pStatusBar;
-
-	delete m_pDb;
-	delete m_pDi;
+    delete m_pDb;
+    delete m_pDi;
 }
 //---------------------------------------------------------------
 
 void CPlotWindow::OnMouseMove(UINT mf, CPoint p)
 {
     char cur_x [64], cur_y [64];
-	vector<float> x;
+    vector<float> x;
 
     m_pDi->m_nMousePt = p;
     x = m_pDi->Logical(p);
@@ -162,7 +160,7 @@ void CPlotWindow::OnMouseMove(UINT mf, CPoint p)
 
 void CPlotWindow::OnLButtonDown(UINT mf, CPoint p)
 {
-	MSG msg;
+    MSG msg;
     CRect rect, ExpRect;
 
     CDC* pDc = GetDC();
@@ -191,7 +189,7 @@ void CPlotWindow::OnLButtonDown(UINT mf, CPoint p)
                 pDc->DrawFocusRect (&rect);
             }
             if (msg.message == WM_LBUTTONUP) break;
-	    }
+	}
 
         SortRect (&ExpRect);
 
@@ -199,9 +197,9 @@ void CPlotWindow::OnLButtonDown(UINT mf, CPoint p)
         {
             vector<float> x = m_pDi->Logical(ExpRect);
             m_pDi->CreateView(CARTESIAN, x);
-	        Invalidate ();
-	    }
+	    Invalidate ();
 	}
+    }
 
     ReleaseDC (pDc);
 
@@ -351,7 +349,6 @@ void CPlotWindow::OnExtrema ()
     e[3] = x[3];
 
     m_pDi->CreateView(CARTESIAN, e);
-
     Invalidate();
 
 }
@@ -360,12 +357,12 @@ void CPlotWindow::OnExtrema ()
 
 void CPlotWindow::OnPaint()
 {
-	CRect rect, upd_rect;
+    CRect rect, upd_rect;
 
-	GetUpdateRect (&upd_rect, TRUE);
-	if (upd_rect.IsRectEmpty()) return;
+    GetUpdateRect (&upd_rect, TRUE);
+    if (upd_rect.IsRectEmpty()) return;
 
-	CPaintDC dc(this);
+    CPaintDC dc(this);
     dc.SetBkColor(m_cBackgroundColor);
 
     GetClientRect(&rect);
@@ -444,8 +441,7 @@ void CPlotWindow::OnPrint()
 
 void CPlotWindow::OnCopyBitmap ()
 {
-    if (! OpenClipboard())
-    {
+    if (! OpenClipboard()) {
         AfxMessageBox ("Clipboard in use by another application");
         return;
     }
@@ -807,7 +803,7 @@ void CPlotWindow::OnExpression()
 void CPlotWindow::OnGrid()
 {
     // Allow user to setup grid style
-
+    CPlotView* pView = m_pDi->GetCurrentView();
     MSG msg = *GetCurrentMessage();
     if (msg.lParam == 1)
     {
@@ -819,7 +815,7 @@ void CPlotWindow::OnGrid()
             int nXtics = *p++;
             int nYtics = *p++;
             int bLines = *p;
-            m_pDi->m_pGrid->SetTics(nXtics, nYtics);
+            pView->m_pGrid->SetTics(nXtics, nYtics);
 
             Invalidate();
         }
@@ -827,11 +823,11 @@ void CPlotWindow::OnGrid()
     else
     {
         CGridDialog gd(this);
-        gd.m_pGrid = m_pDi->m_pGrid;   // point to the grid to be modified
+        gd.m_pGrid = pView->m_pGrid;   // point to the grid to be modified
         int i = gd.DoModal();
         if (i == IDOK)
         {
-            // m_pDi->m_pGrid = gd.m_pGrid;
+            pView->m_pGrid = gd.m_pGrid;
             Invalidate();
         }
     }
@@ -1001,16 +997,14 @@ void CPlotWindow::OnColor()
 
 void CPlotWindow::OnView2DCartesian()
 {
-//
     m_pDi->ResetExtrema();
     m_pDi->CreateView (CARTESIAN, m_pDi->GetExtrema());
-	Invalidate();
+    Invalidate();
 }
 //---------------------------------------------------------------
 
 void CPlotWindow::OnView2DPolar()
 {
-
     vector<float> e(4);
     float rmax;
 
@@ -1022,9 +1016,8 @@ void CPlotWindow::OnView2DPolar()
     e[2] = -rmax;
     e[3] = rmax;
 
-	m_pDi->CreateView (POLAR, e);
-
-	Invalidate();
+    m_pDi->CreateView (POLAR, e);
+    Invalidate();
 }
 //---------------------------------------------------------------
 /*

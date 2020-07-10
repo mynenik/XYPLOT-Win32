@@ -10,32 +10,30 @@
 #ifndef __CPLOTDISPLAY_H__
 #define __CPLOTDISPLAY_H__
 
-enum COORDINATE_SYSTEM {CARTESIAN, CARTESIAN_INVERTED, POLAR};
-
 class CPlotDisplay {
-    deque<CTransform*> m_qCT;    // double ended queue of coordinate transforms
-    deque<CTransform*>::iterator m_pCt;  // iterator to current transform
+    deque<CPlotView*> m_qPV;    // double ended queue of pointers to plot views
+    deque<CPlotView*>::iterator m_qiView;  // iterator to current plot view
     CPlotList* m_pPlotList;     // the plot list
     float m_fAspect;            // plot display desired aspect ratio
 public:
-    CGrid* m_pGrid;             // ptr to grid object
     CPoint m_nMousePt;
     char m_szXform[16];
     char m_szYform[16];
 
-	CPlotDisplay ();
-	~CPlotDisplay ();
-	void CreateView (COORDINATE_SYSTEM, vector<float>);
-	void DeleteView ();
+    CPlotDisplay ();
+    ~CPlotDisplay ();
+    CPlotView* GetCurrentView() { return (*m_qiView); }
+    void CreateView (COORDINATE_SYSTEM, vector<float>);
+    void ApplyCurrentView();
+    void DeleteView ();
     void GoBack();
     void GoForward();
-    void GoHome() {m_pCt = m_qCT.begin();}
-//	void SetViewAngles (float, float);
+    void GoHome() {m_qiView = m_qPV.begin(); ApplyCurrentView();}
     int Nplots() {return m_pPlotList->Nplots();}
-	void SetAspect (float aspect) {m_fAspect = aspect;}
-	float GetAspect ();
+    void SetAspect (float aspect) {m_fAspect = aspect;}
+    float GetAspect ();
     void SetPlotRect (CRect, CDC*);
-    CRect GetPlotRect () {return (**m_pCt).GetPhysical();}
+    CRect GetPlotRect () {return (*m_qiView)->m_pCt->GetPhysical();}
     CPlot* SelectedPlot (CPoint p) {return m_pPlotList->Selection(p);}
     CDataset* GetActiveSet ();
     CDataset* GetOperandSet ();
@@ -46,10 +44,10 @@ public:
     char* GetList () {return m_pPlotList->GetList();}
     void DisplayList (CDC* pDC) {m_pPlotList->DisplayList(pDC);}
     void Draw (CDC*);
-    vector<float> Logical (CPoint p) {return (**m_pCt).Logical(p);}
-    vector<float> Logical (CRect r) {return (**m_pCt).Logical(r);}
+    vector<float> Logical (CPoint p) {return (*m_qiView)->m_pCt->Logical(p);}
+    vector<float> Logical (CRect r) {return (*m_qiView)->m_pCt->Logical(r);}
     void SetExtrema (vector<float> x);
-    vector<float> GetExtrema () {return (**m_pCt).GetLogical();}
+    vector<float> GetExtrema () {return (*m_qiView)->GetExtrema();}
     void ResetExtrema();
     void Reset();
     CPlot* MakePlot(CDataset*, int) ;

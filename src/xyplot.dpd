@@ -1,6 +1,6 @@
 # xyplot object file dependencies
 cdatabase.obj: \
-	cdatabase.cpp \
+	CDatabase.cpp \
 	consts.h \
 	CDatabase.h \
 	CWorkspace41.h \
@@ -9,21 +9,28 @@ cdatabase.obj: \
 	CXyFile.h \
 	saveopts.h 
 cdataset.obj: \
-	cdataset.cpp \
+	CDataset.cpp \
 	CDataset.h 
 cgrid.obj: \
-	cgrid.cpp \
+	CPlotObject.h \
+	CGrid.cpp \
 	CGrid.h 
 cinputdialog.obj: \
-	cinputdialog.cpp \
+	CInputDialog.cpp \
 	CInputDialog.h \
 	resource.h 
 cpickdatadialog.obj: \
-	cpickdatadialog.cpp \
+	CPickDataDialog.cpp \
 	CPickDataDialog.h \
-	resource.h 
+	resource.h
+cplotview.obj: \
+	CTransform.h \
+	CGrid.h \
+	CPolarGrid.h \
+	CPlotView.h \
+	CPlotView.cpp  
 cplotdisplay.obj: \
-	cplotdisplay.cpp \
+	CPlotDisplay.cpp \
 	CPlotDisplay.h \
 	CPlotList.h \
 	CPlot.h \
@@ -36,7 +43,7 @@ cplotdisplay.obj: \
 	CWorkspace41.h \
 	xyp41.h 
 cplotlist.obj: \
-	cplotlist.cpp \
+	CPlotList.cpp \
 	CPlotList.h \
 	CPlot.h \
 	CDataset.h \
@@ -44,11 +51,11 @@ cplotlist.obj: \
 	CTransform.h \
 	ColorTable.h 
 cplotobject.obj: \
-	cplotobject.cpp \
+	CPlotObject.cpp \
 	CPlotObject.h \
 	CTransform.h
 cplotwindow.obj: \
-	cplotwindow.cpp \
+	CPlotWindow.cpp \
 	consts.h \
 	CPlotWindow.h \
 	CDatabase.h \
@@ -76,23 +83,23 @@ cplotwindow.obj: \
 	ForthCompiler.h \
 	ForthVM.h 
 cpolargrid.obj: \
-	cpolargrid.cpp \
+	CPolarGrid.cpp \
 	CPolarGrid.h \
 	CGrid.h \
 	CPlotObject.h \
 	CTransform.h
 cworkspace41.obj: \
-	cworkspace41.cpp \
+	CWorkspace41.cpp \
 	CWorkspace41.h \
 	xyp41.h 
 cxyfile.obj: \
-	cxyfile.cpp \
+	CXyFile.cpp \
 	consts.h \
 	CXyFile.h \
 	CDataset.h \
 	saveopts.h 
 cxyplot.obj: \
-	cxyplot.cpp \
+	CXyPlot.cpp \
 	CXyPlot.h \
 	CPlot.h \
 	CDataset.h \
@@ -129,28 +136,28 @@ xyplot.obj: \
 	ForthCompiler.h \
 	ForthVM.h 
 cgriddialog.obj: \
-	cgriddialog.cpp \
+	CGridDialog.cpp \
 	CGridDialog.h \
 	resource.h \
 	CGrid.h \
 	CPlotObject.h \
 	CTransform.h
 cheaderdialog.obj: \
-	cheaderdialog.cpp \
+	CHeaderDialog.cpp \
 	CHeaderDialog.h \
 	resource.h 
 ctransform.obj: \
-	ctransform.cpp \
+	CTransform.cpp \
 	CTransform.h
 algebracompiler.obj: \
 	algebracompiler.cpp \
 	fbc.h 
 cverifydialog.obj: \
-	cverifydialog.cpp \
+	CVerifyDialog.cpp \
 	CVerifyDialog.h \
 	resource.h 
 csaveoptionsdialog.obj: \
-	csaveoptionsdialog.cpp \
+	CSaveOptionsDialog.cpp \
 	CSaveOptionsDialog.h \
 	resource.h \
 	saveopts.h 

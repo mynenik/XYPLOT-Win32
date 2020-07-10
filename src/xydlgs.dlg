@@ -18,7 +18,7 @@ STYLE WS_CAPTION | WS_SYSMENU | DS_MODALFRAME
 CAPTION "About XYPLOT"
 BEGIN
   CTEXT "XYPLOT for Windows XP/7/8/10", -1, 0, 5, 190, 8
-  CTEXT "Version 1.1.7, Rls: 07-07-2020 (kForth ver. 1.0.16-4)", -1, 0, 14, 215, 8
+  CTEXT "Version 1.1.8-1, Rls: 07-??-2020 (kForth ver. 1.0.16-4)", -1, 0, 14, 215, 8
   CTEXT "Copyright (c) 1997--2020 Krishna Myneni and John Kielkopf", -1, 0, 23, 215, 8
   CTEXT "Provided under the terms of the GNU Affero General Public License", -1, 0, 32, 215, 8
   CTEXT "E-mail: krishna.myneni@ccreweb.org", -1, 0, 41, 215, 8
@@ -38,14 +38,16 @@ GRIDDIALOG DIALOG 10, 10, 122, 71
 STYLE WS_CAPTION | WS_SYSMENU | DS_MODALFRAME
 CAPTION "Grid Specifications"
 BEGIN
-    LTEXT           "Grid Lines", IDC_STATIC, 36, 12, 40, 8,
-    EDITTEXT        IDC_GRID_XTICS, 8, 28, 20, 12
-    LTEXT           "# x tics", IDC_STATIC, 36, 32, 32, 8,
-    EDITTEXT        IDC_GRID_YTICS, 8, 48, 20, 12
-    LTEXT           "# y tics", IDC_STATIC, 36, 52, 32, 8,
+    LTEXT           "Hor Grid Lines", IDC_STATIC, 8, 12, 52, 8,
+    LTEXT           "Ver Grid Lines", IDC_STATIC, 8, 24, 52, 8,  
+    LTEXT           "# x tics", IDC_STATIC, 8, 36, 32, 8,
+    LTEXT           "# y tics", IDC_STATIC, 8, 48, 32, 8,
+    EDITTEXT        IDC_GRID_XTICS, 42, 40, 20, 10
+    EDITTEXT        IDC_GRID_YTICS, 42, 52, 20, 10
     PUSHBUTTON      "OK", IDOK, 80, 12, 35, 15
     PUSHBUTTON      "Cancel", IDCANCEL, 80, 40, 35, 15
-    CONTROL         "Check box", IDC_GRID_LINES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 19, 12, 10, 9
+    CONTROL  "Check box", IDC_HOR_GRID_LINES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 64, 12, 10, 10
+    CONTROL  "Check box", IDC_VER_GRID_LINES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 64, 24, 10, 10
 END
 
 HEADERDIALOG DIALOG 10, 10, 350, 150

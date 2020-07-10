@@ -35,6 +35,7 @@ using namespace std;
 #include "CGrid.h"
 #include "CXyPlot.h"
 #include "CPlotList.h"
+#include "CPlotView.h"
 #include "CPlotDisplay.h"
 #include "CGridDialog.h"
 #include "CHeaderDialog.h"
@@ -81,6 +82,7 @@ const void* FN_SET_PLOT_SYMBOL = set_plot_symbol;
 const void* FN_SET_PLOT_COLOR = set_plot_color;
 const void* FN_SET_PLOT_RGBCOLOR = set_plot_rgbcolor;
 const void* FN_DRAW_PLOT = draw_plot;
+const void* FN_GET_GRID = get_grid;
 const void* FN_SET_GRID_TICS = set_grid_tics;
 const void* FN_SET_GRID_LINES = set_grid_lines;
 const void* FN_GET_WINDOW_TITLE = get_window_title;
@@ -546,6 +548,8 @@ void InitForthInterface ()
   sprintf (s, "%lu%sFN_SET_PLOT_RGBCOLOR\n", FN_SET_PLOT_RGBCOLOR, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_DRAW_PLOT\n", FN_DRAW_PLOT, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_GET_GRID\n", FN_GET_GRID, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_SET_GRID_TICS\n", FN_SET_GRID_TICS, cs);
   strcat (fs, s);
@@ -1019,14 +1023,32 @@ int draw_plot ()
 }
 //------------------------------------------------------------------
 
+int get_grid ()
+{
+   // stack: ( -- nXtics nYtics bXGridLines bYGridLines bXaxis bYaxis )
+   int nx, ny;
+   bool bXlines, bYlines, bXaxis, bYaxis;
+   CPlotView* pView = pMainWnd->m_pDi->GetCurrentView();
+   pView->m_pGrid->GetTics(&nx, &ny);
+   *GlobalSp-- = nx; *GlobalTp-- = OP_IVAL;
+   *GlobalSp-- = ny; *GlobalTp-- = OP_IVAL;
+   pView->m_pGrid->GetLines(&bYlines, &bXlines);
+   *GlobalSp-- = bXlines; *GlobalTp-- = OP_IVAL;
+   *GlobalSp-- = bYlines; *GlobalTp-- = OP_IVAL;
+   pView->m_pGrid->GetAxes(&bXaxis, &bYaxis);
+   *GlobalSp-- = (int) bXaxis; *GlobalTp-- = OP_IVAL;
+   *GlobalSp-- = (int) bYaxis; *GlobalTp-- = OP_IVAL;
+   return 0;
+}
+
 int set_grid_tics ()
 {
   // stack: ( nx ny -- )
   ++GlobalSp; ++GlobalTp;
   int ny = *GlobalSp++; ++GlobalTp;
   int nx = *GlobalSp;
-
-  pMainWnd->m_pDi->m_pGrid->SetTics(nx, ny);
+  CPlotView* pView = pMainWnd->m_pDi->GetCurrentView();
+  pView->m_pGrid->SetTics(nx, ny);
   pMainWnd->Invalidate();
   return 0;
 }
@@ -1037,7 +1059,8 @@ int set_grid_lines ()
   ++GlobalSp; ++GlobalTp;
   bool by = *GlobalSp++; ++GlobalTp;
   bool bx = *GlobalSp;
-  pMainWnd->m_pDi->m_pGrid->SetLines(bx, by);
+  CPlotView* pView = pMainWnd->m_pDi->GetCurrentView();
+  pView->m_pGrid->SetLines(bx, by);
   pMainWnd->Invalidate();
   return 0;
 }

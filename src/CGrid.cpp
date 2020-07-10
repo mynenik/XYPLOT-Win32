@@ -15,34 +15,26 @@ using namespace std;
 #include "CPlot.h"
 #include "CGrid.h"
 
-bool CGridLines::m_bHorizontal = true;
-bool CGridLines::m_bVertical = true;
-
 extern char* LabelFormat (float, float, char);
 
-CGridFrame::CGridFrame (int nXt, int nYt)
-{
-    if (nXt >= 0) nXtics = nXt;
-    if (nYt >= 0) nYtics = nYt;
-}
 //---------------------------------------------------------------
 
 void CGridFrame::Draw (CDC* pDc)
 {
-	CRect rect = m_pT->GetPhysical();
-	CPen FramePen(m_nStyle, m_nWidth, m_nColor);
+    CRect rect = m_pT->GetPhysical();
+    CPen FramePen(m_nStyle, m_nWidth, m_nColor);
     CPen* pOldPen;
-	int k;
-	int ix1, ix2, iy1, iy2, ixL, iyL, ixT, iyT;
+    int k;
+    int ix1, ix2, iy1, iy2, ixL, iyL, ixT, iyT;
 
-	// Draw the frame box
+    // Draw the frame box
 
-	pOldPen = pDc->SelectObject (&FramePen);
-//	pDc->Rectangle(rect);
-	ix1 = rect.TopLeft().x;
-	iy1 = rect.TopLeft().y;
-	ix2 = rect.BottomRight().x;
-	iy2 = rect.BottomRight().y;
+    pOldPen = pDc->SelectObject (&FramePen);
+//  pDc->Rectangle(rect);
+    ix1 = rect.TopLeft().x;
+    iy1 = rect.TopLeft().y;
+    ix2 = rect.BottomRight().x;
+    iy2 = rect.BottomRight().y;
 
     pDc->MoveTo(ix1,iy1);
     pDc->LineTo(ix2, iy1);
@@ -50,71 +42,67 @@ void CGridFrame::Draw (CDC* pDc)
     pDc->LineTo(ix1, iy2);
     pDc->LineTo(ix1, iy1);
 
-	// Draw Tic Marks
+    // Draw Tic Marks
 
-	ixL = rect.Width()/50;
-	iyL = rect.Height()/50;
+    ixL = rect.Width()/50;
+    iyL = rect.Height()/50;
 
     // yL1 = log((double) iy2);
     // yLd = log((double) iy1) - yL1;
 
     if (nXtics > 0)
-	    for (k = 0; k <= nXtics; ++k)
-            nXt[k] = ix1 + k*rect.Width()/nXtics;
+      for (k = 0; k <= nXtics; ++k)
+        nXt[k] = ix1 + k*rect.Width()/nXtics;
 
     if (nYtics > 0)
-        for (k = 0; k <= nYtics; ++k)
-            nYt[k] = iy1 + k*rect.Height()/nYtics;
+      for (k = 0; k <= nYtics; ++k)
+        nYt[k] = iy1 + k*rect.Height()/nYtics;
 
     if (nXtics > 0)
     {
         for (k = 1; k < nXtics; ++k)
         {
             pDc->MoveTo(nXt[k], iy1);
-		    pDc->LineTo(nXt[k], iy1+iyL);
+            pDc->LineTo(nXt[k], iy1+iyL);
             pDc->MoveTo(nXt[k], iy2);
             pDc->LineTo(nXt[k], iy2-iyL);
         }
     }
 
-    if (nYtics > 0)
-    {
-        for (k = 1; k < nYtics; ++k)
-        {
+    if (nYtics > 0) {
+        for (k = 1; k < nYtics; ++k) {
        	    pDc->MoveTo(ix1, nYt[k]);
        	    pDc->LineTo(ix1+ixL, nYt[k]);
        	    pDc->MoveTo(ix2, nYt[k]);
        	    pDc->LineTo(ix2-ixL, nYt[k]);
-	    }
-	}
+	  }
+     }
 
-	pDc->SelectObject(pOldPen);
+     pDc->SelectObject(pOldPen);
 }
 //---------------------------------------------------------------
 
 void CGridLines::Draw (CDC* pDc)
 {
     int i, k, ixT, iyT, ix1, ix2, iy1, iy2;
-	CRect rect = m_pT->GetPhysical();
+    CRect rect = m_pT->GetPhysical();
 
-	ix1 = rect.TopLeft().x;
-	iy1 = rect.TopLeft().y;
-	ix2 = rect.BottomRight().x;
-	iy2 = rect.BottomRight().y;
+    ix1 = rect.TopLeft().x;
+    iy1 = rect.TopLeft().y;
+    ix2 = rect.BottomRight().x;
+    iy2 = rect.BottomRight().y;
 
     if (CGridLines::m_bVertical)
-     {
-
-      if (nXtics > 0)
       {
-	    for (k = 1; k < nXtics; ++k)
+        if (nXtics > 0)
+        {
+	  for (k = 1; k < nXtics; ++k)
 	    {
-	        ixT = nXt[k];
-            for (i = iy1; i < iy2; i++)
+	      ixT = nXt[k];
+              for (i = iy1; i < iy2; i++)
                 if (i % 2) pDc->SetPixel (ixT, i, m_nColor);
-
+            }
         }
-      }
     }
 
   if (CGridLines::m_bHorizontal)
@@ -126,7 +114,6 @@ void CGridLines::Draw (CDC* pDc)
             iyT = nYt[k];
             for (i = ix1; i < ix2; i++)
                 if (i % 2) pDc->SetPixel(i, iyT, m_nColor);
-
         }
       }
     }
@@ -137,20 +124,22 @@ void CAxes::Draw (CDC* pDc)
 {
     float ax[2] = {0., 0.};
     vector<float> x;
-	CPoint p;
-	CRect r = m_pT->GetPhysical();
+    CPoint p;
+    CRect r = m_pT->GetPhysical();
     x = m_pT->GetLogical();
     p = m_pT->Physical(ax);
 
-    if ((x[0] < ax[0]) && (x[1] > ax[0]))
-    {
-      pDc->MoveTo(p.x, r.TopLeft().y);
-      pDc->LineTo(p.x, r.BottomRight().y);
+    if (m_bYaxis) {
+      if ((x[0] < ax[0]) && (x[1] > ax[0])) {
+        pDc->MoveTo(p.x, r.TopLeft().y);
+        pDc->LineTo(p.x, r.BottomRight().y);
+      }
     }
-    if ((x[2] < ax[1]) && (x[3] > ax[1]))
-    {
-      pDc->MoveTo(r.TopLeft().x, p.y);
-      pDc->LineTo(r.BottomRight().x, p.y);
+    if (m_bXaxis) {
+      if ((x[2] < ax[1]) && (x[3] > ax[1])) {
+        pDc->MoveTo(r.TopLeft().x, p.y);
+        pDc->LineTo(r.BottomRight().x, p.y);
+      }
     }
 }
 
@@ -158,21 +147,19 @@ void CAxes::Draw (CDC* pDc)
 
 CGrid::CGrid()
 {
-	m_nStyle = PS_DOT;
-	m_nColor = RGB(0,0,0);
-	m_nFontPointSize = 100;
-	m_szFontName = new char[32];
-	strcpy (m_szFontName, "Courier New");
+    m_nStyle = PS_DOT;
+    m_nColor = RGB(0,0,0);
+    m_nFontPointSize = 100;
+    m_szFontName = new char[32];
+    strcpy (m_szFontName, "Courier New");
 
-    m_pFrame = NULL;
-    m_pLines = NULL;
-    m_pAxes = NULL;
-
-	m_pFrame = new CGridFrame (10, 10);
-	m_pFrame->SetAttributes (PS_SOLID, 1, m_nColor);
-
-    SetLines(CGridLines::m_bHorizontal, CGridLines::m_bVertical);
-    SetAxes(TRUE);
+    m_pFrame = new CGridFrame ();
+    m_pFrame->SetAttributes (PS_SOLID, 1, m_nColor);
+    m_pLines = new CGridLines();
+    m_pAxes = new CAxes();
+    SetTics(10, 10);
+    SetLines(false, false);
+    SetAxes(true, true);
 }
 //---------------------------------------------------------------
 CGrid::~CGrid()
@@ -186,16 +173,8 @@ CGrid::~CGrid()
 
 void CGrid::SetTics (int xtics, int ytics)
 {
-    delete m_pFrame;
-
-    if ((xtics > 0) && (ytics > 0))
-    {
-        m_pFrame = new CGridFrame(xtics, ytics);
-    }
-    else
-    {
-        m_pFrame = NULL;
-    }
+    nXtics = xtics;
+    nYtics = ytics;
 }
 
 void CGrid::GetTics (int* pXtics, int* pYtics)
@@ -205,52 +184,50 @@ void CGrid::GetTics (int* pXtics, int* pYtics)
 }
 //---------------------------------------------------------------
 
-void CGrid::SetLines (bool bx, bool by)
+void CGrid::SetLines (bool bVer, bool bHor)
 {
-  delete m_pLines;
-  CGridLines::m_bVertical = bx;
-  CGridLines::m_bHorizontal = by;
-
-  if (bx || by)
-    {
-      m_pLines = new CGridLines ();
-      m_pLines->SetAttributes (PS_DOT, 1, m_nColor);
-    }
-  else
-    {
-      m_pLines = NULL;
-    }
+  if (m_pLines) {
+    m_pLines->m_bVertical = bVer;
+    m_pLines->m_bHorizontal = bHor;
+  }
 }
 
-void CGrid::SetAxes (bool b)
+void CGrid::GetLines (bool* pHor, bool* pVer)
 {
-  delete m_pAxes;
+  if (m_pLines) {
+    *pVer = m_pLines->m_bVertical;
+    *pHor = m_pLines->m_bHorizontal;
+  }
+}
 
-  if (b)
-    {
-      m_pAxes = new CAxes ();
-      m_pAxes->SetAttributes (PS_SOLID, 1, m_nColor);
-    }
-  else
-    {
-      m_pAxes = NULL;
-    }
+void CGrid::SetAxes (bool bx, bool by)
+{
+  if (m_pAxes) {
+    m_pAxes->SetAttributes (PS_SOLID, 1, m_nColor);
+    m_pAxes->m_bXaxis = bx;
+    m_pAxes->m_bYaxis = by;
+  }
+}
+
+void CGrid::GetAxes (bool* pX, bool* pY)
+{
+  if (m_pAxes) {
+    *pX = m_pAxes->m_bXaxis;
+    *pY = m_pAxes->m_bYaxis;
+  }
 }
 //---------------------------------------------------------------
 
 void CCartesianGrid::Draw(CDC* pDc)
 {
-	// Draw the frame and tics
-
-	if (m_pFrame) m_pFrame->Draw(pDc);
+    // Draw the frame and tics
+    if (m_pFrame) m_pFrame->Draw(pDc);
 
     // Draw the grid lines
-
     if (m_pLines) m_pLines->Draw(pDc);
 
     // Draw the axes
-
-   	if (m_pAxes) m_pAxes->Draw(pDc);
+    if (m_pAxes) m_pAxes->Draw(pDc);
 
 }
 //---------------------------------------------------------------
