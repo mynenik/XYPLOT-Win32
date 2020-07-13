@@ -92,7 +92,7 @@ void CGridLines::Draw (CDC* pDc)
     ix2 = rect.BottomRight().x;
     iy2 = rect.BottomRight().y;
 
-    if (CGridLines::m_bVertical)
+    if (m_bVertical)
       {
         if (nXtics > 0)
         {
@@ -105,7 +105,7 @@ void CGridLines::Draw (CDC* pDc)
         }
     }
 
-  if (CGridLines::m_bHorizontal)
+  if (m_bHorizontal)
     {
       if (nYtics > 0)
       {
