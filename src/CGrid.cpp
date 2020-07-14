@@ -192,7 +192,7 @@ void CGrid::SetLines (bool bVer, bool bHor)
   }
 }
 
-void CGrid::GetLines (bool* pHor, bool* pVer)
+void CGrid::GetLines (bool* pVer, bool* pHor)
 {
   if (m_pLines) {
     *pVer = m_pLines->m_bVertical;

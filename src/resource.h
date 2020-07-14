@@ -77,6 +77,8 @@
 #define IDC_GRID_XTICS      134
 #define IDC_GRID_YTICS      135
 #define IDC_VER_GRID_LINES  136
+#define IDC_X_AXIS          137
+#define IDC_Y_AXIS          138
 
 #define IDC_NAME_EDIT       140
 #define IDC_HEADER_EDIT     141

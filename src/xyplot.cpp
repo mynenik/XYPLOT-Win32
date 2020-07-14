@@ -1032,7 +1032,7 @@ int get_grid ()
    pView->m_pGrid->GetTics(&nx, &ny);
    *GlobalSp-- = nx; *GlobalTp-- = OP_IVAL;
    *GlobalSp-- = ny; *GlobalTp-- = OP_IVAL;
-   pView->m_pGrid->GetLines(&bYlines, &bXlines);
+   pView->m_pGrid->GetLines(&bXlines, &bYlines);
    *GlobalSp-- = bXlines; *GlobalTp-- = OP_IVAL;
    *GlobalSp-- = bYlines; *GlobalTp-- = OP_IVAL;
    pView->m_pGrid->GetAxes(&bXaxis, &bYaxis);

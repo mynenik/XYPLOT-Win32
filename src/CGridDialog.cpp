@@ -21,21 +21,24 @@ using namespace std;
 
 BOOL CGridDialog::OnInitDialog()
 {
-	if (!CModalDialog::OnInitDialog()) return FALSE;
-	int nx, ny, bXlines, bYlines;
-	char s[16];
-	if (m_pGrid->m_pLines->m_bHorizontal) 
-	  HorLinesField()->SetCheck(1);
-	if (m_pGrid->m_pLines->m_bVertical)
-	  VerLinesField()->SetCheck(1);
-	m_pGrid->GetTics(&nx, &ny);
-	sprintf (s, "%3d", nx);
-	SetDlgItemText(IDC_GRID_XTICS, s);
-	sprintf (s, "%3d", ny);
-	SetDlgItemText(IDC_GRID_YTICS, s);
-//	GotoDlgCtrl(GetDlgItem(IDC_GRID_XTICS));
-	GotoDlgCtrl(GetDlgItem(IDC_HOR_GRID_LINES));
-	return TRUE;
+    if (!CModalDialog::OnInitDialog()) return FALSE;
+    int nX, nY;
+    bool bXaxis, bYaxis, bXlines, bYlines;
+    char s[16];
+    m_pGrid->GetAxes(&bXaxis, &bYaxis);
+    m_pGrid->GetLines(&bXlines, &bYlines);
+    m_pGrid->GetTics(&nX, &nY);
+    if (bXaxis) XaxisField()->SetCheck(1);
+    if (bYaxis) YaxisField()->SetCheck(1) ;
+    if (bYlines) HorLinesField()->SetCheck(1);
+    if (bXlines) VerLinesField()->SetCheck(1);
+    sprintf (s, "%3d", nX);
+    SetDlgItemText(IDC_GRID_XTICS, s);
+    sprintf (s, "%3d", nY);
+    SetDlgItemText(IDC_GRID_YTICS, s);
+//  GotoDlgCtrl(GetDlgItem(IDC_GRID_XTICS));
+    GotoDlgCtrl(GetDlgItem(IDC_HOR_GRID_LINES));
+    return TRUE;
 }
 //---------------------------------------------------------------
 
@@ -43,19 +46,25 @@ void CGridDialog::OnOK()
 {
     char s[8];
 
-    BOOL bXlines, bYlines, bAxes;
-    int nXtics, nYtics, nLstyle;
+    bool bXlines, bYlines, bXaxis, bYaxis;
+    int n, nXtics, nYtics, nLstyle;
 
+    m_pGrid->GetTics(&nXtics, &nYtics);
+    bXaxis = XaxisField()->GetCheck();
+    bYaxis = YaxisField()->GetCheck();
     bXlines = VerLinesField()->GetCheck();
     bYlines = HorLinesField()->GetCheck();
-    m_pGrid->m_pLines->m_bVertical = bXlines;
-    m_pGrid->m_pLines->m_bHorizontal = bYlines;
+    m_pGrid->SetAxes(bXaxis, bYaxis);
+    m_pGrid->SetLines(bXlines, bYlines);
 
     XticsField()->GetLine(0, s, 6);
-    nXtics = atoi(s);
-    YticsField()->GetLine(0, s, 6);
-    nYtics = atoi(s);
+    n = atoi(s);
+    if ((n > 0) && (n <= MAX_TICS)) nXtics = n;
 
+    YticsField()->GetLine(0, s, 6);
+    n = atoi(s);
+    if ((n > 0) && (n <= MAX_TICS)) nYtics = n;
+    
     m_pGrid->SetTics (nXtics, nYtics);
     CModalDialog::OnOK();
 }
