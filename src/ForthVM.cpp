@@ -716,7 +716,7 @@ int CPP_fdot ()
       --GlobalSp;
       *pOutStream << *((double*) GlobalSp) << ' ';
       ++GlobalSp;
-      (*pOutStream).flush();
+      pOutStream->flush();
     }
   return 0;
 }

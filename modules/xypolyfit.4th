@@ -129,25 +129,31 @@ variable norder
 : xypoly ( n -- | fit a polynomial of order n to the active dataset )
 	norder !
 	?active dup 0 >=
-	if
+	IF
 	  ds_pdata get_ds
-	  0 >= if
+	  0 >= IF
 	    ds_pdata poly_params norder @ polfit
-	    ." Reduced chi-square = " f. cr 
-	    nterms @ 0 do i dup . 2 spaces 1+ 1 poly_params fmat@ f. cr loop 
-          then
-	then ;
+	    ." Reduced chi-square = " ( f.) 
+            6 f>string count type cr
+	    nterms @ 0 DO
+              I dup . 2 spaces 1+ 1 poly_params fmat@ ( f.)
+              6 f>string count type cr 
+            LOOP
+          THEN
+        ELSE  drop
+	THEN ;
 
 : xypolyfit ( -- | prompt user and fit the active data set )
 	?active 0 >=
-	if
+	IF
 	  c" Enter the order of the fitting polynomial:" get_input
-	  if
+	  IF 
 	    string>s xypoly
-	  else
+	  ELSE
 	    drop
-	  then
-	then ;
+	  THEN
+	THEN
+;
 
 \ add "Poly Fit" as an item in the math menu
 

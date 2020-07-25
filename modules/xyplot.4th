@@ -277,8 +277,8 @@ include yln
 include autocorr
 include derivative
 include xyderiv
-include polyfit
-include peak_search
+\ include polyfit
+\ include peak_search
 \ include xypeaks
 \ include xymap
 \ include yn_vs_ym
