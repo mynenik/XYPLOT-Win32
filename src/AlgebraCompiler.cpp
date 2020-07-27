@@ -100,7 +100,7 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
                 ++cp;   // increment the character pointer
 
             }
-            else if ((f = strtof(cp, &endp)) != 0.)
+            else if ((f = strtod(cp, &endp)) != 0.)
             {
                 op.push_back(OP_FVAL);
                 bp = (byte*) &f;

@@ -1257,66 +1257,51 @@ void CPlotWindow::LoadDatasetFile (char* fname, char* col_spec)
 BOOL CPlotWindow::LoadFile(char* fname)
 {
     int i, ecode, ns;
-	char s[128];
+    char s[128];
+    char fname2[256];
+    i = strlen(fname);
+    if ((i == 0) || (i > 255)) return (false);
+    strcpy(fname2, fname);
+    strupr(fname2);
+    CDataset* d;
 
-    if (*fname)
-    {
-        strupr(fname);
-        CDataset* d;
-
-       	if (strstr(fname, ".XSP"))
-       	{
-       	    CWorkspace41* pWs;
-            ecode = m_pDb->LoadWorkspace (&pWs, fname);
-            if (ecode)
-            {
-                sprintf (s, "XSP FILE CORRUPT");
-                AfxMessageBox (s);
-            }
-            else
-            {
-                for (i = 0; i < pWs->di.nplots; i++)
-                {
-                    ns = pWs->pv[i].set - 1;  // array origin is now 0
-                    d = m_pDb->FindInList(pWs->ds[ns].fname);
-                    if (d) m_pDi->MakePlot(pWs, d, i);
-                }
-                OnReset();
-   	            delete pWs;     // delete the workspace (we're done with it)
-
-            }
-
+    if (strstr(fname2, ".XSP")) {
+      CWorkspace41* pWs;
+      ecode = m_pDb->LoadWorkspace (&pWs, fname);
+      if (ecode) {
+        sprintf (s, "XSP FILE CORRUPT");
+        AfxMessageBox (s);
+      }
+      else {
+        for (i = 0; i < pWs->di.nplots; i++) {
+          ns = pWs->pv[i].set - 1;  // array origin is now 0
+          d = m_pDb->FindInList(pWs->ds[ns].fname);
+          if (d) m_pDi->MakePlot(pWs, d, i);
         }
-        else if (strstr(fname, ".4TH"))
-        {
-            // Load a Forth source file into the built-in Forth environment
-
-            ecode = LoadForthFile (fname);
-        }
-        else
-        {
-            int nCols = m_pDb->GetColumnCount(fname);
-            if (nCols < 0)
-            {
-                AfxMessageBox ("Cannot open input file.");
-            }
-            else if (nCols == 0)
-            {
-                AfxMessageBox ("Cannot find first line of data in file.");
-            }
-            else if (nCols <= 2)
-            {
-                LoadDatasetFile (fname, "");
-            }
-            else
-            {
-                SelectColumns (fname, nCols);
-            }
-
-        }
+        OnReset();
+   	delete pWs;     // delete the workspace (we're done with it)
+      }
     }
-
-    return FALSE;
+    else if (strstr(fname2, ".4TH")) {
+      // Load a Forth source file into the built-in Forth environment
+      ecode = LoadForthFile (fname);
+    }
+    else {
+      int nCols = m_pDb->GetColumnCount(fname);
+      if (nCols < 0) {
+        AfxMessageBox ("Cannot open input file.");
+      }
+      else if (nCols == 0) {
+        AfxMessageBox ("Cannot find first line of data in file.");
+      }
+      else if (nCols <= 2) {
+        LoadDatasetFile (fname, "");
+      }
+      else {
+        SelectColumns (fname, nCols);
+      }
+    }
+    return false;
 }
 
 //---------------------------------------------------------------

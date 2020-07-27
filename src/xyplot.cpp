@@ -57,6 +57,7 @@ extern "C" int *GlobalSp;
 extern "C" byte *GlobalTp;
 
 #define MAX_COLORS 32
+#define MAX_COLOR_NAME_LEN 16
 extern COLORREF colors_rgb_table[];
 extern char* color_names[];
 
@@ -420,12 +421,21 @@ COLORREF LookupColor (char* color_name)
 {
     // Return the COLORREF (color value) associated with
     //   a recognized color name
+    char c1[MAX_COLOR_NAME_LEN];
+    char c2[MAX_COLOR_NAME_LEN];
+    if (strlen(color_name) > MAX_COLOR_NAME_LEN-1) {
+      strncpy(c1, color_name, MAX_COLOR_NAME_LEN-1);
+      c1[MAX_COLOR_NAME_LEN-1] = (char) 0;
+    }
+    else
+      strcpy(c1, color_name);
 
-    strupr(color_name);
+    strupr(c1);
 
     for (int i = 0; i < MAX_COLORS; i++)
       {
-        if (strcmp(color_name, strupr(color_names[i])) == 0)
+        strcpy(c2, color_names[i]);
+        if (strcmp(c1, strupr(c2)) == 0)
             return colors_rgb_table[i];
       }
       return RGB(0,0,0);
