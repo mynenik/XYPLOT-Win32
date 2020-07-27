@@ -13,6 +13,8 @@ using namespace std;
 #include "fbc.h"
 #define byte unsigned char
 
+#define PREFIX_CODE_SIZE  18
+
 int CompileAE (vector<byte>*, char* exp);
 
 int CompileAE (vector<byte>* pOpCodes, char* exp)
@@ -80,7 +82,7 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
             {
                 // Is it a sign operator or an arithmetic operator?
 
-                if (hs.empty() && (op.size() > 18))
+                if (hs.empty() && (op.size() > PREFIX_CODE_SIZE))
                 {
                     // It's an arithmetic operator; push onto hold stack
 
@@ -139,12 +141,7 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
                 else if (*cp == 'Y')   // fetch y
                 {
                     op.push_back(OP_RFETCH);
-                    op.push_back(OP_IVAL);
-                    ival = 4;
-                    bp = (byte*)&ival;
-                    for (i = 0; i < sizeof(int); i++)
-                        op.push_back(*(bp + i));
-                    op.push_back(OP_ADD);
+		    op.push_back(OP_CELLPLUS);
                     op.push_back(OP_SFFETCH);
                     if (! final_op) final_op = 2;
 
@@ -172,7 +169,7 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
             }
             else if (*cp == '=')
             {
-                while (op.size() > 18)
+                while (op.size() > PREFIX_CODE_SIZE)
                 {
                     op.pop_back();
                 }
@@ -245,12 +242,7 @@ endloop:
         }
         else if (final_op == 2)
         {
-            op.push_back(OP_IVAL);
-            ival = 4;
-            bp = (byte*) &ival;
-            for (i = 0; i < sizeof(int); i++)
-                op.push_back(*(bp + i));
-            op.push_back(OP_ADD);
+	    op.push_back(OP_CELLPLUS);
         }
         else
         {
