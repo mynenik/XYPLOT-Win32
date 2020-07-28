@@ -5,6 +5,7 @@
 // This software is provided under the terms of the
 // GNU Affero General Public License (AGPL) v 3.0 or later.
 //
+// #include <iostream>
 #include <vector>
 #include <stack>
 #include <deque>
@@ -13,9 +14,12 @@ using namespace std;
 #include "fbc.h"
 #define byte unsigned char
 
-#define PREFIX_CODE_SIZE  18
+#define PREFIX_CODE_SIZE 18
 
 int CompileAE (vector<byte>*, char* exp);
+char OpChar(byte);
+bool IsMonadic(byte);
+bool PushIfMonadic(stack<byte>*, deque<byte>*);
 
 int CompileAE (vector<byte>* pOpCodes, char* exp)
 {
@@ -45,7 +49,7 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
 
     char exp_copy [256];
     char LabelName [256];
-    int i, ival, ecode = 0;
+    int i, ival, operands_pending = 0, ecode = 0;
     char *tp, *cp, *endp;
     byte last_op = 0, final_op = 0, temp, ch, *bp;
     double f;
@@ -71,88 +75,87 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
     op.push_back(OP_PUSH);      // push nbytes onto return stack
     op.push_back(OP_PUSH);      // push address onto return stack
 
-    do
-    {
+    do {
         cp = tp;    // set character ptr to first char in token
+        while (*cp) {
+            if (strchr (arm_op, *cp)) {
+                // It's an arithmetic operator; check last opcode to see
+                //   if it's an arithmetic operator of higher precedence.
+                //   If so push the last operator operator and hold the
+                //   current.
 
-        while (*cp)
-        {
-
-            if ((*cp == '+') || (*cp == '-'))
-            {
-                // Is it a sign operator or an arithmetic operator?
-
-                if (hs.empty() && (op.size() > PREFIX_CODE_SIZE))
-                {
-                    // It's an arithmetic operator; push onto hold stack
-
-                    if (*cp == '+') ch = OP_FADD; else ch = OP_FSUB;
-                    hs.push(ch);
-                    last_op = ch;
-                }
-                else if (*cp == '-')
-                {
-                    // It's a sign operator; push negate operator onto
-                    //   the hold stack
-
-                    hs.push(OP_FNEG);
-                }
+                ch = *cp;
+                if (ch == '^')
+                    ch = OP_FPOW;
+                else if (ch == '*')
+                    ch = OP_FMUL;
+                else if (ch == '/')
+                    ch = OP_FDIV;
+                else if (ch == '+')
+                    ch = OP_FADD;
                 else
-                    ;
-                ++cp;   // increment the character pointer
+                    ch = OP_FSUB;
+                
+                if ((ch == OP_FSUB) & (hs.size() == operands_pending)) {
+		   ch = OP_FNEG;
+                }
+		else if (!hs.empty()) {
+		  while (!hs.empty()) {
+	            last_op = hs.top();		
+                    if (
+                      ((ch == OP_FPOW) && (last_op != OP_FPOW)) ||
+                      (((ch == OP_FMUL) || (ch == OP_FDIV)) &&
+                     ((last_op == OP_FADD) || (last_op == OP_FSUB)))
+                    ) {
+	              // current operator has higher precedence than last
+		      // cout << "C>L: ";
+		      break;
+                    }
+                    else {
+		      // last operator has higher or equal precedence than current
+		      // cout << "L>C: ";
+		      op.push_back(hs.top());
+		      // cout << "Push " << OpChar(last_op) << endl;
+                      hs.pop();
+		      --operands_pending;
+                    }
+                  }
+	        }
+                else
+		  ;
 
+		hs.push(ch);
+		// cout << "Hold " << OpChar(ch) << endl;
+		++cp;
             }
-            else if ((f = strtod(cp, &endp)) != 0.)
-            {
+	    else if ((f = strtod(cp, &endp)) != 0.) {
+		// push an operand into the opcode queue
+		// cout << "Push " << f << endl;
                 op.push_back(OP_FVAL);
                 bp = (byte*) &f;
                 for (i = 0; i < sizeof(double); i++)
                     op.push_back(*(bp+i));         // store operand
-
-
-                // pop all operators from hold stack into the opcode array
-
-                while (!hs.empty())
-                {
-                    op.push_back(hs.top());
-                    hs.pop();
-                }
-
-                cp = endp;          // advance character ptr
+                 ++operands_pending;  
+                 cp = endp;          // advance character ptr
+                 PushIfMonadic(&hs, &op);
             }
-            else if (isalpha(*cp))
-            {
-
-                if (*cp == 'X')     // fetch x
-                {
+            else if (isalpha(*cp)) {
+                if (*cp == 'X') {    // fetch x
+		    // cout << "Push X" << endl;
                     op.push_back(OP_RFETCH);
                     op.push_back(OP_SFFETCH);
                     if (! final_op) final_op = 1;
-
-                    // pop all operators from hold stack
-
-                    while (!hs.empty())
-                    {
-                        op.push_back(hs.top());
-                        hs.pop();
-                    }
-
+		    ++operands_pending;
+		    PushIfMonadic(&hs, &op);
                 }
-                else if (*cp == 'Y')   // fetch y
-                {
+                else if (*cp == 'Y') {  // fetch
+		    // cout << "Push Y" << endl;
                     op.push_back(OP_RFETCH);
 		    op.push_back(OP_CELLPLUS);
                     op.push_back(OP_SFFETCH);
                     if (! final_op) final_op = 2;
-
-                    // pop all operators from hold stack
-
-                    while (!hs.empty())
-                    {
-                        op.push_back(hs.top());
-                        hs.pop();
-                    }
-
+                    ++operands_pending;
+		    PushIfMonadic(&hs, &op);
                 }
                 // else if (IsOperator(LabelName, &temp))
                 // {
@@ -167,50 +170,13 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
                 }
                 ++cp;
             }
-            else if (*cp == '=')
-            {
-                while (op.size() > PREFIX_CODE_SIZE)
-                {
+            else if (*cp == '=') {
+                while (op.size() > PREFIX_CODE_SIZE) {
+		    byte c = op.back();
                     op.pop_back();
+		    // cout << "Pop " << OpChar(c) << endl;
+		    --operands_pending;
                 }
-                ++cp;
-
-            }
-            else if (strchr (arm_op, *cp))  // arithmetic operation
-            {
-                // It's an arithmetic operator; check last opcode to see
-                //   if it's an arithmetic operator of lower precedence.
-                //   If so push both operators onto hold stack in the
-                //   appropriate order.
-
-                ch = *cp;
-                if (ch == '^')
-                    ch = OP_FPOW;
-                else if (ch == '*')
-                    ch = OP_FMUL;
-                else if (ch == '/')
-                    ch = OP_FDIV;
-                else if (ch == '+')
-                    ch = OP_FADD;
-                else
-                    ch = OP_FSUB;
-
-                if (
-                    (last_op != 0) &&
-                    ((ch == OP_FPOW) && (last_op != OP_FPOW)) ||
-                     (((ch == OP_FMUL) || (ch == OP_FDIV)) &&
-                     ((last_op == OP_FADD) || (last_op == OP_FSUB)))
-                   )
-                {
-                    hs.push(last_op);
-                    hs.push(ch);
-                    op.pop_back();
-                }
-                else
-                {
-                    hs.push(ch);
-                }
-                last_op = ch;
                 ++cp;
             }
             else                    // error in rescale expression
@@ -219,7 +185,6 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
                 ecode = 1;
                 goto endloop;
             }
-
         }
 
         tp = strtok (NULL, delim);  // get next token
@@ -228,6 +193,13 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
 endloop:
 
     if (! final_op) ecode = 2;   // error: no destination for rescale
+    // cout << "Held items: " << hs.size() << endl;
+    while (hs.size()) {
+	    last_op = hs.top();
+	    op.push_back(last_op);
+	    hs.pop();
+	    // cout << "Push " << OpChar(last_op) << endl;
+    }
 
     if (ecode == 0)
     {
@@ -263,3 +235,76 @@ endloop:
 
     return ecode;
 }
+
+char OpChar(byte op)
+{
+	char c;
+	switch (op) {
+	  case OP_FADD:
+	    c = '+';
+	    break;
+	  case OP_FSUB:
+	    c = '-';
+	    break;
+	  case OP_FMUL:
+	    c = '*';
+	    break;
+	  case OP_FDIV:
+	    c = '/';
+	    break;
+	  case OP_FPOW:
+	    c = '^';
+	    break;
+	  case OP_FNEG:
+	    c = 'N';
+	    break;
+	  default:
+	    c = '?';
+	    break;
+	}
+	return( c );
+}
+
+bool IsMonadic (byte opval)
+{
+    // Return true if byte code is for a monadic operator
+    bool flag = false;
+    switch (opval) {
+      case OP_FNEG:
+      case OP_FABS:
+      case OP_FCOS:
+      case OP_FSIN:
+      case OP_FTAN:
+      case OP_FEXP:
+      case OP_FLOG:
+      case OP_FLN:
+      case OP_FACOS:
+      case OP_FASIN:
+      case OP_FROUND:
+      case OP_FTRUNC:
+        flag = true;
+	break;
+      default:
+	break;
+    }
+    return flag;
+}
+
+bool PushIfMonadic ( stack<byte>* pH, deque<byte>* pO )
+{
+    // if top of hold stack is a monadic operator, push it
+    // into the opcode queue.
+    bool flag = false;
+
+    if (!pH->empty()) {
+       byte last_op = pH->top();
+       if (IsMonadic(last_op)) {
+           pO->push_back(last_op);
+           pH->pop();
+           // cout << "Push " << OpChar(last_op) << endl;
+           flag = true;
+       }
+    }
+    return flag;
+}
+
