@@ -5,12 +5,14 @@
 // This software is provided under the terms of the
 // GNU Affero General Public License (AGPL) v 3.0 or later.
 //
-// #include <iostream>
+#include <iostream>
 #include <vector>
 #include <stack>
 #include <deque>
-#include <ctype.h>
 using namespace std;
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 #include "fbc.h"
 #define byte unsigned char
 
@@ -19,7 +21,7 @@ using namespace std;
 int CompileAE (vector<byte>*, char* exp);
 char OpChar(byte);
 bool IsMonadic(byte);
-bool PushIfMonadic(stack<byte>*, deque<byte>*);
+int PushOperators ( stack<byte>*, deque<byte>*, int);
 
 int CompileAE (vector<byte>* pOpCodes, char* exp)
 {
@@ -41,8 +43,8 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
 //  0   no error.
 //
 
-    char* delim = " ,\t\n\r";
-    char* arm_op = "^*/+-";
+    const char* wspace = " \t\n\r";
+    const char* arm_op = "^*/+-";
 
     stack< byte > hs;    // operator hold stack
     deque< byte > op;    // sequence of operators in double ended queue
@@ -54,8 +56,17 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
     byte last_op = 0, final_op = 0, temp, ch, *bp;
     double f;
 
-    strcpy (exp_copy, exp);
-    tp = strtok (exp_copy, delim);      // ptr to token
+    // Copy the expression removing all white space
+    cp = exp;
+    tp = exp_copy;
+    while (*cp) {
+      if (!strchr(wspace, *cp))
+	*tp++ = *cp++;
+      else
+	++cp;
+    }
+    *tp = (char) 0;
+    tp = exp_copy;
 
     // set up the loop parameters
 
@@ -75,130 +86,126 @@ int CompileAE (vector<byte>* pOpCodes, char* exp)
     op.push_back(OP_PUSH);      // push nbytes onto return stack
     op.push_back(OP_PUSH);      // push address onto return stack
 
-    do {
-        cp = tp;    // set character ptr to first char in token
-        while (*cp) {
-            if (strchr (arm_op, *cp)) {
-                // It's an arithmetic operator; check last opcode to see
-                //   if it's an arithmetic operator of higher precedence.
-                //   If so push the last operator operator and hold the
-                //   current.
-
-                ch = *cp;
-                if (ch == '^')
-                    ch = OP_FPOW;
-                else if (ch == '*')
-                    ch = OP_FMUL;
-                else if (ch == '/')
-                    ch = OP_FDIV;
-                else if (ch == '+')
-                    ch = OP_FADD;
-                else
-                    ch = OP_FSUB;
-                
-                if ((ch == OP_FSUB) & (hs.size() == operands_pending)) {
-		   ch = OP_FNEG;
-                }
-		else if (!hs.empty()) {
-		  while (!hs.empty()) {
-	            last_op = hs.top();		
-                    if (
-                      ((ch == OP_FPOW) && (last_op != OP_FPOW)) ||
-                      (((ch == OP_FMUL) || (ch == OP_FDIV)) &&
-                     ((last_op == OP_FADD) || (last_op == OP_FSUB)))
-                    ) {
-	              // current operator has higher precedence than last
-		      // cout << "C>L: ";
-		      break;
-                    }
-                    else {
-		      // last operator has higher or equal precedence than current
-		      // cout << "L>C: ";
-		      op.push_back(hs.top());
-		      // cout << "Push " << OpChar(last_op) << endl;
-                      hs.pop();
-		      --operands_pending;
-                    }
-                  }
-	        }
-                else
-		  ;
-
-		hs.push(ch);
-		// cout << "Hold " << OpChar(ch) << endl;
-		++cp;
-            }
-	    else if ((f = strtod(cp, &endp)) != 0.) {
-		// push an operand into the opcode queue
-		// cout << "Push " << f << endl;
-                op.push_back(OP_FVAL);
-                bp = (byte*) &f;
-                for (i = 0; i < sizeof(double); i++)
-                    op.push_back(*(bp+i));         // store operand
-                 ++operands_pending;  
-                 cp = endp;          // advance character ptr
-                 PushIfMonadic(&hs, &op);
-            }
-            else if (isalpha(*cp)) {
-                if (*cp == 'X') {    // fetch x
-		    // cout << "Push X" << endl;
-                    op.push_back(OP_RFETCH);
-                    op.push_back(OP_SFFETCH);
-                    if (! final_op) final_op = 1;
-		    ++operands_pending;
-		    PushIfMonadic(&hs, &op);
-                }
-                else if (*cp == 'Y') {  // fetch
-		    // cout << "Push Y" << endl;
-                    op.push_back(OP_RFETCH);
-		    op.push_back(OP_CELLPLUS);
-                    op.push_back(OP_SFFETCH);
-                    if (! final_op) final_op = 2;
-                    ++operands_pending;
-		    PushIfMonadic(&hs, &op);
-                }
-                // else if (IsOperator(LabelName, &temp))
-                // {
-                    // push function operator onto the hold stack
-
-                   // hs.push(temp);
-                // }
-                else
-                {
-                    ecode = 2;  // unrecognized name
-                    goto endloop;
-                }
-                ++cp;
-            }
-            else if (*cp == '=') {
-                while (op.size() > PREFIX_CODE_SIZE) {
-		    byte c = op.back();
-                    op.pop_back();
-		    // cout << "Pop " << OpChar(c) << endl;
-		    --operands_pending;
-                }
-                ++cp;
-            }
-            else                    // error in rescale expression
-            {
-                temp = *cp;         // for debug use
-                ecode = 1;
-                goto endloop;
-            }
+    
+    cp = tp;    // set character ptr to first char in token
+    while (*cp) {
+      if (strchr (arm_op, *cp)) {
+        // It's an arithmetic operator
+        ch = *cp;
+        if (ch == '^')
+          ch = OP_FPOW;
+        else if (ch == '*')
+          ch = OP_FMUL;
+        else if (ch == '/')
+          ch = OP_FDIV;
+        else if (ch == '+')
+	  // is '+' a sign marker or a dyadic operator?
+          ch = ((cp == tp) || (strchr(arm_op, *(cp-1)))) ? 0 : OP_FADD;
+        else if (ch == '-') { 
+	  // is '-' a monadic or dyadic operator?
+	  ch = ((cp == tp) || (strchr(arm_op, *(cp-1)))) ? OP_FNEG : OP_FSUB;
         }
-
-        tp = strtok (NULL, delim);  // get next token
-    } while (tp) ;
+	else
+	  ch = 0;  // unhandled operator; skip char
+	     
+        if (ch) { 
+	  if (!IsMonadic(ch)) {
+	    if (!hs.empty()) {
+	      last_op = hs.top();
+	      byte next_to_last = 0;
+	      if (hs.size() > 1) {
+	        hs.pop();
+	        next_to_last = hs.top(); // we need next to last
+	        hs.push(last_op);
+	      }
+              if (
+                (ch == OP_FPOW) ||
+                 (((ch == OP_FMUL) || (ch == OP_FDIV)) &&
+                 ((last_op == OP_FADD) || (last_op == OP_FSUB) )) ||
+		 ((!(last_op == OP_FNEG)) && (next_to_last == OP_FPOW))
+              ) {
+	        // current operator has higher precedence than last
+                // cout << "C>L: ";
+	        ;
+              }
+              else {
+	        // last operator has higher or equal precedence than current
+	        // cout << "L>C: ";
+	        operands_pending = PushOperators(&hs, &op, operands_pending);
+	      }
+	    }
+          }
+	  hs.push(ch);
+	  // cout << "Hold " << OpChar(ch) << endl;
+	  // cout << "Held items = " << hs.size() << endl;
+	}
+	++cp;
+      }
+      else if ((f = strtod(cp, &endp)) != 0.) {
+	// push a numeric constant operand into the opcode queue
+	// cout << "Push " << f << endl;
+        op.push_back(OP_FVAL);
+        bp = (byte*) &f;
+        for (i = 0; i < sizeof(double); i++)
+          op.push_back(*(bp+i));         // store operand
+         ++operands_pending;  
+         cp = endp;          // advance character ptr
+      }
+      else if (isalpha(*cp)) {
+        if (*cp == 'X') {    // fetch x
+        // cout << "Push X" << endl;
+          op.push_back(OP_RFETCH);
+          op.push_back(OP_SFFETCH);
+          if (! final_op) final_op = 1;
+          ++operands_pending;
+        }
+        else if (*cp == 'Y') {  // fetch
+	  // cout << "Push Y" << endl;
+          op.push_back(OP_RFETCH);
+	  op.push_back(OP_CELLPLUS);
+          op.push_back(OP_SFFETCH);
+          if (! final_op) final_op = 2;
+          ++operands_pending;
+        }
+        // else if (IsOperator(LabelName, &temp))
+        // {
+        // push function operator onto the hold stack
+        // hs.push(temp);
+        // }
+        else {
+          ecode = 2;  // unrecognized name
+          goto endloop;
+        }
+        ++cp;
+      }
+      else if (*cp == '=') {
+        while (op.size() > PREFIX_CODE_SIZE) {
+          byte c = op.back();
+          op.pop_back();
+          // cout << "Pop " << OpChar(c) << endl;
+        }
+        operands_pending = 0;
+	while (!hs.empty()) hs.pop();
+        ++cp;
+	tp = cp;
+      }
+      else                    // error in rescale expression
+      {
+         temp = *cp;         // for debug use
+         ecode = 1;
+         goto endloop;
+      }
+   }
 
 endloop:
 
     if (! final_op) ecode = 2;   // error: no destination for rescale
     // cout << "Held items: " << hs.size() << endl;
     while (hs.size()) {
-	    last_op = hs.top();
-	    op.push_back(last_op);
-	    hs.pop();
-	    // cout << "Push " << OpChar(last_op) << endl;
+      last_op = hs.top();
+      op.push_back(last_op);
+      hs.pop();
+      // cout << "Push " << OpChar(last_op) << endl;
     }
 
     if (ecode == 0)
@@ -290,21 +297,26 @@ bool IsMonadic (byte opval)
     return flag;
 }
 
-bool PushIfMonadic ( stack<byte>* pH, deque<byte>* pO )
+int PushOperators ( stack<byte>* pH, deque<byte>* pO, int pending )
 {
-    // if top of hold stack is a monadic operator, push it
-    // into the opcode queue.
-    bool flag = false;
+    // Push operators from hold stack into the opcode queue,
+    // if there are sufficient operands available.
+    byte last_op;
+    while ( (!pH->empty()) && pending) {
+      last_op = pH->top();		
+      if (IsMonadic(last_op)) {
+        pO->push_back(last_op);
+      }
+      else if (pending > 1) {
+        pO->push_back(last_op);
+        --pending;
+      }
+      else
+       break;
 
-    if (!pH->empty()) {
-       byte last_op = pH->top();
-       if (IsMonadic(last_op)) {
-           pO->push_back(last_op);
-           pH->pop();
-           // cout << "Push " << OpChar(last_op) << endl;
-           flag = true;
-       }
+      // cout << "Push " << OpChar(last_op) << endl;
+      pH->pop();
     }
-    return flag;
+    return pending;
 }
 
