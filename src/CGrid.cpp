@@ -234,39 +234,38 @@ void CCartesianGrid::Draw(CDC* pDc)
 
 void CCartesianGrid::Labels(CDC* pDc)
 {
-	int k;
-	vector<float> x;
-	float xt, yt;
-	char xl[20], yl[20];
-	char xform[16], yform[16];
+    int k;
+    vector<float> x;
+    float xt, yt;
+    char xl[20], yl[20];
+    char xform[16], yform[16];
 
-	CFont font, *pOldFont;
+    CFont font, *pOldFont;
 
-    if (! font.CreatePointFont(m_nFontPointSize, m_szFontName, pDc))
-	{
-	    AfxMessageBox("Font not available!");
-	}
+    if (! font.CreatePointFont(m_nFontPointSize, m_szFontName, pDc)) {
+      AfxMessageBox("Font not available!");
+    }
     pOldFont = pDc->SelectObject(&font);
 
-	TEXTMETRIC tm;
-	pDc->GetTextMetrics (&tm);
+    TEXTMETRIC tm;
+    pDc->GetTextMetrics (&tm);
 
-	CRect rect = m_pT->GetPhysical();
+    CRect rect = m_pT->GetPhysical();
     x = m_pT->GetLogical();
 
-	float xmin = x[0];
-	float xmax = x[1];
-	float ymin = x[2];
-	float ymax = x[3];
-	float xdel = (xmax - xmin)/(float) nXtics;
-	float ydel = (ymax - ymin)/(float) nYtics;
+    float xmin = x[0];
+    float xmax = x[1];
+    float ymin = x[2];
+    float ymax = x[3];
+    float xdel = (xmax - xmin)/(float) nXtics;
+    float ydel = (ymax - ymin)/(float) nYtics;
 
     strcpy (xform, LabelFormat (xmin, xmax, 'X'));
     strcpy (yform, LabelFormat (ymin, ymax, 'Y'));
-	int xl_width = atoi(&xform[1]);
-	int yl_width = atoi(&yform[1]);
-	if (xl_width < 6) xl_width = 6;
-	if (yl_width < 6) yl_width = 6;
+    int xl_width = atoi(&xform[1]);
+    int yl_width = atoi(&yform[1]);
+    if (xl_width < 6) xl_width = 6;
+    if (yl_width < 6) yl_width = 6;
 
     int xl_pixel_width = xl_width*tm.tmAveCharWidth;
 
@@ -278,16 +277,14 @@ void CCartesianGrid::Labels(CDC* pDc)
 
 // xkstep = (rect.Width()/((float) xlwidth * tm.tmAveCharWidth) > 4.5) ? 2 : 5;
 
-    for (k = 0; k <= nXtics; k += xkstep)
-    {
-        xt = xmin + k*xdel;
-        memset (xl, 32, 20);
-        sprintf (xl, xform, xt);
+    for (k = 0; k <= nXtics; k += xkstep) {
+      xt = xmin + k*xdel;
+      memset (xl, 32, 20);
+      sprintf (xl, xform, xt);
 
-        pDc->TextOut(nXt[k] - xl_pixel_width/2,
-          rect.BottomRight().y + tm.tmHeight/2,
-          xl, xl_width);
-
+      pDc->TextOut(nXt[k] - xl_pixel_width/2,
+        rect.BottomRight().y + tm.tmHeight/2,
+        xl, xl_width);
     }
 
     int ykstep = 2;
@@ -298,16 +295,14 @@ void CCartesianGrid::Labels(CDC* pDc)
 
 // ykstep = (rect.Height()/(float) tm.tmHeight > 4.5) ? 2 : 5;
 
-    for (k = 0; k <= nYtics; k += ykstep)
-    {
+    for (k = 0; k <= nYtics; k += ykstep) {
         yt = ymax - k*ydel;
         memset (yl, 32, 20);
         sprintf (yl, yform, yt);
 
         pDc->TextOut(rect.TopLeft().x - (yl_width + 1)*tm.tmAveCharWidth,
           nYt[k] - tm.tmHeight/2, yl, yl_width);
-
     }
 
-	pDc->SelectObject(pOldFont);
+    pDc->SelectObject(pOldFont);
 }

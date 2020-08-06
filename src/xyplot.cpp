@@ -379,36 +379,33 @@ char* DisplayFormat (float x1, float x2)
     int field_width = 6;
     int precision = 4;
 
-	if ((diff < .01f) || (diff >= 100000.f))
-	  field_width += 6;
-	else if ((diff >= .01f) && (diff < .1f))
-	  ++precision;
-	else if ((diff >= .1f) && (diff < 1.f))
-	  ;
-	else if ((diff >= 1.f) && (diff < 10.f))
-	  --precision;
-	else if ((diff >= 10.f) && (diff < 100.f))
-	  precision -= 2;
-	else if ((diff >= 100.f) && (diff < 1000.f))
-	  precision -= 3;
-	else
-	{
-	    field_width = 8;
-	    precision = 0;
-	}
+    if ((diff < .01f) || (diff >= 100000.f))
+      field_width += 6;
+    else if ((diff >= .01f) && (diff < .1f))
+      ++precision;
+    else if ((diff >= .1f) && (diff < 1.f))
+      ;
+    else if ((diff >= 1.f) && (diff < 10.f))
+      --precision;
+    else if ((diff >= 10.f) && (diff < 100.f))
+      precision -= 2;
+    else if ((diff >= 100.f) && (diff < 1000.f))
+      precision -= 3;
+    else {
+      field_width = 8;
+      precision = 0;
+    }
 
-    float a3 = vmax/diff;
-    if (a3 >= 10. && a3 <= 1.e6)
-    {
-        if (diff != 0.)
-        {
-            int i = (int) (log(a3)/log(10.)) - 1;
-            if ((x1 < 0.) || (x2 < 0.)) i++;
-            if (i < 10) field_width += i;
-	    }
-	}
+    if ( diff != 0.) {
+      float a3 = vmax/diff;
+      if (a3 >= 10. && a3 <= 1.e6) {
+        int i = (int) (log(a3)/log(10.)) - 1;
+        if ((x1 < 0.) || (x2 < 0.)) i++;
+        if (i < 10) field_width += i;
+      }
+    }
 
-	if (field_width > 8)
+    if (field_width > 8)
       sprintf (format, "%c%2d.%1de", '%', field_width, precision);
     else
       sprintf (format, "%c%1d.%1df", '%', field_width, precision);
