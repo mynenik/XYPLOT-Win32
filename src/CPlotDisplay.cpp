@@ -254,7 +254,7 @@ void CPlotDisplay::ApplyCurrentView()
    CTransform* pT = (*m_qiView)->m_pCt;
    if (pT) {
      (*m_qiView)->m_pGrid->SetTransform(pT);
-     vector<float> x = (*m_qiView)->GetExtrema();
+     vector<float> x = this->GetExtrema();
      this->SetCoordinateDisplayFormat(x);
    }
 }

@@ -208,12 +208,8 @@ END_MESSAGE_MAP()
 
 BOOL CXyplotApp::InitInstance()
 {
-    // Get the command line info
 
     CommandLine = GetCommandLine();
-
-	// Register xyplot plot window class
-
     wClass = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW,
         LoadStandardCursor (IDC_CROSS),
         (HBRUSH) GetStockObject (WHITE_BRUSH),
@@ -334,14 +330,12 @@ char* LabelFormat (float x1, float x2, char axis)
 {
 // Determine label output format for range of numbers between x1 and x2.
 
-    static char format[255];
-
+    static char format[16];
     float diff = fabs (x2 - x1);
     int j = (x1 < 0.) || (x2 < 0.);
 
-	switch (axis)
-	{
-	  case 'Y':
+    switch (axis) {
+      case 'Y':
         if ((diff < .001f) || (diff >= 100000.f))
           strcpy (format, "%9.1e");
         else if ((diff >= .001f) && (diff < 1.f))
@@ -353,17 +347,15 @@ char* LabelFormat (float x1, float x2, char axis)
         else if ((diff >= 100.f) && (diff < 1000.f))
           strcpy (format, "%6.1f");
         else
-          strcpy (format, "%6f");
-	    break;
-	  case 'X':
+          strcpy (format, "%6.0f");
+        break;
+      case 'X':
         strcpy (format, DisplayFormat(x1, x2));
         break;
       default:
         ;
     }
-
     return format;
-
 }
 //----------------------------------------------------------------
 
@@ -371,7 +363,7 @@ char* DisplayFormat (float x1, float x2)
 {
 // Determine display format for range of numbers between x1 and x2.
 
-    static char format[255];
+    static char format[16];
     float diff = fabs ((x2 - x1));
     float a1 = fabs (x1);
     float a2 = fabs (x2);

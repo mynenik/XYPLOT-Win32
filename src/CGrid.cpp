@@ -31,6 +31,8 @@ void CGridFrame::Draw (CDC* pDc)
 
     pOldPen = pDc->SelectObject (&FramePen);
 //  pDc->Rectangle(rect);
+//  pDc->SetForeground(m_nColor);
+
     ix1 = rect.TopLeft().x;
     iy1 = rect.TopLeft().y;
     ix2 = rect.BottomRight().x;
@@ -58,27 +60,25 @@ void CGridFrame::Draw (CDC* pDc)
       for (k = 0; k <= nYtics; ++k)
         nYt[k] = iy1 + k*rect.Height()/nYtics;
 
-    if (nXtics > 0)
-    {
-        for (k = 1; k < nXtics; ++k)
-        {
-            pDc->MoveTo(nXt[k], iy1);
-            pDc->LineTo(nXt[k], iy1+iyL);
-            pDc->MoveTo(nXt[k], iy2);
-            pDc->LineTo(nXt[k], iy2-iyL);
-        }
+    if (nXtics > 0) {
+      for (k = 1; k < nXtics; ++k) {
+        pDc->MoveTo(nXt[k], iy1);
+        pDc->LineTo(nXt[k], iy1+iyL);
+        pDc->MoveTo(nXt[k], iy2);
+        pDc->LineTo(nXt[k], iy2-iyL);
+      }
     }
 
     if (nYtics > 0) {
-        for (k = 1; k < nYtics; ++k) {
-       	    pDc->MoveTo(ix1, nYt[k]);
-       	    pDc->LineTo(ix1+ixL, nYt[k]);
-       	    pDc->MoveTo(ix2, nYt[k]);
-       	    pDc->LineTo(ix2-ixL, nYt[k]);
-	  }
-     }
+      for (k = 1; k < nYtics; ++k) {
+        pDc->MoveTo(ix1, nYt[k]);
+        pDc->LineTo(ix1+ixL, nYt[k]);
+        pDc->MoveTo(ix2, nYt[k]);
+        pDc->LineTo(ix2-ixL, nYt[k]);
+      }
+    }
 
-     pDc->SelectObject(pOldPen);
+    pDc->SelectObject(pOldPen);
 }
 //---------------------------------------------------------------
 
@@ -92,28 +92,22 @@ void CGridLines::Draw (CDC* pDc)
     ix2 = rect.BottomRight().x;
     iy2 = rect.BottomRight().y;
 
-    if (m_bVertical)
-      {
-        if (nXtics > 0)
-        {
-	  for (k = 1; k < nXtics; ++k)
-	    {
-	      ixT = nXt[k];
-              for (i = iy1; i < iy2; i++)
-                if (i % 2) pDc->SetPixel (ixT, i, m_nColor);
-            }
+    if (m_bVertical) {
+      if (nXtics > 0) {
+        for (k = 1; k < nXtics; ++k) {
+          ixT = nXt[k];
+          for (i = iy1; i < iy2; i++)
+            if (i % 2) pDc->SetPixel (ixT, i, m_nColor);
         }
+      } 
     }
 
-  if (m_bHorizontal)
-    {
-      if (nYtics > 0)
-      {
-        for (k = 1; k < nYtics; ++k)
-        {
-            iyT = nYt[k];
-            for (i = ix1; i < ix2; i++)
-                if (i % 2) pDc->SetPixel(i, iyT, m_nColor);
+    if (m_bHorizontal) {
+      if (nYtics > 0) {
+        for (k = 1; k < nYtics; ++k) {
+          iyT = nYt[k];
+          for (i = ix1; i < ix2; i++)
+            if (i % 2) pDc->SetPixel(i, iyT, m_nColor);
         }
       }
     }
@@ -186,40 +180,41 @@ void CGrid::GetTics (int* pXtics, int* pYtics)
 
 void CGrid::SetLines (bool bVer, bool bHor)
 {
-  if (m_pLines) {
-    m_pLines->m_bVertical = bVer;
-    m_pLines->m_bHorizontal = bHor;
-  }
+    if (m_pLines) {
+      m_pLines->m_bVertical = bVer;
+      m_pLines->m_bHorizontal = bHor;
+    }
 }
 
 void CGrid::GetLines (bool* pVer, bool* pHor)
 {
-  if (m_pLines) {
-    *pVer = m_pLines->m_bVertical;
-    *pHor = m_pLines->m_bHorizontal;
-  }
+    if (m_pLines) {
+      *pVer = m_pLines->m_bVertical;
+      *pHor = m_pLines->m_bHorizontal;
+    }
 }
 
 void CGrid::SetAxes (bool bx, bool by)
 {
-  if (m_pAxes) {
-    m_pAxes->SetAttributes (PS_SOLID, 1, m_nColor);
-    m_pAxes->m_bXaxis = bx;
-    m_pAxes->m_bYaxis = by;
-  }
+    if (m_pAxes) {
+      m_pAxes->SetAttributes (PS_SOLID, 1, m_nColor);
+      m_pAxes->m_bXaxis = bx;
+      m_pAxes->m_bYaxis = by;
+    }
 }
 
 void CGrid::GetAxes (bool* pX, bool* pY)
 {
-  if (m_pAxes) {
-    *pX = m_pAxes->m_bXaxis;
-    *pY = m_pAxes->m_bYaxis;
-  }
+    if (m_pAxes) {
+      *pX = m_pAxes->m_bXaxis;
+      *pY = m_pAxes->m_bYaxis;
+    }
 }
 //---------------------------------------------------------------
 
 void CCartesianGrid::Draw(CDC* pDc)
 {
+//  pDc->SetForeground(m_nColor);
     // Draw the frame and tics
     if (m_pFrame) m_pFrame->Draw(pDc);
 
@@ -228,13 +223,12 @@ void CCartesianGrid::Draw(CDC* pDc)
 
     // Draw the axes
     if (m_pAxes) m_pAxes->Draw(pDc);
-
 }
 //---------------------------------------------------------------
 
 void CCartesianGrid::Labels(CDC* pDc)
 {
-    int k;
+    int k, iy;
     vector<float> x;
     float xt, yt;
     char xl[20], yl[20];
@@ -249,7 +243,6 @@ void CCartesianGrid::Labels(CDC* pDc)
 
     TEXTMETRIC tm;
     pDc->GetTextMetrics (&tm);
-
     CRect rect = m_pT->GetPhysical();
     x = m_pT->GetLogical();
 
@@ -268,40 +261,34 @@ void CCartesianGrid::Labels(CDC* pDc)
     if (yl_width < 6) yl_width = 6;
 
     int xl_pixel_width = xl_width*tm.tmAveCharWidth;
-
     int xkstep = 2;
-
-    while (nXtics*xl_pixel_width/xkstep > rect.Width())
-        xkstep *= 2;
+    while (nXtics*xl_pixel_width/xkstep > rect.Width()) xkstep *= 2;
     if (xkstep > nXtics) xkstep = nXtics;
 
-// xkstep = (rect.Width()/((float) xlwidth * tm.tmAveCharWidth) > 4.5) ? 2 : 5;
+    xkstep = (rect.Width()/((float) xl_width*tm.tmAveCharWidth) > 4.5) ? 2 : 5;
+    iy = rect.BottomRight().y + tm.tmHeight/2;
 
     for (k = 0; k <= nXtics; k += xkstep) {
       xt = xmin + k*xdel;
       memset (xl, 32, 20);
       sprintf (xl, xform, xt);
-
-      pDc->TextOut(nXt[k] - xl_pixel_width/2,
-        rect.BottomRight().y + tm.tmHeight/2,
-        xl, xl_width);
+      xl_pixel_width = strlen(xl)*tm.tmAveCharWidth;
+      pDc->TextOut(nXt[k] - xl_pixel_width/2, iy, xl, xl_width);
     }
 
     int ykstep = 2;
-
-    while (nYtics*tm.tmHeight/ykstep > rect.Height()/2)
-        ykstep *= 2;
+    while (nYtics*tm.tmHeight/ykstep > rect.Height()/2) ykstep *= 2;
     if (ykstep > nYtics) ykstep = nYtics;
 
-// ykstep = (rect.Height()/(float) tm.tmHeight > 4.5) ? 2 : 5;
+    ykstep = (rect.Height()/(float) tm.tmHeight > 4.5) ? 2 : 5;
+    iy = -tm.tmHeight/2;
 
     for (k = 0; k <= nYtics; k += ykstep) {
         yt = ymax - k*ydel;
         memset (yl, 32, 20);
         sprintf (yl, yform, yt);
-
         pDc->TextOut(rect.TopLeft().x - (yl_width + 1)*tm.tmAveCharWidth,
-          nYt[k] - tm.tmHeight/2, yl, yl_width);
+          nYt[k] + iy, yl, yl_width);
     }
 
     pDc->SelectObject(pOldFont);
