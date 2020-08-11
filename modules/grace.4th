@@ -18,11 +18,8 @@
 
 \ Utility words
 
-: rep(',") ( a u -- a u | replace every single quote with double quote in string)
-	2dup 0 ?do dup c@ [char] ' = if [char] " over c! then 1+ loop drop ;
-
-: rep(comma,space) ( a u -- a u | replace every comma with a space in string)
-        2dup 0 ?do dup c@ [char] , = if bl over c! then 1+ loop drop ;
+: rep(',") ( a u -- a u )  [char] ' [char] " replace-char ;
+: rep(comma,space) ( a u -- a u ) [char] , bl replace-char ;
 
 \ Number <=> string conversions, enforcing conversion in base 10
 \ (uses words from strings.4th ).
