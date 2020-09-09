@@ -47,7 +47,7 @@ extern int NumberParse (float*, char*);
 extern COLORREF LookupColor (char*);
 extern COLORREF colors_rgb_table[];
 extern int CompileAE (vector<BYTE>*, char* exp);
-extern int ExecuteForthExpression (char*, ostringstream*, int*, int*);
+extern int ExecuteForthExpression (char*, ostringstream*, int*, long int*);
 
 vector<char*> GetStartupFileList(char*);
 
@@ -565,7 +565,8 @@ void CPlotWindow::OnForthMenuItem ()
         return;
     }
 
-    int nError, line;
+    int nError;
+    long int line;
     char out_s[4096];
     memset(out_s, 0, 4096);
     stringstream ForthOutput;
@@ -725,7 +726,7 @@ void CPlotWindow::OnExpression()
     char s[256], emsg[256];
     *s = 0;
     ostringstream* pSS = NULL;
-    int i, len, *StackPtr;
+    long int i, len, *StackPtr;
     BYTE* TypePtr;
 
     MSG msg = *GetCurrentMessage();
@@ -1476,8 +1477,8 @@ BOOL CPlotWindow::SaveMetafile(char* name)
 int CPlotWindow::LoadForthFile(char* fname)
 {
     char s[256];
-    int lnum;
-    int *sp;
+    long int lnum;
+    long int *sp;
     BYTE *tp;
 
     strcpy (s, "include ");

@@ -29,7 +29,7 @@ int AddToHeader (char*, char*, bool);
 void LoadInitializationFile();
 void InitForthInterface ();
 int LoadForthFile(char*);
-int ExecuteForthExpression (char*, ostringstream*, int*, int*);
+int ExecuteForthExpression (char*, ostringstream*, int*, long int*);
 COLORREF LookupColor(char*);
 
 // The following functions provide the interface between

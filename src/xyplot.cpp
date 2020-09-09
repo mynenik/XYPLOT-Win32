@@ -61,7 +61,7 @@ extern "C" byte *GlobalTp;
 extern COLORREF colors_rgb_table[];
 extern char* color_names[];
 
-int debug = FALSE;                   // global variable for debug mode
+bool debug = FALSE;                   // global variable for debug mode
 volatile int InputData;
 
 // Forth interface constant function pointers
@@ -480,12 +480,12 @@ int AddToHeader (char* text, char* hdr, bool prefix)
 }
 //-------------------------------------------------------------
 
-int ExecuteForthExpression (char* s, ostringstream* pOutput, int* pError, int* pLine)
+int ExecuteForthExpression (char* s, ostringstream* pOutput, int* pError, long int* pLine)
 {
   // Return zero if no error, 1 if compiler error, 2 if VM error
 
   istringstream* pSS = new istringstream (s);
-  int* sp;
+  long int* sp;
   byte* tp;
   vector<byte> op;
 
@@ -512,7 +512,6 @@ void InitForthInterface ()
 {
   char fs[4096], s[64];
   char* cs = " constant ";
-  int esrc, ec, lnum;
 
   sprintf (s, "%lu%sFN_GET_COLOR_MAP\n", FN_GET_COLOR_MAP, cs);
   strcpy (fs, s);
@@ -604,6 +603,8 @@ void InitForthInterface ()
   char out_s[2048];
   memset (out_s, 0, 2048);
   stringstream* pSS = new stringstream(out_s, 2047);
+  int esrc, ec;
+  long int lnum;
 
   esrc = ExecuteForthExpression(fs, (ostringstream*) pSS, &ec, &lnum);
   if (esrc)
@@ -621,7 +622,8 @@ void InitForthInterface ()
 int LoadForthFile(char* fname)
 {
   char s[512], out_s[1024];
-  int esrc, ec, lnum;
+  int esrc, ec;
+  long int lnum;
 
   strcpy (s, "include ");
   strcat (s, fname);
