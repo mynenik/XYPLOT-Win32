@@ -3,12 +3,11 @@
 \ Forth interface to xyplot
 \
 \ Copyright (c) 1999--2020 Krishna Myneni
-\ Creative Consulting for Research and Education
 \
 \ This software is provided under the terms of the 
 \ GNU Affero General Public License (AGPL), v3.0 or later.
 \
-\ Requires: xypw32.exe version >= 1.1.6
+\ Requires: xypw32.exe version >= 1.3.0
 \
 \ XYPLOT defines Forth constants which contain pointers to
 \ C++ functions that interface with the Forth environment.
@@ -30,8 +29,8 @@
 \  get_plot ( i addr -- n ) Return info on plot i into a structure.
 \  drop_plot ( -- )  Drop the active plot.
 \  make_plot ( addr -- ) Make a plot according to info in structure.
-\  set_plot_symbol ( symbolname -- ) set active plot symbol.
-\  set_plot_color ( colorname -- ) set active plot color.
+\  set_plot_symbol ( ^symbolname -- ) set active plot symbol.
+\  set_plot_color ( ^colorname -- ) set active plot color.
 \  draw_plot ( flag -- ) draw the active plot.
 \  get_grid ( -- nXtics nYtics bXLines bYLines bXaxis bYaxis ) get grid params.
 \  set_grid_tics ( nx ny -- ) set number of tics for x and y axes
@@ -42,8 +41,8 @@
 \  draw_window ( -- ) 	Draw the plot window.
 \  reset_window ( -- ) 	Reset the plot window.
 \  message_box ( a u -- ) Popup a message window to display text.
-\  file_open_dialog ( ^filter -- ^filename flag ) Provide file selection dialog.
 \  get_input ( ^prompt -- ^resp flag ) Provide dialog for text input.
+\  file_open_dialog ( ^filter -- ^filename flag ) Provide file selection dialog.
 \  get_window_limits ( -- fxmin fymin fxmax fymax ) Return window extrema.
 \  set_window_limits ( fxmin fymin fxmax fymax -- ) Set window extrema.
 \  add_menu_item ( menu name command -- ) Add a new menu item
@@ -77,119 +76,121 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
    FN_GET_COLOR_MAP call ;
 
 : get_active_set ( -- n | return the active dataset number )
-	\ n less than zero indicates an error.
-	FN_GET_ACTIVE_SET call ;
+    \ n less than zero indicates an error.
+    FN_GET_ACTIVE_SET call ;
 
 : get_operand_set ( -- n | return the operand dataset number )
-	\ n less than zero indicates an error.
-	FN_GET_OPERAND_SET call ;
+    \ n less than zero indicates an error.
+    FN_GET_OPERAND_SET call ;
 
 : ?active ( -- n) get_active_set ;
 : ?operand ( -- n) get_operand_set ;
 
 : get_active_plot ( -- n | return the active plot number )
-	FN_GET_ACTIVE_PLOT call ;
+    FN_GET_ACTIVE_PLOT call ;
 
 : get_operand_plot ( -- n | return the operand plot number )
-	FN_GET_OPERAND_PLOT call ;
+    FN_GET_OPERAND_PLOT call ;
 
 : set_active_plot ( n -- | set plot n as the active plot )
-	FN_SET_ACTIVE_PLOT call ;
+    FN_SET_ACTIVE_PLOT call ;
 
 : set_operand_plot ( n -- | set plot n as the operand plot )
-	FN_SET_OPERAND_PLOT call ;
+    FN_SET_OPERAND_PLOT call ;
 
 : get_ds ( i addr -- n | return info on dataset i into a structure at addr )
-	\ n less than zero indicates an error.
-	FN_GET_DS call ;
+    \ n less than zero indicates an error.
+    FN_GET_DS call ;
 
 : set_ds_extrema ( i -- | recompute the extrema for dataset i )
-	FN_SET_DS_EXTREMA call ;
+    FN_SET_DS_EXTREMA call ;
 
 : make_ds ( addr -- n | make a dataset in xyplot; return set number )
-	FN_MAKE_DS call ;
+    FN_MAKE_DS call ;
 
 : get_plot ( i addr -- n | return info on plot i into a structure at addr )
-	\ n less than zero indicates an error.
-	FN_GET_PLOT call ;
+    \ n less than zero indicates an error.
+    FN_GET_PLOT call ;
 
 : drop_plot ( addr -- | drop the active plot )
-        FN_DROP_PLOT call ;
+    FN_DROP_PLOT call ;
 
 : make_plot ( addr -- | make a plot in xyplot )
-	FN_MAKE_PLOT call ;
+    FN_MAKE_PLOT call ;
 
 : set_plot_symbol ( symbolname -- | set active plot symbol )
-	FN_SET_PLOT_SYMBOL call ;
+    FN_SET_PLOT_SYMBOL call ;
 
 : set_plot_color ( colorname -- | set active plot color )
-	FN_SET_PLOT_COLOR call ;
+    FN_SET_PLOT_COLOR call ;
 
 : draw_plot ( flag -- | draw active plot, if flag = false use bkg color )
-	FN_DRAW_PLOT call ;
+    FN_DRAW_PLOT call ;
 
 : get_grid ( -- nXtics nYtics bXlines bYlines bXaxis bYaxis )
-	FN_GET_GRID call ;
+    FN_GET_GRID call ;
 
 : set_grid_tics ( nx ny -- | set number of tics on x and y axes )
-	FN_SET_GRID_TICS call ;
+    FN_SET_GRID_TICS call ;
 
 : set_grid_lines ( flagx flagy -- | set grid lines on/off on x and y axes )
-	FN_SET_GRID_LINES call ;
+    FN_SET_GRID_LINES call ;
 
 : get_window_title ( c-addr umax -- uret )
-	FN_GET_WINDOW_TITLE call ;
+    FN_GET_WINDOW_TITLE call ;
 
 : set_window_title ( c-addr u -- )
-	FN_SET_WINDOW_TITLE call ;
+    FN_SET_WINDOW_TITLE call ;
 
 : clear_window ( -- | clear the plot window )
-	FN_CLEAR_WINDOW call ;
+    FN_CLEAR_WINDOW call ;
 
 : draw_window ( -- | draw the plot window )
-	FN_DRAW_WINDOW call ;
+    FN_DRAW_WINDOW call ;
 
 : reset_window ( -- | reset the plot window )
-	FN_RESET_WINDOW call ;
+    FN_RESET_WINDOW call ;
 
 : get_window_limits ( -- fx1 fy1 fx2 fy2 | obtain the plot window limits )
-	FN_GET_WINDOW_LIMITS call ;
+    FN_GET_WINDOW_LIMITS call ;
 
 : set_window_limits ( fx1 fy1 fx2 fy2 -- | set the plot window limits )
-	FN_SET_WINDOW_LIMITS call ;
+    FN_SET_WINDOW_LIMITS call ;
 
 : add_menu_item ( menu name command -- | add new menu item )
-	FN_ADD_MENU_ITEM call ;
+    FN_ADD_MENU_ITEM call ;
 
 : set_background ( colorname -- | set plot window background color )
-	FN_SET_BACKGROUND call ;
+    FN_SET_BACKGROUND call ;
 
 : set_foreground ( colorname -- | set plot window foreground color )
-	FN_SET_FOREGROUND call ;
+    FN_SET_FOREGROUND call ;
 
 : message_box ( a u -- | pop up a message window to display text )
-       FN_MESSAGE_BOX call ;
-
-: file_open_dialog ( ^filter -- ^filename flag )
-	FN_FILE_OPEN call ;
+    FN_MESSAGE_BOX call ;
 
 : get_input ( ^prompt -- ^resp flag | get text input from dialog box )
-	FN_GET_INPUT call ;
+    FN_GET_INPUT call ;
+
+: file_open_dialog ( ^filter -- ^filename flag )
+    FN_FILE_OPEN call ;
+
 
 1 SFLOATS constant SFLOAT       \ size in bytes of single precision float
 
-\ kForth libraries and utilities
+\ kForth libraries, utilities, and modules support
 include ans-words.4th
 include strings.4th
 include files.4th
 include utils.4th
+include modules.fs
 include struct.4th
 include struct-ext.4th
 
 \ Save Options structure
 \   HeaderType: 0=none, 1=xyplot format, 2=user-defined line prefix
 \   Delimiter:  0=space, 1=tab, 2=comma, other=space
-\   NumberFormat: 0=exponential, 1=floating poin, 2=integer, other=exponential
+\   NumberFormat: 0=exponential, 1=fixed point, 2=integer, other=exponential
 \   EndOfLine:  0=Unix, 1=DOS
 \   UserPrefix: text prefix for header type option 2
 struct
@@ -218,13 +219,11 @@ struct
   cell%  field  PlotInfo->Color   \ plot color
 end-struct PlotInfo%
 
-
 \ Defining words for making DatasetInfo% and PlotInfo% structures
 
 : DatasetInfo  create DatasetInfo% %allot drop ; nondeferred
 : PlotInfo     create PlotInfo%    %allot drop ; nondeferred 
 : SaveOptions  create SaveOptions% %allot drop ; nondeferred
-
 
 \ Useful words to fetch and store the i^th x, y pair from/to
 \ a dataset are given below. Note that addr is the address of 
@@ -252,38 +251,41 @@ end-struct PlotInfo%
 \ Load all of the forth files that provide basic functions
 \ and menu items
 
-0 [IF]
 \ Modules from the Forth Scientific Library (FSL, kForth-port)
 include fsl/fsl-util
 include fsl/dynmem
 include fsl/complex
-[ELSE]
-cr .( Older matrix package will soon be obsoleted in favor of FSL.) cr
-include matrix
-[THEN]
+include fsl/horner
+include fsl/lufact
+include fsl/dets
+include fsl/gaussj
+include fsl/extras/determ
+include fsl/extras/curvefit
+include fsl/extras/four1
+include fsl/extras/derivative
+include fsl/extras/polyfit
 
-\ XYPLOT modules ( ver >= 1.1.7 )
+\ XYPLOT modules ( ver >= 1.3.0 )
 include xutils
-include xypolyfit
 include arithmetic
-include abs
+include xypolyfit
+\ include xyexpfit
 include xyhistogram
-include fft
-include xyfft
+\ include xyfft
 include smooth
 include lpf
+include autocorr
+include xyderiv
+include peak_search
+include xypeaks
+include xysort
+include xyswap
+include yn_vs_ym
+include abs
 include ylog
 include yln
-include autocorr
-include derivative
-include xyderiv
-\ include polyfit
-\ include peak_search
-\ include xypeaks
-\ include xymap
-\ include yn_vs_ym
+include xymap
 include grace
-include xyswap
 
 \ You can put some initialization stuff here, for example
 \  to set the background and foreground colors.

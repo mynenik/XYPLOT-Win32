@@ -11,144 +11,135 @@
 \
 \ Requires:
 \
-\	matrix.4th
 \	derivative.4th
 \	polyfit.4th
 \
 \ Revisions:
+\       2007-06-12  rewritten for use with FSL-style arrays and modules
+\       2012-06-26  convert to unnamed module
 \
-1024 1024 * constant MAX_PEAKSEARCH_PTS
-MAX_PEAKSEARCH_PTS 2 fmatrix pksin
+
+Begin-Module
+
+FLOAT DMATRIX pksin{{
 
 32768 constant MAX_PEAKS
-MAX_PEAKS 2 fmatrix peaks
+MAX_PEAKS 2 FLOAT MATRIX peaks{{
 
 32 constant MAX_WIDTH
 
-variable input_m
-variable input_npts
-variable ipw
-variable npeaks
+0 value Npeaks
+0 value Npts
+0 value MinPkWidth
+0 value ips
+0 value ipe
+0 ptr input_m{{
+
 variable ys1
 variable ys2
-variable ips
-variable ipe
 
 fvariable xpeak
 fvariable ypeak
 fvariable xpk2
 fvariable xoffs
 
-3 1 fmatrix xp
-3 1 fmatrix yp
-MAX_WIDTH 1 fmatrix xpp
-MAX_WIDTH 1 fmatrix ypp
-3 1 fmatrix pcoeffs
+3          FLOAT ARRAY  xp{
+3          FLOAT ARRAY  yp{
+MAX_WIDTH  FLOAT ARRAY  xpp{
+MAX_WIDTH  FLOAT ARRAY  ypp{
+3          FLOAT ARRAY  pcoeffs{
 
-: peak_search ( fm ipw -- ierr)
+Public:
 
-	ipw !
-	dup mat_size@ drop input_npts !
-	input_m !
+: peak_search ( 'mat np ipw -- ierr)
 
-	\ Copy the input matrix into the pksin matrix
+    to MinPkWidth  to Npts  to input_m{{
 
-	input_m a@ pksin 
-	over mat_size@ * dfloats cell+ cell+	\ size of input matrix in bytes
-	cmove
+    & pksin{{ Npts 2 }}malloc
 
-	\ Compute first derivative of data.
+    \ Copy the input matrix into the pksin matrix
 
-	pksin derivative
-	if 1 exit then
+    input_m{{  pksin{{ Npts 2 }}fcopy 
 
-	\  Search for X axis crossings.
+    \ Compute first derivative of data.
 
-	0 npeaks !
-	1 2 pksin fmat@ 0e f< ys1 !	\ is first value negative?
+    pksin{{ Npts  derivative  IF 1 EXIT THEN
 
-	input_npts @ 2 do
-	  i 2 pksin fmat@ 0e f< ys2 !	
-	  ys2 @ ys1 @ <> if
+    \  Search for X axis crossings.
+
+    0 to Npeaks
+    pksin{{ 0 1 }} F@ 0e F< ys1 !	\ is first value negative?
+
+    Npts 1- 1 DO
+	pksin{{ I 1 }} F@ 0e F< ys2 !	
+	ys2 @ ys1 @ <> IF
 	    \  X axis crossing found. Is it a peak or a valley?
 	    
-	    ys1 @ 0 >= if
-	      \ Went from positive to negative so we found a peak.
+	    ys1 @ 0 >= IF
+		\ Went from positive to negative so we found a peak.
 	      
-	      npeaks @ 1+ dup MAX_PEAKS <= if npeaks ! then
 
-	      \  Use linear interpolation to determine x value at crossing.
+		\ Use linear interpolation to determine x value at crossing.
 
-	      i 1 pksin fmat@		\ x(i)
-	      i 1- 2 pksin fmat@	\ y'(i-1)
-	      f*
-	      i 1- 1 pksin fmat@	\ x(i-1)
-	      i 2 pksin fmat@		\ y'(i)
-	      f*
-	      f-
-	      i 1- 2 pksin fmat@	\ y'(i-1)
-	      i 2 pksin fmat@		\ y'(i)
-	      f- f/ xpeak f!
+		pksin{{ I 0 }}    F@  pksin{{ I 1- 1 }} F@  F*
+		pksin{{ I 1- 0 }} F@  pksin{{ I 1 }}    F@  F*
+		F-
+		pksin{{ I 1- 1 }} F@  pksin{{ I 1 }} F@ F- F/ xpeak F!
 
-	      \  Use parabolic fit to original data to determine peak height.
+		\  Use parabolic fit to original data to determine peak height.
 
-	      i 1- 1 pksin fmat@ fnegate xoffs f!	\ -x(i-1)	
-	      0e 
-	      1 1 xp fmat!
-	      i 1 pksin fmat@ xoffs f@ f+
-	      2 1 xp fmat!
-	      i 1+ 1 pksin fmat@ xoffs f@ f+
-	      3 1 xp fmat!
+		pksin{{ I 1- 0 }} F@ fnegate xoffs F!	\ -x(i-1)
 
-	      i 1- 2 input_m a@ fmat@
-	      1 1 yp fmat!
-	      i 2 input_m a@ fmat@
-	      2 1 yp fmat!
-	      i 1+ 2 input_m a@ fmat@
-	      3 1 yp fmat!
+		0e                                xp{ 0 } F!
+		pksin{{ I 0 }}    F@ xoffs F@ F+  xp{ 1 } F!
+		pksin{{ I 1+ 0 }} F@ xoffs F@ F+  xp{ 2 } F!
 
-	      xp yp pcoeffs 2 polfit fdrop
+		input_m{{ I 1- 1 }} F@  yp{ 0 } F!
+		input_m{{ I 1 }}    F@  yp{ 1 } F!
+		input_m{{ I 1+ 1 }} F@  yp{ 2 } F!
 
-	      xpeak f@ xoffs f@ f+ xpk2 f!
-	      xpk2 f@ fdup f* 3 1 pcoeffs fmat@ f*
-	      xpk2 f@ 2 1 pcoeffs fmat@ f* f+
-	      1 1 pcoeffs fmat@ f+
-	      ypeak f!
+		xp{ yp{ pcoeffs{ 2 3 polfit fdrop
 
-	      xpeak f@ npeaks @ 1 peaks fmat!	\ store peak position
-	      ypeak f@ npeaks @ 2 peaks fmat!	\ store peak height
+		xpeak F@ xoffs F@ F+ xpk2 F!
+		xpk2 F@ fdup F* pcoeffs{ 2 } F@ F*
+		xpk2 F@ pcoeffs{ 1 } F@ F* F+
+		pcoeffs{ 0 } F@ F+  ypeak F!
 
-	      \  Test for minimum width
+		xpeak F@  peaks{{ Npeaks 0 }} F!	\ store peak position
+		ypeak F@  peaks{{ Npeaks 1 }} F!	\ store peak height
 
-	      i ipw @ 2/ - ips !
-	      i ipw @ 2/ + ipe !
+		Npeaks 1+ dup MAX_PEAKS <= IF to Npeaks ELSE drop THEN
 
-	      ips @ 1 < ipe @ input_npts @ > or
-	      if 
-	        -1 npeaks +!	\ reject the peak
-	      else
-	        ips @ 1 pksin fmat@ xoffs f!
+		\  Test for minimum width
 
-	        ipe @ 1+ ips @ do
-	          i 1 pksin fmat@ xoffs f@ f-
-	          i ips @ - 1+ 1 xpp fmat!
-	          i 2 input_m a@ fmat@
-	          i ips @ - 1+ 1 ypp fmat!
-	        loop
+		I MinPkWidth 2/ - to ips
+		I MinPkWidth 2/ + to ipe 
 
-	        xpp ypp pcoeffs 2 polfit fdrop
+		ips 0<  ipe Npts >=  OR
+		IF 
+		    Npeaks 1- to Npeaks     \ reject the peak
+		ELSE
+		    pksin{{ ips 0 }} F@ xoffs f!
+
+		    ipe 1+ ips DO
+			pksin{{ I 0 }} F@ xoffs F@ F-   xpp{ I ips - }  F!
+			input_m{{ I 1 }} F@             ypp{ I ips - }  F!
+		    LOOP
+
+		    xpp{ ypp{ pcoeffs{ 2 ipe ips - 1+ polfit fdrop
 	        
-	        3 1 pcoeffs fmat@ 0e f>=
-	        if -1 npeaks +! then  \ reject the peak
-	      then
-	    then
-	  then
-	  ys2 @ ys1 !
-	loop
+		    pcoeffs{ 2 } F@ 0e F>=  IF Npeaks 1- to Npeaks THEN  \ reject the peak
+		THEN
+	    THEN
+	THEN
+	ys2 @ ys1 !
+    LOOP
 
-	npeaks @ 0> if
-	  npeaks @ 2 peaks mat_size!	\ set the matrix size
-	   0		\ no error
-	else 
-	  2		\ error: no peaks found
-	then ;
+    Npeaks 0> IF
+	0		\ no error
+    ELSE
+	2		\ error: no peaks found
+    THEN ;
+
+End-Module
+

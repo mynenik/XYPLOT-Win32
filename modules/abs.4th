@@ -4,7 +4,11 @@
 \
 \ Copyright (c) 2000--2020 Krishna Myneni
 \
+Begin-Module
+
 DatasetInfo ds
+
+Public:
 
 : abs_ds ( -- )
 	?active			\ get the active set number
@@ -25,3 +29,5 @@ DatasetInfo ds
 \ add this function to the math menu
 
 MN_MATH c" Magnitude" c" abs_ds reset_window" add_menu_item
+
+End-Module

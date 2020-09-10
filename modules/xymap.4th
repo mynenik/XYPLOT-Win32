@@ -9,123 +9,126 @@
 \  searching module for xyplot (xypeaks.4th) may be used to 
 \  extract peak information from waveform data.
 \
-\ Copyright (c) 2000--2005 Krishna Myneni
-\ Provided under the GNU General Public License
+\ Copyright (c) 2000--2012 Krishna Myneni
+\ Provided under the GNU Lesser General Public License (LGPL)
 \
 \ Required files:
 \	xyplot.4th
-\	matrix.4th
 \
 \ Revisions:
-\      4-1-2000   created
-\      1-15-2005  updated use of DatasetInfo structure km
+\      04-01-2000   created
+\      01-15-2005   updated use of DatasetInfo structure km
+\      08-18-2007   updated to use FSL matrices; placed menu items
+\                     in a Maps submenu of the Math menu  km
+\      2009-10-29   updated data structure member names  km
+\      2012-06-26   converted to unnamed module  km
 
+Begin-Module
+
+DatasetInfo ds1
 DatasetInfo dsmap
-
-32768 4 * constant MAX_MAP_PTS
-MAX_MAP_PTS 2 fmatrix map_data
-map_data 2 cells + dsmap DDATA !	\ store the data pointer
+FLOAT DMATRIX  map_data{{
 
 variable map_type
+0 value Npts
+
+Public:
+
+\ map type = 
+\	0  y_n+1 vs y_n
+\ 	1  x_n+1 vs x_n
+\	2  dy_n+1 vs dy_n
+\	3  dx_n+1 vs dx_n
+\	4  dy_n+1 vs dx_n
 
 : map ( ntype -- | create a map )
-  \ ntype = 
-  \	0 for map of y_n+1 vs y_n
-  \ 	1 for map of x_n+1 vs x_n
-  \	2 for map of dy_n+1 vs dy_n
-  \	3 for map of dx_n+1 vs dx_n
-  \	4 for map of dy_n+1 vs dx_n
+    map_type !
+    ?active dup 0< IF drop EXIT THEN
+    ds1 get_ds
+    0 >= IF
 
-
-	map_type !
-	?active dup
-	0 >= if
-	  ds1 get_ds
-	  0 >= if
-
-	    \ Create map
-
-	    map_type @
-	    case
-	      0 of
-	        ds1 DatasetInfo->Npts @ 1 do
-	          i 1- ds1 @xy fswap fdrop
-	          i 1 map_data fmat!
-	          i ds1 @xy fswap fdrop
-	          i 2 map_data fmat!
-	        loop
- 		c" Map of y_n+1 vs y_n"
-	        ds1 DatasetInfo->Npts @ 1-  
-	      endof
+	map_type @
+	CASE
+	    0 OF
+		ds1 DatasetInfo->Npts @ 1- to Npts
+		& map_data{{ Npts 2 }}malloc
+		Npts 0 DO
+		    I    ds1 @xy fswap fdrop  map_data{{ I 0 }} F!
+		    I 1+ ds1 @xy fswap fdrop  map_data{{ I 1 }} F!
+		LOOP
+		c" Map of y_n+1 vs y_n"
+	    ENDOF
 	        
-	      1 of
-	        ds1 DatasetInfo->Npts @ 1 do
-	          i 1- ds1 @xy fdrop
-	          i 1 map_data fmat!
-	          i ds1 @xy fdrop
-	          i 2 map_data fmat!
-	        loop
- 		c" Map of x_n+1 vs x_n"
-	        ds1 DatasetInfo->Npts @ 1-  
-	      endof
+	    1 OF
+		ds1 DatasetInfo->Npts @ 1- to Npts
+		& map_data{{ Npts 2 }}malloc
+		Npts 0 DO
+		    I    ds1 @xy fdrop  map_data{{ I 0 }} F!
+		    I 1+ ds1 @xy fdrop  map_data{{ I 1 }} F!
+		LOOP
+		c" Map of x_n+1 vs x_n"
+	    ENDOF
 
-	      2 of
-	        ds1 DatasetInfo->Npts @ 1- 1 do
-	          i ds1 @xy fswap fdrop i 1- ds1 @xy fswap fdrop f-
-	          i 1 map_data fmat!
-	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
-	          i 2 map_data fmat!
-	        loop
-	        c" Map of dy_n+1 vs dy_n"
-	        ds1 DatasetInfo->Npts @ 2-
-	      endof
+	    2 OF
+		ds1 DatasetInfo->Npts @ 2- to Npts
+		& map_data{{ Npts 2 }}malloc
+		Npts 0 DO
+		    I 1+ ds1 @xy fswap fdrop  I ds1 @xy fswap fdrop F-
+		    map_data{{ I 0 }} F!
+		    I 2+ ds1 @xy fswap fdrop  I 1+ ds1 @xy fswap fdrop F-
+		    map_data{{ I 1 }} F!
+		LOOP
+		c" Map of dy_n+1 vs dy_n"
+	    ENDOF
 
-	      3 of
-	        ds1 DatasetInfo->Npts @ 1- 1 do
-	          i ds1 @xy fdrop i 1- ds1 @xy fdrop f-
-	          i 1 map_data fmat!
-	          i 1+ ds1 @xy fdrop i ds1 @xy fdrop f-
-	          i 2 map_data fmat!
-	        loop
-	        c" Map of dx_n+1 vs dx_n"
-	        ds1 DatasetInfo->Npts @ 2-
-	      endof
+	    3 OF
+		ds1 DatasetInfo->Npts @ 2- to Npts
+		& map_data{{ Npts 2 }}malloc
+		Npts 0 DO
+		    I 1+ ds1 @xy fdrop I    ds1 @xy fdrop F-  map_data{{ I 0 }} F!
+		    I 2+ ds1 @xy fdrop I 1+ ds1 @xy fdrop F-  map_data{{ I 1 }} F!
+		LOOP
+		c" Map of dx_n+1 vs dx_n"
+	    ENDOF
 
-	      4 of
-	        ds1 DatasetInfo->Npts @ 1- 1 do
-	          i ds1 @xy fdrop i 1- ds1 @xy fdrop f-
-	          i 1 map_data fmat!
-	          i 1+ ds1 @xy fswap fdrop i ds1 @xy fswap fdrop f-
-	          i 2 map_data fmat!
-	        loop
-	        c" Map of dy_n+1 vs dx_n"
-	        ds1 DatasetInfo->Npts @ 2-
-	      endof
-	      "  " 0
-	    endcase
+	    4 OF
+		ds1 DatasetInfo->Npts @ 2- to Npts
+		& map_data{{ Npts 2 }}malloc
+		Npts 0 DO
+		    I 1+ ds1 @xy fdrop I ds1 @xy fdrop F-  map_data{{ I 0 }} F!
+		    I 2+ ds1 @xy fswap fdrop I 1+ ds1 @xy fswap fdrop F-
+		    map_data{{ I 1 }} F!
+		LOOP
+		c" Map of dy_n+1 vs dx_n"
+	    ENDOF
+	    0 to Npts  c"  "
+	ENDCASE
 
-	    dup 0= if 2drop ." Unrecognized map type." exit then
+	Npts 0= IF drop ." Unrecognized map type." EXIT THEN
 
-	    2 map_data mat_size!	\ set size of map_data
+	\ Create the map dataset in xyplot
 
-	    \ Create the map dataset in xyplot
+	1+         dsmap  DatasetInfo->Header !
+	c" Map" 1+ dsmap  DatasetInfo->Name !
+	REAL_DOUBLE dsmap DatasetInfo->Type !	\ double precision fp type
+	Npts       dsmap  DatasetInfo->Npts !
+	2          dsmap  DatasetInfo->Size !
+	map_data{{ dsmap  DatasetInfo->Data !
 
-	    1+ dsmap DatasetInfo->HEADER !
-	    c" Map" 1+ dsmap DatasetInfo->Name !
-	    256 dsmap DatasetInfo->Type !		\ double precision fp type
-	    map_data mat_size@ drop dsmap DatasetInfo->Npts !
-	    2 dsmap DatasetInfo->Size !
-
-	    dsmap make_ds drop
-	  then
-	else
-	  drop
-	then ;	    
+	dsmap make_ds drop
 	    
-MN_MATH  c" Map: y_n+1 vs y_n"    c" 0 map"  add_menu_item
-MN_MATH  c" Map: x_n+1 vs x_n"    c" 1 map"  add_menu_item
-MN_MATH  c" Map: dy_n+1 vs dy_n"  c" 2 map"  add_menu_item
-MN_MATH  c" Map: dx_n+1 vs dx_n"  c" 3 map"  add_menu_item
-MN_MATH  c" Map: dy_n+1 vs dx_n"  c" 4 map"  add_menu_item
- 	 	
-	
+	& map_data{{ }}free
+    THEN
+;	    
+	    
+\ MN_MATH  c" Maps" make_submenu  CONSTANT  MN_MAPS
+
+MN_MATH  c" y_n+1 vs y_n"    c" 0 map"  add_menu_item
+MN_MATH  c" x_n+1 vs x_n"    c" 1 map"  add_menu_item
+MN_MATH  c" dy_n+1 vs dy_n"  c" 2 map"  add_menu_item
+MN_MATH  c" dx_n+1 vs dx_n"  c" 3 map"  add_menu_item
+MN_MATH  c" dy_n+1 vs dx_n"  c" 4 map"  add_menu_item
+
+End-Module
+
+

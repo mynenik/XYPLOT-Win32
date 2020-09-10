@@ -2,13 +2,21 @@
 \
 \ Smooth function for xyplot
 \
-\ Copyright (c) 1999--2020 Krishna Myneni
+\ Copyright (c) 1999--2009 Krishna Myneni
 \ Creative Consulting for Research and Education
 \
+\ Revisions: 
+\   1999-02-21  km
+\   2009-10-28  km  updated data structure member names
+\   2012-06-02  km  make this an unnamed module
+
+Begin-Module
 
 DatasetInfo dsa 	\ active dataset info structure
 
 fvariable ylast
+
+Public:
 
 : smooth ( -- | smooth the y values of the active dataset )
 	?active dup 0 >=
@@ -39,5 +47,6 @@ fvariable ylast
 
 MN_MATH c" Smooth" c" smooth draw_window" add_menu_item
 
+End-Module
 
 

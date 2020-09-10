@@ -2,13 +2,18 @@
 \
 \ Auto-correlation function for xyplot
 \
-\ Copyright (c) 2000--2020 Krishna Myneni
-\ Provided under the GNU General Public License
+\ Copyright (c) 2000--2012 Krishna Myneni
+\ Provided under the GNU Lesser General Public License (LGPL)
 \
 \ Revisions:
-\    2000-3-6   created  km
-\    2005-1-14  updated use of DatasetInfo structure  km
+\    2000-03-06  created  km
+\    2005-01-14  updated use of DatasetInfo structure  km
+\    2009-10-29  updated data structure field names  km
+\    2012-06-26  convert to unnamed module  km
 
+Begin-Module
+
+DatasetInfo ds1    \ active dataset info structure; ds1 should exist
 DatasetInfo ds_acorr
 create acorrbuf 32768 dfloats allot
 
@@ -16,6 +21,8 @@ variable np
 variable npcorr
 fvariable fcorrsum
 fvariable fcorrnorm
+
+Public:
 
 : autocorrelation ( -- | compute the numerical autocorrelation function )
 
@@ -79,4 +86,7 @@ fvariable fcorrnorm
 \ add "AutoCorrelation" as an item in the math menu
 
 MN_MATH  c" AutoCorrelation"  c" autocorrelation draw_window" add_menu_item
+
+End-Module
+
 

@@ -5,35 +5,40 @@
 \ (c) 1999--2020 Krishna Myneni
 \
 \ This software is released under the terms of the GNU
-\ General Public License
+\ Lesser General Public License (LGPL)
 \ 
 \ Requires:
 \
-\	matrix.4th
 \	xyplot.4th
 \	xutils.4th
 
+Begin-Module
+
 DatasetInfo ds3
 
-2 16384 fmatrix result
+FLOAT DMATRIX result{{
+0 value Npts
 
 : make_result ( ^name  -- n | make dataset resulting from an arithmetic operation )
 	
-	\ Set up the info structure for a new dataset
+    \ Set up the info structure for a new dataset
 
-	dup 1+                ds3 DatasetInfo->Name !
-	count s"  of " strcat
-	ds1 DatasetInfo->Name a@ dup strlen strcat
-	s"  and " strcat
-	ds2 DatasetInfo->Name a@ dup strlen strcat
-	strpck 1+ 	      ds3 DatasetInfo->Header !
+    dup 1+      ds3  DatasetInfo->Name !
+    count s"  of " strcat
+    ds1 DatasetInfo->Name a@ dup strlen strcat
+    s"  and " strcat
+    ds2 DatasetInfo->Name a@ dup strlen strcat
+    strpck 1+   ds3 DatasetInfo->Header !
 
-	REAL_DOUBLE           ds3 DatasetInfo->Type !
-	result mat_size@ drop ds3 DatasetInfo->Npts !
-	2                     ds3 DatasetInfo->Size !
-	result cell+ cell+    ds3 DatasetInfo->Data !
+    REAL_DOUBLE ds3  DatasetInfo->Type !
+    Npts        ds3  DatasetInfo->Npts !
+    2           ds3  DatasetInfo->Size !
+    result{{    ds3  DatasetInfo->Data !
 		 	      
-	ds3 make_ds ;
+    ds3 make_ds
+
+    & result{{ }}free
+;
 
 PlotInfo pl3
 : plot_result ( n -- | make plot of result using new dataset number)
@@ -45,14 +50,19 @@ PlotInfo pl3
     pl3 make_plot
 ;
 
-: ?interpolate ( fx1 idx -- flag | return TRUE if interpolation is needed )
-    ds2 @xy fdrop f= invert ;
+: ?interpolate ( rx1 idx -- flag | return TRUE if interpolation is needed )
+    ds2 @xy fdrop f<> ;
+
+Private:
 
 fvariable xs
 fvariable x1
 fvariable x2
 fvariable y1
 fvariable y2
+
+Public:
+
 fvariable slope
 variable ordering2  \ true indicates ds2 is in ascending order; false otherwise
 true ordering2 !
@@ -82,69 +92,66 @@ true ordering2 !
       y1 f@ y2 f@  y1 f! y2 f!
     THEN
     y2 f@ y1 f@ f- x2 f@ x1 f@ f- f/ slope f!
-    y2 f@ x2 f@ xs f@ f- slope f@ f* f- 
+    y2 f@ x2 f@ xs f@ f- slope f@ f* f-
 ;
 
-variable rcntr
-variable ar_operator
 
-: do_arithmetic ( xt -- flag | apply operator over index range )
-	ar_operator !
-	1 rcntr !
-	index_range
-	2dup <>
-	IF
-	  0 ds2 @xy fdrop  1 ds2 @xy fdrop f< ordering2 !
-	  swap
-	  2dup - 2 result mat_size!	\ set size of result matrix	
-	  DO
-	    i ds1 @xy               \ -- fx1 fy1
-	    fover                   \ -- fx1 fy1 fx1
-	    \ find index of point in ds2 with nearest abscissa
-	    fdup ds2 findx          \ -- fx1 fy1 fx1 index
-	    dup >r                  \ r: idx 
+0 value ridx
+0 ptr   ar_operator 
+
+: do_arithmetic ( xt -- flag | loop over index range n1 to n2 and apply operator )
+    to ar_operator
+    0 to ridx
+    index_range
+    2dup <>
+    IF
+	0 ds2 @xy fdrop  1 ds2 @xy fdrop f< ordering2 !
+	swap
+	2dup - to Npts
+	& result{{ Npts 2 }}malloc      \ allocate the result matrix
+	DO
+	    I ds1 @xy
+	    fover 
+	    fdup ds2 findx    \ find index of nearest point in ds2
+	    dup >r
 	    ?interpolate 0= IF
-	      r> ds2 @xy            \ -- fx1 fy1 fx2 fy2
-	      fswap fdrop           \ -- fx1 fy1 fy2
+	      r> ds2 @xy
+	      fswap fdrop
 	    ELSE
-	      fover r>              \ -- fx1 fy1 fx1 idx
-	      interpolate_y2        \ -- fx1 fy1 fy2i
+	      fover r> interpolate_y2
 	    THEN
-	    ar_operator a@ execute  \ -- fx1 operator(fy1, fy2)
-	    2 rcntr @ result frow!
-	    1 rcntr +!
-	  LOOP
-	  true
-	ELSE
-	  2drop
-	  false
-	THEN ;
+	    ar_operator execute
+	    result{{ ridx 1 }} F!  result{{ ridx 0 }} F!
+	    ridx 1+ to ridx
+	LOOP  true
+    ELSE
+	2drop false
+    THEN ;
 
+Public:
  
 : add_ds ( -- | add the operand set and the active set )
-	['] f+ do_arithmetic
-	IF c" Sum" make_result plot_result THEN ;
+	['] f+ do_arithmetic  IF c" Sum" make_result plot_result THEN ;
 
-   
 : sub_ds ( -- | add the operand set and the active set )
-	['] f- do_arithmetic
-	IF c" Difference" make_result plot_result THEN ;
-   	   
+	['] f- do_arithmetic  IF c" Difference" make_result plot_result THEN ;
      	        
 : mul_ds ( -- | add the operand set and the active set )
-	['] f* do_arithmetic
-	IF c" Product" make_result plot_result THEN ;
-
+	['] f* do_arithmetic  IF c" Product" make_result plot_result THEN ;
    
 : div_ds ( -- | add the operand set and the active set )
-	['] f/ do_arithmetic
-	IF c" Quotient" make_result plot_result THEN ;
+	['] f/ do_arithmetic  IF c" Quotient" make_result plot_result THEN ;
    
 
-\ add xyplot math menu items
+\ add arithmetic functions to submenu of Math Menu
 
-MN_MATH c" Add"		c" add_ds reset_window" add_menu_item
-MN_MATH c" Subtract"	c" sub_ds reset_window" add_menu_item
-MN_MATH c" Multiply"	c" mul_ds reset_window" add_menu_item
-MN_MATH c" Divide"	c" div_ds reset_window" add_menu_item
+\ MN_MATH  c" Arithmetic"  make_submenu  CONSTANT  MN_ARITHMETIC
+
+MN_MATH  c" Add"	c" add_ds reset_window"  add_menu_item
+MN_MATH  c" Subtract"	c" sub_ds reset_window"  add_menu_item
+MN_MATH  c" Multiply"	c" mul_ds reset_window"  add_menu_item
+MN_MATH  c" Divide"	c" div_ds reset_window"  add_menu_item
+
+End-Module
+
 

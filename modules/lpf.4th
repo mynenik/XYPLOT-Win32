@@ -16,6 +16,9 @@
 \ Copyright (c) 2002  Krishna Myneni, Provided under the GNU
 \   General Public License.
 \
+\ Revisions:
+\   2012-06-02  km  make this an unnamed module
+\
 \ Notes:
 \
 \ 1. The calculation is based on integrating the differential equation:
@@ -23,10 +26,15 @@
 \	d v_out / dt  = (v_in - v_out)/RC
 \
 
-DatasetInfo ds
+Begin-Module
+
 fvariable RC		1e-4 RC f!	\ default time constant of the filter
 fvariable xlast
 fvariable ylast
+
+DatasetInfo ds
+
+Public:
 
 : lpf ( -- | apply a low pass filter to a data set )
 	\ The input data is replaced with the output data
@@ -63,5 +71,5 @@ fvariable ylast
 
 MN_MATH c" Low-Pass Filter" c" xylpf draw_window" add_menu_item
 
- 
-	  
+End-Module
+

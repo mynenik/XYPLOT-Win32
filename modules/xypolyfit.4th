@@ -1,161 +1,74 @@
 \ xypolyfit.4th   
 \                                                               
 \  Polynomial fitting routine for xyplot                          
-\
+\  
 \ Adapted from the routine polfit in P.R. Bevington,
 \ "Data Reduction and Error Analysis for the Physical Sciences"
 \
-\ Requires the following source files:
-\
-\	matrix.4th
+\ Requires:
+\       fsl/extras/polyfit.4th
 \
 \ Revisions:
 \              
-\	10-2-98 Adapted for LabForth KM             
-\	3-29-99 Adapted for kForth KM  
-\	3-15-2000 Adapted for xyplot KM
-\	4-15-2000 Added user query for order KM
-\ 	12-12-2000 Indexing mods and use of fmatrix  KM
-\        1-13-2005 use DatasetInfo structure creation word and update usage  KM
+\	1998-10-02  Adapted for LabForth KM             
+\	1999-03-29  Adapted for kForth KM  
+\	2000-03-15  Adapted for xyplot KM
+\	2000-04-15  Added user query for order KM
+\ 	2000-12-12  Indexing mods and use of fmatrix  KM
+\       2005-01-13  use DatasetInfo structure creation word and update usage  KM
+\       2007-06-02  use FSL arrays and matrices  KM
+\       2007-06-05  use FSL modules lufact and dets for computing determinants  KM
+\       2007-06-12  moved polfit to polfit2 in polyfit.4th; factored common
+\                     code with array argument version of polfit KM
+\       2009-10-29  updated data structure field names KM
+\       2012-06-26  converted to unnamed module  km
 
-variable nterms     \ number of terms (order - 1)               
-variable params     \ holds address of parameter matrix         
-variable nmax                                                   
-variable npts
-                                                   
-fvariable chisq                                                 
-fvariable xterm                                                 
-fvariable yterm                                                 
-fvariable delta                                                 
-                                                                
-\ Floating point matrices used by polfit                        
-                                                                
-10 10 fmatrix apfit
-19 1  fmatrix sumx                                    
-10 1  fmatrix sumy
-                    
-\ ds = address of dataset info structure                    
-\ a = address of fmatrix for receiving fitted parameters        
-\ n = order of fitting polynomial                               
-                                                                
-: polfit ( ds a n -- chi-square | perform polynomial fit )     
-    1+ nterms !                                                 
-    params !                                                    
-    nterms @ dup apfit mat_size!                               
-    nterms @ 1 sumy mat_size!                                  
-    nterms @ 1 params a@ mat_size!                              
-    nterms @ 2* 1- nmax !                                       
-    nmax @ 1 sumx mat_size!                                    
-    dup DatasetInfo->Npts @ npts !                                  
-    sumx fmat_zero                                              
-    sumy fmat_zero                                              
-    params a@ fmat_zero                                          
-    0e chisq f!                                                 
-    npts @ 0 do                                                 
-      i over @xy	\ fetch the i^th point
-      fswap		\ fy fx
-      1e                                               
-      nmax @ 1+ 1 do                                               
-        fdup                                                
-        i 1 sumx fmat_addr >r                                
-        r@ f@ f+ r> f!                                          
-        fover f*
-      loop
-      xterm f!
-                                                      
-      fover                                            
-      nterms @ 1+ 1 do                                             
-        fdup                                               
-        i 1 sumy fmat_addr >r                                
-        r@ f@ f+ r> f!                                          
-        fover f*                                          
-      loop
-      yterm f!                                                      
-      fover fdup f*
-      chisq >r r@ f@ f+ r> f!                                   
-      fdrop fdrop                                               
-    loop                                                        
-    drop	\ drop ds
+Begin-Module
 
-    nterms @ 1+ 1 do                                               
-      nterms @ 1+ 1 do                                             
-        i j + 1- 1 sumx fmat@                                   
-        j i apfit fmat!                                   
-      loop                                                      
-    loop                                                        
-    apfit determ 
-    fdup delta f!                                  
-    0e f= if 0e exit then                                   
-    nterms @ 1+ 1 do                                               
-      nterms @ 1+ 1 do                                             
-        nterms @ 1+ 1 do                                           
-          i j + 1- 1 sumx fmat@                                 
-          j i apfit fmat!                                 
-        loop                                                    
-        i 1 sumy fmat@                                       
-        i j apfit fmat!                                   
-      loop                                                      
-      apfit determ
-      delta f@ f/                                  
-      i 1 params a@ fmat!                                     
-    loop                                                        
-
-\ Calculate chi-squared                                         
-
-    nterms @ 1+ 1 do                                               
-      chisq f@ i 1 params a@ fmat@                            
-      i 1 sumy fmat@ f* 2e f*                                
-      f- chisq f!                                               
-      nterms @ 1+ 1 do                                             
-        j i + 1- 1 sumx fmat@                                   
-        i 1 params a@ fmat@ f*                                
-        j 1 params a@ fmat@ f*                                
-        chisq f@ f+ chisq f!                                    
-      loop                                                      
-    loop
-                                      
-    chisq f@                                                    
-    npts @ nterms @ - s>f                                       
-    f/ ;
-
-                                                               
 DatasetInfo  ds_pdata 
 DatasetInfo  ds_pfit 
+PlotInfo     pl_pfit
 
-10 1  fmatrix  poly_params
+FLOAT DARRAY  poly_params{
 
-variable norder
+0 value Norder
+
+Public:
 
 : xypoly ( n -- | fit a polynomial of order n to the active dataset )
-	norder !
-	?active dup 0 >=
-	IF
-	  ds_pdata get_ds
-	  0 >= IF
-	    ds_pdata poly_params norder @ polfit
-	    ." Reduced chi-square = " ( f.) 
-            6 f>string count type cr
-	    nterms @ 0 DO
-              I dup . 2 spaces 1+ 1 poly_params fmat@ ( f.)
-              6 f>string count type cr 
+    to Norder
+    ?active dup 0 >= IF
+       ds_pdata get_ds  0 >= IF
+	    & poly_params{ Norder 1+ }malloc 
+	    ds_pdata poly_params{ Norder polfit2
+	    ." Reduced chi-square = " ( f.)
+            6 f>string count type cr 
+	    Nterms 0 DO  
+              I . 2 spaces poly_params{ I } F@ ( f.)
+              6 f>string count type cr  
             LOOP
-          THEN
-        ELSE  drop
-	THEN ;
+	    
+	    ds_pdata DatasetInfo->Npts @ 100 > IF
+		  \ Compute fitted curve at same abscissas as data
+	    ELSE
+		  \ Computed fitted curve on a grid of 100 points
+	    THEN
+
+	    & poly_params{ }free
+	THEN
+    THEN ;
+
 
 : xypolyfit ( -- | prompt user and fit the active data set )
-	?active 0 >=
-	IF
-	  c" Enter the order of the fitting polynomial:" get_input
-	  IF 
-	    string>s xypoly
-	  ELSE
-	    drop
-	  THEN
-	THEN
-;
+    ?active 0 >= IF
+	c" Enter the order of the fitting polynomial:" get_input
+	IF  string>s xypoly  ELSE  drop  THEN
+    THEN ;
 
 \ add "Poly Fit" as an item in the math menu
 
 MN_MATH c" Poly Fit" c" xypolyfit draw_window" add_menu_item
+
+End-Module
+
 
