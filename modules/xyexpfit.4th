@@ -89,27 +89,27 @@ PlotInfo pl3
 ;
 
 : .expfit-params ( -- )
-    ." Reduced Chi^2 = " chi-sqr f@ f. cr
-    ." a = " params{ 0 } f@ f. cr
-    ." b = " params{ 1 } f@ f. cr
-    ." c = " params{ 2 } f@ f. cr ;
+    ." Reduced Chi^2 = " chi-sqr f@ 6 f>string count type ( f.) cr
+    ." a = " params{ 0 } f@ 6 f>string count type ( f.) cr
+    ." b = " params{ 1 } f@ 6 f>string count type ( f.) cr
+    ." c = " params{ 2 } f@ 6 f>string count type ( f.) cr ;
 
 : xyexpfit ( -- )
     ?active 0 >= 
     if
       c" Enter initial a, b, c for y=a*exp(-x/b) + c:" get_input
       if
-        count parse_args 3 <> abort" Entered wrong number of parameters!"
+        count parse_csv 3 <> abort" Entered wrong number of parameters!"
         params{ 2 } f!  params{ 1 } f!  params{ 0 } f!
         c" Enter initial increments da, db, dc:" get_input
         if
-         count parse_args 3 <> abort" Entered wrong number of params!"
+         count parse_csv 3 <> abort" Entered wrong number of params!"
          increments{ 2 } f!  increments{ 1 } f!  increments{ 0 } f!
         else
           exit
         then
-        ." Initial parameters and increments:" cr
-        3 0 do params{ I } f@ f. 2 spaces increments{ I } f@ f. cr loop
+        \ ." Initial parameters and increments:" cr
+        \ 3 0 do params{ I } f@ f. 2 spaces increments{ I } f@ f. cr loop
         expfit if
           .expfit-params
           make-expfit-ds

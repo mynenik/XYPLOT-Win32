@@ -269,7 +269,7 @@ include fsl/extras/polyfit
 include xutils
 include arithmetic
 include xypolyfit
-\ include xyexpfit
+include xyexpfit
 include xyhistogram
 \ include xyfft
 include smooth
