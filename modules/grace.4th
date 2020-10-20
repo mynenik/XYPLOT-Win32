@@ -253,7 +253,7 @@ variable nplots_for_set
     0 nplots_for_set !
     0 ?DO
       dup PlotList{ I } PlotInfo->Set @ = IF
-        I PlotsForSet{ nplots_for_set } @ !
+        I PlotsForSet{ nplots_for_set @ } !
         1 nplots_for_set +!
       THEN
     LOOP
