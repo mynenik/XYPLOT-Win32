@@ -287,6 +287,7 @@ include ylog
 include yln
 include xymap
 include grace
+include xyjoin
 
 \ You can put some initialization stuff here, for example
 \  to set the background and foreground colors.
