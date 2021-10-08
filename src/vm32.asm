@@ -1,8 +1,8 @@
 ; vm32.asm
 ;
-; The kForth Virtual Machine
+; The assembler portion of kForth 32-bit Virtual Machine
 ;
-; Copyright (c) 1998--2020 Krishna Myneni
+; Copyright (c) 1998--2021 Krishna Myneni
 ;
 ; This software is provided under the terms of the GNU
 ;   Affero General Public License (AGPL) v 3.0 or later.
@@ -21,8 +21,8 @@
 public _GlobalSp, _GlobalTp, _GlobalIp, _GlobalRp, _GlobalRtp
 public _BottomOfStack, _BottomOfReturnStack, _BottomOfTypeStack
 public _BottomOfReturnTypeStack, _vmEntryRp, _Base, _State
-public _pTIB, _TIB, _WordBuf, _NumberCount, _NumberBuf
-public _JumpTable
+public _Precision, _pTIB, _TIB, _WordBuf
+public _NumberCount, _NumberBuf, _JumpTable
 
 EXTRN _Sleep@4:NEAR
 
@@ -61,7 +61,6 @@ _Precision dd 0
 _pTIB dd 0
 _TIB db 256 dup 0
 _WordBuf db 256 dup 0
-_ParseBuf db 1024 dup 0
 _NumberCount dd 0
 _NumberBuf db 256 dup 0
 
@@ -142,10 +141,10 @@ _JumpTable dd L_false, L_true, L_cells, L_cellplus ; 0 -- 3
           dd _CPP_twoliteral, _C_tonumber, _C_numberquery, _CPP_sliteral ; 296 -- 299
           dd _CPP_fliteral, _CPP_twovariable, _CPP_twoconstant, L_nop ; 300 -- 303
           dd _CPP_tofile, _CPP_console, _CPP_loop, _CPP_plusloop  ; 304 -- 307
-          dd _CPP_unloop, L_nop, L_nop, L_blank  ; 308 -- 311
+          dd _CPP_unloop, _CPP_noname, L_nop, L_blank  ; 308 -- 311
           dd L_slashstring, _C_trailing, _C_parse, L_nop ; 312 -- 315
           dd L_nop, L_nop, L_nop, L_nop  ; 316 -- 319
-          dd L_nop, L_nop, L_nop, L_nop  ; 320 -- 323
+          dd _C_dlopen, _C_dlerror, _C_dlsym, _C_dlclose  ; 320 -- 323
           dd L_nop, _CPP_alias, _C_system, _C_chdir ; 324 -- 327
           dd _C_timeanddate, L_nop, _CPP_wordlist, _CPP_forthwordlist ; 328 -- 331
           dd _CPP_getcurrent, _CPP_setcurrent, _CPP_getorder, _CPP_setorder ; 332 -- 335
@@ -168,6 +167,17 @@ _JumpTable dd L_false, L_true, L_cells, L_cellplus ; 0 -- 3
           dd L_nop, L_nop, L_nop, L_nop  ; 400 -- 403
           dd L_nop, L_uwfetch, L_ulfetch, L_slfetch ; 404 -- 407
           dd L_lstore, L_nop, L_nop, L_nop ; 408 -- 411
+          dd L_nop, L_nop, L_nop, L_nop  ; 412 -- 415
+          dd L_nop, L_nop, L_nop, L_nop  ; 416 -- 419
+          dd L_nop, L_nop, L_nop, L_nop  ; 420 -- 423
+          dd L_nop, L_nop, L_nop, L_nop  ; 424 -- 427
+          dd L_nop, L_nop, L_nop, L_nop  ; 428 -- 431
+          dd L_nop, L_nop, L_nop, L_nop  ; 432 -- 435
+          dd L_nop, L_nop, L_nop, L_nop  ; 436 -- 439
+          dd L_nop, L_nop, L_nop, L_nop  ; 440 -- 443
+          dd L_nop, L_nop, L_nop, L_nop  ; 444 -- 447
+          dd L_nop, L_nop, _C_valloc, _C_vfree  ; 448 -- 451
+          dd _C_vprotect, L_nop, L_nop, L_nop   ; 452 -- 455
 _DATA ENDS
 
 public _L_initfpu, _L_depth, _L_quit, _L_abort, _L_ret
@@ -1392,9 +1402,10 @@ L_calladdr:
 	mov ecx, ebp ; address to execute (intrinsic Forth word or other)
 	add ebp, 3
 	mov _GlobalIp, ebp
-	call [ecx]   ; <== fixme ==
-	mov ebp, _GlobalIp
-	ret
+        jmp [ecx]
+;	call [ecx]   ; <== fixme ==
+;	mov ebp, _GlobalIp
+;	ret
 
 L_count:
         mov ebx, _GlobalTp

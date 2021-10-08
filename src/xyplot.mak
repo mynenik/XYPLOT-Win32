@@ -74,7 +74,7 @@ LIBS		= gdi32.lib kernel32.lib user32.lib  \
 
 CFLAGS		=  -Ae -Ar -mn -C -WA -S -3 -a8 -c -gf 
 LFLAGS		=  /CO /NOI /DE /NOPACKF /XN /NT /ENTRY:WinMainCRTStartup /BAS:4194304 /A:512 /RC   :XYPLOT.RES
-DEFINES		= -D_DEBUG=1 -D_X86_=1 -D_MT=1 -D_MBCS=1
+DEFINES		= -D_DEBUG=1 -D_X86_=1 -D_MT=1 -D_MBCS=1 -D_WIN32_=1
 !ELSE
 OUTPUTDIR	= .
 CREATEOUTPUTDIR	=
@@ -95,7 +95,7 @@ LIBS		= gdi32.lib \
 
 CFLAGS		=  -Ae -Ar -mn -WA -3 -a8 -c 
 LFLAGS		=  /M /NOI /DE /DET /PACKF /XN /NT /ENTRY:WinMainCRTStartup /BAS:4194304 /A:512 /RC   :XYPLOT.RES
-DEFINES		= -D_X86_=1 -D_MT=1 -D_MBCS=1
+DEFINES		= -D_X86_=1 -D_MT=1 -D_MBCS=1 -D_WIN32_=1 -DDIR_ENV_VAR=\"XYPLOT_DIR\"
 !ENDIF
 
 HFLAGS		= $(CFLAGS) 
@@ -154,7 +154,7 @@ BATS		=
 
 
 .C.OBJ:
-	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$*.obj $*.c
+	$(CC) $(CFLAGS) -Jm $(DEFINES) $(INCLUDES) -o$*.obj $*.c
 
 .CPP.OBJ:
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -o$*.obj $*.cpp

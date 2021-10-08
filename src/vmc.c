@@ -1,15 +1,20 @@
 /*
 vmc.c
 
-C portion of the kForth virtual machine
+  C portion of the kForth virtual machine
 
-Copyright (c) 1998--2020 Krishna Myneni and David P. Wallace, 
-<krishna.myneni@ccreweb.org>
+  Copyright (c) 1998--2021 Krishna Myneni and David P. Wallace, 
+  <krishna.myneni@ccreweb.org>
 
-This software is provided under the terms of the GNU
-Affero General Public License (AGPL), v 3.0 or later.
+  This software is provided under the terms of the GNU
+  Affero General Public License (AGPL), v 3.0 or later.
 
 */
+
+#ifndef _WIN32_
+#define _GNU_SOURCE
+#endif
+
 #include<sys/types.h>
 #include<sys/time.h>
 #include<sys/timeb.h>
@@ -37,14 +42,16 @@ Affero General Public License (AGPL), v 3.0 or later.
 
 /*  Provided by ForthVM.cpp  */
 extern int* GlobalSp;
-extern byte* GlobalTp;
 extern byte* GlobalIp;
 extern int* GlobalRp;
-extern byte* GlobalRtp;
 extern int* BottomOfStack;
 extern int* BottomOfReturnStack;
+#ifndef __FAST__
+extern byte* GlobalTp;
+extern byte* GlobalRtp;
 extern byte* BottomOfTypeStack;
 extern byte* BottomOfReturnTypeStack;
+#endif
 extern int CPP_bye();
 
 /* Provided by vm32.asm */
@@ -56,19 +63,23 @@ extern int JumpTable[];
 extern char WordBuf[];
 extern char TIB[];
 extern char NumberBuf[];
-extern char ParseBuf[];
 
-int L_dnegate();
-int L_dplus();
-int L_dminus();
-int L_udmstar();
-int L_utmslash();
-int L_quit();
-int L_abort();
-int vm(byte*);
+extern int L_dnegate();
+extern int L_dplus();
+extern int L_dminus();
+extern int L_udmstar();
+extern int L_utmslash();
+extern int L_quit();
+extern int L_abort();
+extern int vm(byte*);
 
 // struct timeval ForthStartTime;
+#ifdef _WIN32_
 unsigned long int ForthStartTime;
+#else
+struct timeval ForthStartTime;
+struct termios tios0;
+#endif
 double* pf;
 double f;
 char temp_str[256];
@@ -90,8 +101,9 @@ int C_fexpm1() { DOUBLE_FUNC(expm1) return 0; }
 int C_fln   () { DOUBLE_FUNC(log)   return 0; }
 int C_flnp1 () { DOUBLE_FUNC(log1p) return 0; }
 int C_flog  () { DOUBLE_FUNC(log10) return 0; }
-// int C_falog () { DOUBLE_FUNC(exp10) return 0; }
-
+#ifndef _WIN32_
+int C_falog () { DOUBLE_FUNC(exp10) return 0; }
+#else
 int C_falog ()
 {
      pf = (double*)(GlobalSp + 1);
@@ -99,7 +111,8 @@ int C_falog ()
      *pf = pow(10., f);
      return 0;
 }
-     
+#endif
+
 // powA  is copied from the source of the function pow() in paranoia.c,
 //   at  http://www.math.utah.edu/~beebe/software/ieee/
 double powA(double x, double y) /* return x ^ y (exponentiation) */
@@ -147,7 +160,7 @@ int C_fmin ()
 	++pf;
 	if (f < *pf) *pf = f;
 	GlobalSp += 2;
-	GlobalTp += 2;
+	INC2_DTSP
 	return 0;
 }
 
@@ -158,9 +171,71 @@ int C_fmax ()
 	++pf;
 	if (f > *pf) *pf = f;
 	GlobalSp += 2;
-	GlobalTp += 2;
+	INC2_DTSP
 	return 0;
 }
+
+#ifdef _WIN32_
+// Allocate virtual read-write memory; return start address
+// if successful, or -1 on error.
+int C_valloc ()
+{
+  /* stack: ( anew usize ntype nprot -- a|0 ) */
+  
+  DROP
+  long int np = TOS;
+  DROP
+  long int nt = TOS;
+  DROP
+  unsigned long int u = (unsigned long int) TOS;
+  DROP
+  unsigned long int au = (unsigned long int) TOS;
+
+  void* p = VirtualAlloc( au, u, nt, np );
+		
+  if (p == 0) p = -1;
+  TOS = (int) p;
+  DEC_DSP
+  STD_ADDR  
+  return 0;
+}
+
+// Free virtual memory previously allocated with VALLOCATE.
+// Return 0 on success.
+int C_vfree ()
+{
+   /* stack: ( a -- ior ) */
+   DROP
+   void* p = TOS;  // <== fixme ==  check address!
+   bool b = VirtualFree( p, 0, MEM_RELEASE );
+   TOS = (!b);
+   DEC_DSP
+   STD_IVAL
+   return 0;
+}
+
+// Set protection for virtual memory region starting at
+// address a and usize bytes. The new protection value
+// is newprot, and aoldprot is the address for storing
+// the old protection value. Return 0 on success.
+int C_vprotect ()
+{
+   /* stack: ( a usize newprot aoldprot -- ior ) */
+   DROP
+   long int* aop = TOS;  // <== fixme == check address!
+   DROP
+   unsigned long int np = TOS;
+   DROP
+   unsigned long int u = TOS;
+   DROP
+   void* p = (void*) TOS;  // <== fixme == check address!
+   bool b = VirtualProtect( p, u, np, aop );
+   TOS = (!b);
+   DEC_DSP
+   STD_IVAL
+   return 0;
+} 
+#endif
 
 int C_open ()
 {
@@ -168,25 +243,22 @@ int C_open ()
      ^str is a counted string with the pathname, flags
      indicates the method of opening (read, write, etc.)  */
 
-  int flags, mode = 0, fd;
+  int flags, mode = 0;
   char* pname;
 
-  ++GlobalSp; ++GlobalTp;
-  flags = *GlobalSp;
-  ++GlobalSp; ++GlobalTp;
-  if (*GlobalTp == OP_ADDR)
-    {
-      pname = *((char**)GlobalSp);
-      ++pname;
-//      if (flags & O_CREAT) mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-      if (flags & O_CREAT) mode = _S_IREAD | _S_IWRITE ;
-      fd = open (pname, flags, mode);
-      *GlobalSp-- = fd;
-      *GlobalTp-- = OP_IVAL;
-      return 0;
-    }
-  else
-    return 1;  /* not an address error */
+  DROP
+  flags = TOS;
+  DROP
+  CHK_ADDR
+  pname = *((char**)GlobalSp);
+  ++pname;
+#ifndef _WIN32_
+  if (flags & O_CREAT) mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+#else
+  if (flags & O_CREAT) mode = _S_IREAD | _S_IWRITE ;
+#endif
+  PUSH_IVAL( open (pname, flags, mode) )
+  return 0;
 }
       
 int C_lseek ()
@@ -194,11 +266,14 @@ int C_lseek ()
   /* stack: ( fd offset mode -- error | set file position in fd ) */
 
   int fd, offset, mode;
-  ++GlobalSp; ++GlobalTp;
-  mode = *GlobalSp++; ++GlobalTp;
-  offset = *GlobalSp++;
-  fd = *GlobalSp;
-  *GlobalSp-- = lseek (fd, offset, mode);
+  DROP
+  mode = TOS;
+  DROP
+  offset = TOS;
+  INC_DSP
+  fd = TOS;
+  TOS = lseek (fd, offset, mode);
+  DEC_DSP
   return 0;
 }
 
@@ -208,9 +283,10 @@ int C_close ()
   /* stack: ( fd -- err | close the specified file and return error code ) */
 
   int fd;
-  ++GlobalSp;
-  fd = *GlobalSp;
-  *GlobalSp-- = close(fd);
+  INC_DSP
+  fd = TOS;
+  TOS = close(fd);
+  DEC_DSP
   return 0;
 }
 
@@ -220,19 +296,15 @@ int C_read ()
   int fd, count;
   void* buf;
 
-  ++GlobalSp; ++GlobalTp;
-  count = *GlobalSp++; ++GlobalTp;
-  if (*GlobalTp == OP_ADDR)
-    {      
-      buf = *((void**)GlobalSp);
-      ++GlobalSp; ++GlobalTp;
-      fd = *GlobalSp;
-      *GlobalSp-- = read (fd, buf, count);
-      *GlobalTp-- = OP_IVAL;
-      return 0;
-    }
-  else
-    return 1;  /* not an address error */
+  DROP
+  count = TOS;
+  DROP
+  CHK_ADDR
+  buf = *((void**)GlobalSp);
+  DROP
+  fd = TOS;
+  PUSH_IVAL( read (fd, buf, count) )
+  return 0;
 }
 
 int C_write ()
@@ -241,19 +313,15 @@ int C_write ()
   int fd, count;
   void* buf;
 
-  ++GlobalSp; ++GlobalTp;
-  count = *GlobalSp++; ++GlobalTp;
-  if (*GlobalTp == OP_ADDR)
-    {
-      buf = *((void**)GlobalSp);
-      ++GlobalSp; ++GlobalTp;
-      fd = *GlobalSp;
-      *GlobalSp-- = write (fd, buf, count);
-      *GlobalTp-- = OP_IVAL;
-      return 0;
-    }
-  else
-    return 1;  /* not an address error */
+  DROP
+  count = TOS;
+  DROP
+  CHK_ADDR
+  buf = *((void**)GlobalSp);
+  DROP
+  fd = TOS;
+  PUSH_IVAL( write (fd, buf, count) )
+  return 0;
 }
 
 // FSYNC ( fd -- ior )
@@ -267,7 +335,7 @@ int C_fsync ()
   int e;
   DROP
   fd = TOS;
-  pH = (int*) _get_osfhandle(fd);
+  pH = _get_osfhandle(fd);
   e = (FlushFileBuffers(pH) == 0);
   PUSH_IVAL( e )
   return 0;
@@ -279,7 +347,7 @@ int C_ioctl ()
   int handle, request, nbin, nbout, success, nbret;
   char *inbuf, *outbuf;
   
-  ++GlobalSp; ++GlobalTp;
+  DROP
   nbout = *GlobalSp++; GlobalTp++;
   outbuf  = *((char**) GlobalSp);
   GlobalSp++;GlobalTp++;
@@ -288,12 +356,71 @@ int C_ioctl ()
   GlobalSp++; GlobalTp++;
   request = *GlobalSp++; GlobalTp++;
   handle = *GlobalSp;
-  success = DeviceIoControl((HANDLE)handle, request, inbuf, nbin, outbuf, nbout,
-		  (unsigned long*) &nbret, NULL);
+  success = DeviceIoControl(handle, request, inbuf, nbin, outbuf, nbout,
+		  &nbret, NULL);
   *GlobalSp-- = !success;
   return 0;
 }
 /*----------------------------------------------------------*/
+
+int C_dlopen ()
+{
+   /* stack: ( azLibName flag -- handle | NULL) */
+   unsigned flags;
+   HMODULE handle;
+   char *pLibName;
+
+   DROP
+   flags = TOS;   // flags is ignored
+   DROP
+   CHK_ADDR
+   pLibName = *((char**) GlobalSp);  // pointer to a null-terminated string
+
+   handle = LoadLibraryA((LPCSTR) pLibName);
+   PUSH_IVAL((int) handle)
+   return 0;
+}
+
+int C_dlerror ()
+{
+   /* stack: ( -- addrz) ; Returns address of null-terminated string*/
+   static char errMsg[16];
+   memset(errMsg, 0, 16);
+   long int ecode = GetLastError();
+   _snprintf(errMsg, 15, "Error  %d", ecode);
+   errMsg[15] = 0; 
+   PUSH_ADDR((int) errMsg)
+   return 0;
+}
+
+int C_dlsym ()
+{
+    /* stack: ( handle azsymbol -- addr ) */
+    HMODULE handle;
+    char *pSymbol;
+    void *pSymAddr;
+
+    DROP
+    CHK_ADDR
+    pSymbol = *((char**)GlobalSp);  // pointer to a null-terminated string
+    DROP
+    handle = TOS;
+
+    pSymAddr = GetProcAddress(handle, (const char*) pSymbol);
+    PUSH_ADDR((int) pSymAddr)
+    return 0;
+}
+
+int C_dlclose ()
+{
+    /* stack: ( handle -- error | 0) */
+    HMODULE handle;
+    INC_DSP
+    handle = TOS;
+    TOS = ( FreeLibrary(handle) == 0) ;
+    DEC_DSP
+    return 0;
+}
 
 void save_term ()
 {
@@ -334,9 +461,8 @@ int C_key ()
           n = 0;
      }
    }
-   *GlobalSp-- = ch;
-   *GlobalTp-- = OP_IVAL;
- 
+
+   PUSH_IVAL( ch )
    return 0;
 }
 /*----------------------------------------------------------*/
@@ -355,8 +481,9 @@ int C_keyquery ()
       (inBuf.Event.KeyEvent.bKeyDown) &&
       (inBuf.Event.KeyEvent.uChar.AsciiChar));
 
-  *GlobalSp-- = key_available ? -1 : 0;
-  *GlobalTp-- = OP_IVAL;
+  TOS = key_available ? -1 : 0;
+  DEC_DSP
+  STD_IVAL
   return 0;
 }      
 /*----------------------------------------------------------*/
@@ -370,9 +497,10 @@ int C_accept ()
   int n1, n2, nr, nw;
 
   hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  ++GlobalSp; ++GlobalTp;
-  n1 = *GlobalSp++; ++GlobalTp;
-  if (*GlobalTp != OP_ADDR) return 1;
+  DROP
+  n1 = TOS;
+  DROP
+  CHK_ADDR
   cp = *((char**)GlobalSp);
   cpstart = cp;
 
@@ -391,16 +519,15 @@ int C_accept ()
 	}
 	else
 	  // write (0, bksp, 3);
-	  WriteConsole(hStdOut, bksp, 3, (unsigned long*)&nw, NULL);
+	  WriteConsole(hStdOut, bksp, 3, &nw, NULL);
        }
        else {
 	  // write (0, cp, 1);
-	  WriteConsole(hStdOut, cp, 1, (unsigned long*)&nw, NULL);
+	  WriteConsole(hStdOut, cp, 1, &nw, NULL);
 	  ++n2; ++cp;
         }
     }
-  *GlobalSp-- = n2;
-  *GlobalTp-- = OP_IVAL;
+  PUSH_IVAL( n2 )
   return 0;
 }
 
@@ -538,12 +665,14 @@ int C_word ()
   return 0;
 }
 
+// PARSE  ( char "ccc<char>" -- c-addr u )
+// Parse text delimited by char; return string address and count.
+// Forth-94 Core Extensions wordset 6.2.2008
 int C_parse ()
 {
-  /* stack: ( n -- a u | parse string delimited by char n ) */
   DROP
   char delim = TOS;
-  char *dp = ParseBuf;
+  char *cp = pTIB;
   int count = 0;
   if (*pTIB)
     {
@@ -551,12 +680,12 @@ int C_parse ()
       while (*pTIB)
         {
           if (*pTIB == delim) break;
-          *dp++ = *pTIB++;
+          ++pTIB;
           ++count;
         }
       if (*pTIB) ++pTIB;  /* consume the delimiter */
     }
-  PUSH_ADDR((int) ParseBuf)
+  PUSH_ADDR((long int) cp)
   PUSH_IVAL(count)
   return 0;
 }
@@ -603,8 +732,10 @@ int C_sharp()
 
   *GlobalSp = *(GlobalSp+2); --GlobalSp;
   *GlobalSp = *(GlobalSp+2); --GlobalSp;  /* 2dup */
+#ifndef __FAST__
   *GlobalTp = *(GlobalTp+2); --GlobalTp;
   *GlobalTp = *(GlobalTp+2); --GlobalTp;  /*  "  */
+#endif
   TOS = 0; /* pad to triple length */
   DEC_DSP
   DEC_DTSP
@@ -882,7 +1013,7 @@ int C_system ()
   if (nr) {
     /* Process creation succeeded; wait for child exit */
     WaitForSingleObject(pi.hProcess, INFINITE);
-    nr = GetExitCodeProcess(pi.hProcess, (unsigned long*)&ec);
+    nr = GetExitCodeProcess(pi.hProcess, &ec);
     if (nr == 0) ec = -1;
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
@@ -891,8 +1022,7 @@ int C_system ()
   else
     ec = -1;
     
-  *GlobalSp-- = ec;
-  *GlobalTp-- = OP_IVAL;
+  PUSH_IVAL( ec )
   return 0;
 }
 /*----------------------------------------------------------*/
@@ -904,14 +1034,13 @@ int C_chdir ()
   char* cp;
   int nc;
 
-  ++GlobalSp; ++GlobalTp;
-  if (*GlobalTp != OP_ADDR) return 1;
-  cp = (char*)(*GlobalSp);
+  DROP
+  CHK_ADDR
+  cp = (char*) TOS;
   nc = *cp;
   strncpy (temp_str, cp+1, nc);
   temp_str[nc] = 0;
-  *GlobalSp-- = chdir(temp_str);
-  *GlobalTp-- = OP_IVAL;
+  PUSH_IVAL( chdir(temp_str) )
   return 0;
 }
 /*-----------------------------------------------------------*/
@@ -926,13 +1055,12 @@ int C_timeanddate ()
   time (&t);
   t_loc = *(localtime (&t));
 
-  *GlobalSp-- = t_loc.tm_sec; *GlobalTp-- = OP_IVAL;
-  *GlobalSp-- = t_loc.tm_min; *GlobalTp-- = OP_IVAL;
-  *GlobalSp-- = t_loc.tm_hour; *GlobalTp-- = OP_IVAL;
-  *GlobalSp-- = t_loc.tm_mday; *GlobalTp-- = OP_IVAL;
-  *GlobalSp-- = 1 + t_loc.tm_mon; *GlobalTp-- = OP_IVAL;
-  *GlobalSp-- = 1900 + t_loc.tm_year; *GlobalTp-- = OP_IVAL;
-
+  PUSH_IVAL( t_loc.tm_sec )
+  PUSH_IVAL( t_loc.tm_min )
+  PUSH_IVAL( t_loc.tm_hour )
+  PUSH_IVAL( t_loc.tm_mday )
+  PUSH_IVAL( 1 + t_loc.tm_mon )
+  PUSH_IVAL( 1900 + t_loc.tm_year )
   return 0;
 }
 /*------------------------------------------------------*/
@@ -942,21 +1070,27 @@ void set_start_time ()
   /* this is not a word in the Forth dictionary; it is
      used by the initialization routine on startup     */
 
-  // gettimeofday (&ForthStartTime, NULL);
+#ifdef _WIN32_
   ForthStartTime = GetTickCount();
-
+#else
+  gettimeofday (&ForthStartTime, NULL);
+#endif
 }
 
 int C_msfetch ()
 {
   /* stack: ( -- msec | return msec elapsed since start of Forth ) */
   
-  // struct timeval tv;
-  // gettimeofday (&tv, NULL);
-  // *GlobalSp-- = (tv.tv_sec - ForthStartTime.tv_sec)*1000 + 
-  // (tv.tv_usec - ForthStartTime.tv_usec)/1000;
-  *GlobalSp-- = GetTickCount() - ForthStartTime;
-  *GlobalTp-- = OP_IVAL;
+#ifdef _WIN32_
+  TOS = GetTickCount() - ForthStartTime;
+#else
+  struct timeval tv;
+  gettimeofday (&tv, NULL);
+  TOS = (tv.tv_sec - ForthStartTime.tv_sec)*1000 +
+    (tv.tv_usec - ForthStartTime.tv_usec)/1000;
+#endif
+  DEC_DSP
+  STD_IVAL
   return 0;
 }
 /*------------------------------------------------------*/
