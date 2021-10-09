@@ -1,7 +1,7 @@
 /*
 XYPLOT.CPP
 
-Copyright (c) 1995--2020 Krishna Myneni
+Copyright (c) 1995--2021 Krishna Myneni
 
 Provided under the terms of the GNU Affero General Public License
 (AGPL) v 3.0 or later.
@@ -97,8 +97,8 @@ const void* FN_ADD_MENU_ITEM = add_menu_item;
 const void* FN_SET_BACKGROUND = set_background;
 const void* FN_SET_FOREGROUND = set_foreground;
 const void* FN_MESSAGE_BOX = message_box;
-const void* FN_FILE_OPEN = file_open_dialog;
-const void* FN_FILE_SAVE = file_save_dialog;
+const void* FN_FILE_OPEN_DIALOG = file_open_dialog;
+const void* FN_FILE_SAVE_DIALOG = file_save_dialog;
 const void* FN_GET_INPUT = get_input;
 
 int nForthMenuItems = 0;
@@ -575,9 +575,9 @@ void InitForthInterface ()
   strcat (fs, s);
   sprintf (s, "%lu%sFN_MESSAGE_BOX\n", FN_MESSAGE_BOX, cs);
   strcat (fs, s);
-  sprintf (s, "%lu%sFN_FILE_OPEN\n", FN_FILE_OPEN, cs);
+  sprintf (s, "%lu%sFN_FILE_OPEN_DIALOG\n", FN_FILE_OPEN_DIALOG, cs);
   strcat (fs, s);
-  sprintf (s, "%lu%sFN_FILE_SAVE\n", FN_FILE_SAVE, cs);
+  sprintf (s, "%lu%sFN_FILE_SAVE_DIALOG\n", FN_FILE_SAVE_DIALOG, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_INPUT\n", FN_GET_INPUT, cs);
   strcat (fs, s);

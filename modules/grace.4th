@@ -227,7 +227,11 @@ variable bYaxis
 65536  constant  MAXGRACEPTS
 16384  constant  MAXHDRSIZE
 
+0 [IF]
 MAXPLOTS PlotInfo% %size ARRAY PlotList{
+[ELSE] \ standard Forth 200x structures
+MAXPLOTS PlotInfo% ARRAY PlotList{
+[THEN]
 
 MAXPLOTS INTEGER ARRAY PlotsForSet{
 variable nplots_for_set

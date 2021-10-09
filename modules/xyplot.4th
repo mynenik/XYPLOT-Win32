@@ -7,7 +7,11 @@
 \ This software is provided under the terms of the 
 \ GNU Affero General Public License (AGPL), v3.0 or later.
 \
-\ Requires: xypw32.exe version >= 1.3.0
+\ Please report bugs to <krishna.myneni@ccreweb.org>
+\
+\ Requires: 
+\   Windows -- xypw32.exe ver >= 1.4.0
+\   Linux   -- xyplot32   ver >= 2.7.1
 \
 \ XYPLOT defines Forth constants which contain pointers to
 \ C++ functions that interface with the Forth environment.
@@ -25,29 +29,48 @@
 \  set_operand_plot ( n -- ) Set the operand plot to plot n.
 \  get_ds ( i addr -- n ) Return info on dataset i into a structure.
 \  set_ds_extrema ( i -- ) Recompute the extrema for dataset i.
-\  make_ds ( addr -- )	Make a dataset according to info in structure.
+\  make_ds ( addr -- n )  Make a dataset according to info in structure.
 \  get_plot ( i addr -- n ) Return info on plot i into a structure.
 \  drop_plot ( -- )  Drop the active plot.
 \  make_plot ( addr -- ) Make a plot according to info in structure.
-\  set_plot_symbol ( ^symbolname -- ) set active plot symbol.
-\  set_plot_color ( ^colorname -- ) set active plot color.
-\  draw_plot ( flag -- ) draw the active plot.
-\  get_grid ( -- nXtics nYtics bXLines bYLines bXaxis bYaxis ) get grid params.
-\  set_grid_tics ( nx ny -- ) set number of tics for x and y axes
-\  set_grid_lines ( flagx flagy -- ) set grid lines on/off for x and y axes 
-\  get_window_title ( c-addr umax -- c-addr uret ) get title of window.
-\  set_window_title ( c-addr u -- )  set title of window.
+\  set_plot_symbol ( ^symbolname -- ) Set active plot symbol.
+\  set_plot_color ( ^colorname -- ) Set active plot color.
+\  draw_plot ( flag -- ) Draw the active plot.
+\  get_grid ( -- nXtics nYtics bXlines bYlines bXaxis bYaxis ) Get grid params.
+\  set_grid_tics ( nx ny -- ) Set number of tics for x and y axes.
+\  set_grid_lines ( flagx flagy -- ) Set grid lines on/off for x and y axes.
+\  get_window_title ( c-addr umax -- c-addr uret ) Get title of window.
+\  set_window_title ( c-addr u -- )  Set title of window.
 \  clear_window ( -- )	Clear the plot window.
 \  draw_window ( -- ) 	Draw the plot window.
 \  reset_window ( -- ) 	Reset the plot window.
+\  radio_box ( ^label1 ^label2 ... n -- m ) Provide a radio button selection box.
 \  message_box ( a u -- ) Popup a message window to display text.
 \  get_input ( ^prompt -- ^resp flag ) Provide dialog for text input.
 \  file_open_dialog ( ^filter -- ^filename flag ) Provide file selection dialog.
 \  get_window_limits ( -- fxmin fymin fxmax fymax ) Return window extrema.
 \  set_window_limits ( fxmin fymin fxmax fymax -- ) Set window extrema.
-\  add_menu_item ( menu name command -- ) Add a new menu item
-\  set_background ( colorname -- ) Set plot window background color.
-\  set_foreground ( colorname -- ) Set plot window foreground color.
+\  add_menu_item ( menu_id ^name ^command -- ) Add a new menu item.
+\  make_menu ( ^name -- menu_id ) Create a new menu.
+\  make_submenu ( menu_id ^name -- submenu_id ) Create a submenu in existing menu.
+\  set_background ( ^colorname -- ) Set plot window background color.
+\  set_foreground ( ^colorname -- ) Set plot window foreground color.
+\  set_save_options ( addr -- ) Set the format options for saving a data file.
+
+\ kForth libraries, utilities, and modules support
+include ans-words.4th
+include strings.4th
+include files.4th
+include utils.4th
+include modules.fs
+0 [IF]
+include struct.4th
+include struct-ext.4th
+[ELSE] \ standard Forth 200x structures
+include struct-200x.4th
+[THEN]
+[UNDEFINED] _WIN32_ [IF] include signal.4th [THEN]
+
 
 \ Data type and precision constants
 
@@ -73,7 +96,7 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 
 : get_color_map ( acolorref acolornames maxlen maxcolors -- ncolors )
     \ Return number of colors in the map; ncolors < 0 indicates error
-   FN_GET_COLOR_MAP call ;
+    FN_GET_COLOR_MAP call ;
 
 : get_active_set ( -- n | return the active dataset number )
     \ n less than zero indicates an error.
@@ -136,12 +159,6 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_grid_lines ( flagx flagy -- | set grid lines on/off on x and y axes )
     FN_SET_GRID_LINES call ;
 
-: get_window_title ( c-addr umax -- uret )
-    FN_GET_WINDOW_TITLE call ;
-
-: set_window_title ( c-addr u -- )
-    FN_SET_WINDOW_TITLE call ;
-
 : clear_window ( -- | clear the plot window )
     FN_CLEAR_WINDOW call ;
 
@@ -157,7 +174,7 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_window_limits ( fx1 fy1 fx2 fy2 -- | set the plot window limits )
     FN_SET_WINDOW_LIMITS call ;
 
-: add_menu_item ( menu name command -- | add new menu item )
+: add_menu_item ( menu_id ^name ^command -- | add new menu item )
     FN_ADD_MENU_ITEM call ;
 
 : set_background ( colorname -- | set plot window background color )
@@ -173,35 +190,60 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
     FN_GET_INPUT call ;
 
 : file_open_dialog ( ^filter -- ^filename flag )
-    FN_FILE_OPEN call ;
+    FN_FILE_OPEN_DIALOG call ;
 
 
-1 SFLOATS constant SFLOAT       \ size in bytes of single precision float
+[DEFINED] _WIN32_ [IF]  \ Interface functions for Windows version only
+: get_window_title ( c-addr umax -- uret )
+    FN_GET_WINDOW_TITLE call ;
 
-\ kForth libraries, utilities, and modules support
-include ans-words.4th
-include strings.4th
-include files.4th
-include utils.4th
-include modules.fs
-include struct.4th
-include struct-ext.4th
+: set_window_title ( c-addr u -- )
+    FN_SET_WINDOW_TITLE call ;
+
+[ELSE]  \ Interface functions for Linux version only
+
+: make_menu ( ^menu_name -- menu_id | create a new menu )
+    FN_MAKE_MENU call ;
+
+: make_submenu ( menu_id ^menu_name -- menu_id | create a submenu in existing menu )
+    FN_MAKE_SUBMENU call ;
+
+: radio_box ( ^label1 ^label2 ... n -- m | provide a radio button selection box )
+    FN_RADIO_BOX call ;
+
+: set_save_options ( addr -- | set file save format options, specified in structure )
+    FN_SET_SAVE_OPTIONS call ;
+[THEN]
+
+1 SFLOATS constant SFLOAT      \ size in bytes of single precision float
 
 \ Save Options structure
 \   HeaderType: 0=none, 1=xyplot format, 2=user-defined line prefix
 \   Delimiter:  0=space, 1=tab, 2=comma, other=space
 \   NumberFormat: 0=exponential, 1=fixed point, 2=integer, other=exponential
 \   EndOfLine:  0=Unix, 1=DOS
-\   UserPrefix: text prefix for header type option 2
+\   UserPrefix: text prefix for header type option 2 
+0 [IF]
 struct
-  cell%  field  SaveOptions->HeaderType
-  cell%  field  SaveOptions->Delimiter
+  cell%  field  SaveOptions->HeaderType 
+  cell%  field  SaveOptions->Delimiter   
   cell%  field  SaveOptions->NumberFormat
-  cell%  field  SaveOptions->EndOfLine
+  cell%  field  SaveOptions->EndOfLine        
   1 16 chars field SaveOptions->UserPrefix
 end-struct SaveOptions%
 
+[ELSE]  \ Use standardized Forth-2012 structures
+begin-structure SaveOptions%
+  field:  SaveOptions->HeaderType
+  field:  SaveOptions->Delimiter
+  field:  SaveOptions->NumberFormat
+  field:  SaveOptions->EndOfLine
+16 chars +field SaveOptions->UserPrefix
+end-structure
+[THEN]
+
 \ Dataset Information Structure
+0 [IF]
 struct
   cell%  field  DataSetInfo->Name    \ pointer to name string
   cell%  field  DataSetInfo->Header  \ pointer to header string
@@ -211,7 +253,19 @@ struct
   cell%  field  DataSetInfo->Data    \ pointer to data
 end-struct DatasetInfo%
 
+[ELSE]  \ standard Forth-200x structure
+begin-structure DatasetInfo%
+  field:  DataSetInfo->Name    \ pointer to name string
+  field:  DataSetInfo->Header  \ pointer to header string
+  field:  DataSetInfo->Type    \ dataset type
+  field:  DataSetInfo->Npts    \ number of points in set
+  field:  DataSetInfo->Size    \ datum dimension
+  field:  DataSetInfo->Data    \ pointer to data
+end-structure
+[THEN]
+
 \ Plot Information Structure
+0 [IF]
 struct
   cell%  field  PlotInfo->Set     \ data set number
   cell%  field  PlotInfo->Type    \
@@ -219,11 +273,27 @@ struct
   cell%  field  PlotInfo->Color   \ plot color
 end-struct PlotInfo%
 
-\ Defining words for making DatasetInfo% and PlotInfo% structures
+[ELSE]  \ standard Forth-200x structure
+begin-structure PlotInfo%
+  field:  PlotInfo->Set     \ data set number
+  field:  PlotInfo->Type    \
+  field:  PlotInfo->Symbol  \ plot symbol
+  field:  PlotInfo->Color   \ plot color
+end-structure
+[THEN]
 
-: DatasetInfo  create DatasetInfo% %allot drop ; nondeferred
-: PlotInfo     create PlotInfo%    %allot drop ; nondeferred 
-: SaveOptions  create SaveOptions% %allot drop ; nondeferred
+\ Defining words for making various structures
+0 [IF]
+: DatasetInfo  create DatasetInfo% %allot drop ;
+: PlotInfo     create PlotInfo%    %allot drop ;
+: SaveOptions  create SaveOptions% %allot drop ;
+
+[ELSE]  \ standard Forth-200x structure creation words
+: DatasetInfo  create DatasetInfo% allot ;
+: PlotInfo     create PlotInfo%    allot ;
+: SaveOptions  create SaveOptions% allot ;
+[THEN]
+
 
 \ Useful words to fetch and store the i^th x, y pair from/to
 \ a dataset are given below. Note that addr is the address of 
@@ -264,9 +334,10 @@ include fsl/extras/curvefit
 include fsl/extras/four1
 include fsl/extras/derivative
 include fsl/extras/polyfit
-
-\ XYPLOT modules ( ver >= 1.3.0 )
+    
+\ XYPLOT modules
 include xutils
+[UNDEFINED] _WIN32_ [IF] include template [THEN]
 include arithmetic
 include xypolyfit
 include xyexpfit
@@ -274,6 +345,9 @@ include xyhistogram
 \ include xyfft
 include smooth
 include lpf
+include abs
+include ylog
+include yln
 include autocorr
 include xyderiv
 include xyarea
@@ -282,9 +356,6 @@ include xypeaks
 include xysort
 include xyswap
 include yn_vs_ym
-include abs
-include ylog
-include yln
 include xymap
 include grace
 include xyjoin
@@ -295,6 +366,21 @@ include xyjoin
 c" white" set_background
 c" black" set_foreground
 0 0 set_grid_lines
+
+[UNDEFINED] _WIN32_ [IF]
+\ Modify the save options to some non-default values
+
+SaveOptions sv-opt
+
+2 sv-opt  SaveOptions->HeaderType ! \ user-defined prefix for header lines (non-default)
+0 sv-opt  SaveOptions->Delimiter  ! \ space delimiter (default)
+0 sv-opt  SaveOptions->NumberFormat ! \ exponential number format (default)
+0 sv-opt  SaveOptions->EndOfLine  !   \ unix format
+sv-opt    SaveOptions->UserPrefix 16 erase
+s" #" sv-opt SaveOptions->UserPrefix swap cmove  ( this is the line prefix used by xmgrace ) 
+
+sv-opt set_save_options
+[THEN]
 
 \ end of xyplot.4th
 
