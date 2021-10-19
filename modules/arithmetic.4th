@@ -2,7 +2,7 @@
 \
 \ xyplot module for dataset arithmetic functions
 \
-\ (c) 1999--2020 Krishna Myneni
+\ (c) 1999--2021 Krishna Myneni
 \
 \ This software is released under the terms of the GNU
 \ Lesser General Public License (LGPL)
@@ -143,14 +143,19 @@ Public:
 	['] f/ do_arithmetic  IF c" Quotient" make_result plot_result THEN ;
    
 
-\ add arithmetic functions to submenu of Math Menu
+\ add arithmetic functions to menu/submenu of Math Menu
+[UNDEFINED] _WIN32_ [IF]
+MN_MATH  c" Arithmetic"  make_submenu  CONSTANT  MN_ARITHMETIC
+MN_ARITHMETIC
+[ELSE]
+MN_MATH
+[THEN]
 
-\ MN_MATH  c" Arithmetic"  make_submenu  CONSTANT  MN_ARITHMETIC
-
-MN_MATH  c" Add"	c" add_ds reset_window"  add_menu_item
-MN_MATH  c" Subtract"	c" sub_ds reset_window"  add_menu_item
-MN_MATH  c" Multiply"	c" mul_ds reset_window"  add_menu_item
-MN_MATH  c" Divide"	c" div_ds reset_window"  add_menu_item
+dup  c" Add" 		c" add_ds reset_window"  add_menu_item
+dup  c" Subtract"	c" sub_ds reset_window"  add_menu_item
+dup  c" Multiply"	c" mul_ds reset_window"  add_menu_item
+dup  c" Divide"		c" div_ds reset_window"  add_menu_item
+drop
 
 End-Module
 
