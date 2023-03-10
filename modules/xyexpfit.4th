@@ -16,12 +16,11 @@
 
 Begin-Module
 
-: noname ( fx a -- fy )
+: Exp-func ( fx a -- fy )
     >r 
     r@ 1 } f@ f/ fnegate fexp
     r@ 0 } f@ f* 
     r> 2 } f@ f+ ;
-' noname IS functn
 
 MAX_POINTS FLOAT array x{
 MAX_POINTS FLOAT array y{
@@ -51,6 +50,8 @@ Public:
        npts @ 0 ?DO
          I ds1 @xy  y{ I } f!  x{ I } f!
        LOOP
+
+       ['] Exp-Func IS functn
 
        5 0 DO
          x{ y{ params{ increments{ 3 npts @ curfit chi-sqr f!
@@ -89,10 +90,10 @@ PlotInfo pl3
 ;
 
 : .expfit-params ( -- )
-    ." Reduced Chi^2 = " chi-sqr f@ 6 f>string count type ( f.) cr
-    ." a = " params{ 0 } f@ 6 f>string count type ( f.) cr
-    ." b = " params{ 1 } f@ 6 f>string count type ( f.) cr
-    ." c = " params{ 2 } f@ 6 f>string count type ( f.) cr ;
+    ." Reduced Chi^2 = " chi-sqr f@ f$. cr
+    ." a = " params{ 0 } f@ f$. cr
+    ." b = " params{ 1 } f@ f$. cr
+    ." c = " params{ 2 } f@ f$. cr ;
 
 : xyexpfit ( -- )
     ?active 0 >= 
@@ -108,8 +109,8 @@ PlotInfo pl3
         else
           exit
         then
-        \ ." Initial parameters and increments:" cr
-        \ 3 0 do params{ I } f@ f. 2 spaces increments{ I } f@ f. cr loop
+        ." Initial parameters and increments:" cr
+        3 0 do params{ I } f@ f$. 2 spaces increments{ I } f@ f$. cr loop
         expfit if
           .expfit-params
           make-expfit-ds

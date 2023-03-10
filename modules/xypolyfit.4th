@@ -41,11 +41,9 @@ Public:
        ds_pdata get_ds  0 >= IF
 	    & poly_params{ Norder 1+ }malloc 
 	    ds_pdata poly_params{ Norder polfit2
-	    ." Reduced chi-square = " ( f.)
-            6 f>string count type cr 
+	    ." Reduced chi-square = " f$. cr 
 	    Nterms 0 DO  
-              I . 2 spaces poly_params{ I } F@ ( f.)
-              6 f>string count type cr  
+              I . 2 spaces poly_params{ I } f@ f$. cr  
             LOOP
 	    
 	    ds_pdata DatasetInfo->Npts @ 100 > IF
