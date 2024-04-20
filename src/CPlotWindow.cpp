@@ -987,11 +987,11 @@ void CPlotWindow::OnColor()
 		    c = cd.GetColor();
 	}
 
-	if (c)
-	{
+//	if (c)
+//	{
         	m_pDi->SetColor(c);
 		Invalidate();
-	}
+//	}
 }
 //---------------------------------------------------------------
 
@@ -1236,7 +1236,7 @@ void CPlotWindow::LoadDatasetFile (char* fname, char* col_spec)
   // Load a dataset file into the database, with the columns
   //   to load specified in the col_spec
 
-  char s[128];
+  char s[512];
   CDataset* d;
 
   int ecode = m_pDb->LoadDataset(&d, fname, ParseColumns(col_spec), 0);
@@ -1311,7 +1311,7 @@ BOOL CPlotWindow::OnFileSave ()
 {
 	CFileDialog fd(FALSE);
 	CString szSaveTypes, szFileExt, SaveFileName;
-	char szt[256], szf[256];
+	char szt[256], szf[512];
 	int i;
 	BOOL success = FALSE;
 

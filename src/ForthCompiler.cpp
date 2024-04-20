@@ -3,7 +3,7 @@
 // A compiler to generate kForth Byte Code (FBC) from expressions
 //   or programs
 //
-// Copyright (c) 1998--2020 Krishna Myneni, 
+// Copyright (c) 1998--2022 Krishna Myneni, 
 // <krishna.myneni@ccreweb.org>
 //
 // Contributors:
@@ -17,21 +17,16 @@
 //
 #include <iostream>
 #include <fstream>
-using std::cout;
-using std::endl;
-using std::istream;
-using std::ostream;
-using std::ifstream;
-using std::ofstream;
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "fbc.h"
 #include <vector>
 #include <stack>
-using std::vector;
-using std::stack;
+using namespace std;
+#include "fbc.h"
 #include "ForthCompiler.h"
+#include "VMerrors.h"
+#include "kfmacros.h"
 
 const int IMMEDIATE   = PRECEDENCE_IMMEDIATE;
 const int NONDEFERRED = PRECEDENCE_NON_DEFERRED;
@@ -40,7 +35,6 @@ const int NONDEFERRED = PRECEDENCE_NON_DEFERRED;
 
 size_t NUMBER_OF_INTRINSIC_WORDS =
    sizeof(ForthWords) / sizeof(ForthWords[0]);
-
 
 extern bool debug;
 
@@ -89,15 +83,18 @@ extern "C"  long int JumpTable[];
 
 // stacks for keeping track of nested control structures
 
-vector<int> ifstack;	// stack for if-then constructs
-vector<int> beginstack;	// stack for begin ... constructs
-vector<int> whilestack;	// stack for while jump holders
-vector<int> dostack;    // stack for do loops
-vector<int> querydostack; // stack for conditional do loops
-vector<int> leavestack; // stack for leave jumps
-vector<int> recursestack; // stack for recursion
-vector<int> casestack;  // stack for case jumps
-vector<int> ofstack;   // stack for of...endof constructs
+stack<int> ifstack;	// stack for if-then constructs
+stack<int> beginstack;	// stack for begin ... constructs
+stack<int> whilestack;	// stack for while jump holders
+stack<int> dostack;    // stack for do loops
+stack<int> querydostack; // stack for conditional do loops
+stack<int> leavestack; // stack for leave jumps
+stack<int> recursestack; // stack for recursion
+stack<int> casestack;  // stack for case jumps
+stack<int> ofstack;   // stack for of...endof constructs
+
+WordListEntry NewWord;     // current definition (word or anonymous)
+vector<byte>* pCurrentOps; // current opcode vector
 
 long int linecount;
 
@@ -106,32 +103,6 @@ long int linecount;
 istream* pInStream ;
 ostream* pOutStream ;
 
-// Global ptr to current opcode vector
-
-vector<byte>* pCurrentOps;
-
-// The word currently being compiled (needs to be global)
-
-WordListEntry NewWord;
-//---------------------------------------------------------------
-
-
-const char* C_ErrorMessages[] =
-{
-	"",
-	"",
-	"End of definition with no beginning",
-	"End of string",	 
-        "Not allowed inside colon definition",
-	"Error opening file",
-	"Incomplete IF...THEN structure",
-	"Incomplete BEGIN structure",
-	"Unknown word",
-	"No matching DO",
-	"Incomplete DO loop",
-	"Incomplete CASE structure",
-	"VM returned error"
-};
 //---------------------------------------------------------------
 
 bool IsForthWord (char* name, WordListEntry* pE)
@@ -287,7 +258,7 @@ int ForthCompiler (vector<byte>* pOpCodes, long int* pLc)
 	{
 	  if (State)
 	    {
-	      ecode = E_C_ENDOFSTREAM;  // reached end of stream before end of definition
+	      ecode = E_V_END_OF_STREAM;  // end of stream before end of definition
 	      break;
 	    }
 	  break;    // end of stream reached
@@ -358,7 +329,7 @@ int ForthCompiler (vector<byte>* pOpCodes, long int* pLc)
 	      else
 		{
 		  *pOutStream << endl << WordToken << endl;
-		  ecode = E_C_UNKNOWNWORD;  // unknown keyword
+		  ecode = E_V_UNDEFINED_WORD;  // unknown keyword
 		  goto endcompile;
 		}
 	     }
@@ -378,7 +349,7 @@ int ForthCompiler (vector<byte>* pOpCodes, long int* pLc)
 
 endcompile:
   
-  if ((ecode != E_C_NOERROR) && (ecode != E_C_ENDOFSTREAM))
+  if ((ecode != E_V_NOERROR) && (ecode != E_V_END_OF_STREAM))
     {
       // A compiler or vm error occurred; reset to interpreter mode and
       //   clear all flow control stacks.
