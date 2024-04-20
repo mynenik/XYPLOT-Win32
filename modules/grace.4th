@@ -13,7 +13,7 @@
 \ 
 \       https://github.com/mynenik/
 \
-\ Copyright (c) 2003--2020 Krishna Myneni
+\ Copyright (c) 2003--2024 Krishna Myneni
 \ Provided under the GNU Affero General Public License, v 3.0 or later.
 \
 
@@ -867,7 +867,7 @@ variable xyp_symbol
       grace_pattrs{{ grace_set @ ATTR_LINETYPE }} @ IF
         sym_LINE_PLUS_POINT xyp_symbol !
       ELSE
-        grace_pattrs{{ grace_set @ ATTR_SYMBOLSIZE }} @ 11 < IF
+        grace_pattrs{{ grace_set @ ATTR_SYMBOLSIZE }} @ 3 < IF
           sym_POINT xyp_symbol !
         ELSE
           sym_BIG_POINT xyp_symbol !
