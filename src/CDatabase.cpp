@@ -27,6 +27,7 @@ CDatabase::CDatabase()
     m_nSave.Delimiter = 0;
     m_nSave.NumberFormat = 0;
     m_nSave.CrLf = 0;
+//    strcpy(m_nSave.UserPrefix, "#"); // default prefix for alternate header style is xmgrace comment
 }
 //---------------------------------------------------------------
 CDatabase::~CDatabase()
@@ -457,6 +458,7 @@ int CDatabase::SaveDataset (CDataset* d, vector<int> lim, char* name)
         int ncols = d->SizeOfDatum();
         // float* p = d->begin() + i1*ncols;
 	float* p = (float*) &(*d)[0] + i1*ncols;
+	// float* p = (float*) &(*(d->begin())) + i1*ncols;
         f.WriteData(p, i2-i1+1, ncols);
     }
     else

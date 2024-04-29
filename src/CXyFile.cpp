@@ -30,11 +30,11 @@ CXyFile::CXyFile (char* name, int open_mode)
     m_pOutFile = NULL;
     m_bReadData = 0;
     m_nFail = 0;
-	strcpy (m_szName, name);
+    strcpy (m_szName, name);
 
 	if (open_mode)
 	{
-	  m_pOutFile = new ofstream (name);
+	  m_pOutFile = new ofstream (name, ios::out | ios::binary);
 	  if (m_pOutFile->fail()) m_nFail = 1;
 	}
 	else
@@ -53,7 +53,7 @@ CXyFile::~CXyFile()
     delete [] m_pValues;
     delete [] m_szFirstLine;
     delete [] m_szHeader;
-	delete [] m_szName;
+    delete [] m_szName;
 }
 //---------------------------------------------------------------
 
@@ -137,35 +137,110 @@ void CXyFile::ReadHeader()
 }
 //---------------------------------------------------------------
 
+void CXyFile::GetFormatStrings(char* prefix, char* delim, char* numFmt, char* eol)
+{
+// Any char ptr which is NULL will not be set.
+//
+    if (prefix) {  // set the prefix string
+      if (m_nSave.HeaderType == 2)
+           *prefix = '\000';  // no prefix char for now
+      else
+	   *prefix = '\000';
+    }
+
+    if (delim) {  // set the delimiter string
+      switch (m_nSave.Delimiter)
+      {
+        case 1:
+            strcpy (delim, "\t");
+            break;
+        case 2:
+            strcpy (delim, ",");
+            break;
+        default:
+            strcpy (delim, " ");
+            break;
+      }
+    }
+    if (numFmt) {  // set the number format string
+      switch (m_nSave.NumberFormat)
+      {
+        case 1:
+            strcpy (numFmt, "%f");
+            break;
+        case 2:
+            strcpy (numFmt, "%d");
+            break;
+        default:
+            strcpy (numFmt, "%14e");
+            break;
+      }
+    }
+    if (eol) {  // set the EOL string
+      if (m_nSave.CrLf) strcpy(eol, "\015\012");
+      else strcpy(eol, "\012");
+    }
+}
+//---------------------------------------------------------------
+
+void CXyFile::WriteHeaderLines(char* hdr, char* prefix, char* eol)
+{
+    char *cp1, *cp2, line[256];
+
+    cp1 = hdr;
+    cp2 = cp1;
+    int nc;
+    while (cp2) {
+        cp2 = strchr(cp1, (int) '\012');  // search for LF
+        if (cp2)
+        {
+            nc = cp2 - cp1;
+            if (nc > 255) nc = 255;      // enforce max line length
+            strncpy(line, cp1, nc);      // extract line up to LF (not including LF)
+            if (nc)
+            {
+                if (line[nc-1] == '\015') --nc;  // strip CR
+            }
+            line[nc] = 0;
+
+	    if (prefix)
+              *m_pOutFile << prefix << ' ' << line << eol;
+	    else
+              *m_pOutFile << line << eol;
+
+            cp1 = cp2+1;
+        }
+        else
+        {
+            if (prefix)
+              if (*cp1) *m_pOutFile << prefix << ' ' << cp1 << eol;
+        }
+    }
+}
+//---------------------------------------------------------------
+
 void CXyFile::WriteHeader (char* hdr)
 {
 // Write a header to the file
 
-	strcpy (m_szHeader, hdr);
+    char prefix[16], eol[4];
+    GetFormatStrings(prefix, NULL, NULL, eol);
 
     switch (m_nSave.HeaderType)
     {
-        case 0:
-            // No header
+        case 0:   // No header
             break;
-
-        case 1:
-            // Write header in standard xyplot format
-
-            *m_pOutFile << HEADER_BEGIN << '\n';
-	        *m_pOutFile << m_szHeader;
-	        *m_pOutFile << HEADER_END << '\n';
-	        break;
-
-        case 2:
-          // Write header with prefix symbol on each line
-          break;
-
-        default:
-          // no output
-          ;
-
-	}
+        case 1:   // Standard xyplot format (C comment)
+            *m_pOutFile << HEADER_BEGIN << eol;
+	    WriteHeaderLines(hdr, NULL, eol);
+	    *m_pOutFile << HEADER_END << eol;
+	    break;
+        case 2:  // Prefix string on each line
+	    WriteHeaderLines(hdr, prefix, eol);
+            break;
+        default: // no output
+            break;
+    }
 }
 //---------------------------------------------------------------
 
@@ -192,7 +267,7 @@ Arguments:
 Return the number of points read from the file.
 */
 
-	float* d = data;
+    float* d = data;
     int nPts = 0, i, *cp;
     char s [MAX_LINE_LENGTH];
 
@@ -214,7 +289,7 @@ Return the number of points read from the file.
             ++i;
         }
 
-	    ++nPts;
+        ++nPts;
     }
 
     while ((! m_pInFile->fail()) && (nPts < MAX_POINTS))
@@ -241,54 +316,36 @@ int CXyFile::WriteData(float* data, int nrows, int ncols)
 {
 // Write data to file
 
-	float* d = data;
-   	char temp [32], szDelimiter[4], szFormat[16], szEOL[4];
-   	int i, j;
+    float* d = data;
+    char szDatum [32], szDelimiter[4], szFormat[8], szEOL[4];
+    int i, j;
+    
+    GetFormatStrings(NULL, szDelimiter, szFormat, szEOL);
+    bool bIntegerFormat = (m_nSave.NumberFormat == 2);
 
-    if (m_nSave.CrLf) strcpy (szEOL, "\012"); else strcpy (szEOL, "\n");
-
-    switch (m_nSave.Delimiter)
-    {
-        case 1:
-            strcpy (szDelimiter, "\t");
-            break;
-        case 2:
-            strcpy (szDelimiter, ",");
-            break;
-        default:
-            strcpy (szDelimiter, " ");
-            break;
-    }
-
-    switch (m_nSave.NumberFormat)
-    {
-        case 1:
-            strcpy (szFormat, "%f");
-            break;
-        case 2:
-            strcpy (szFormat, "%d");
-            break;
-        default:
-            strcpy (szFormat, "%14e");
-            break;
-    }
-
-	if (nrows > 0)
-	{
-		for (i = 0; i < nrows; ++i)
-		{
-		    for (j = 0; j < ncols; ++j)
-		    {
-   			    if (m_nSave.NumberFormat != 2) sprintf (temp, szFormat, *d++);
-   			    else sprintf (temp, szFormat, (int)(*d++));
-			    *m_pOutFile << temp;
-			    *m_pOutFile << szDelimiter;
-			}
-			*m_pOutFile << szEOL;
-		}
+    if (nrows > 0) {
+      if (bIntegerFormat) {
+        for (i = 0; i < nrows; ++i) {
+          for (j = 0; j < ncols-1; ++j) {
+              sprintf (szDatum, szFormat, (int)(*d++));         
+              *m_pOutFile << szDatum << szDelimiter;
+          }
+          sprintf (szDatum, szFormat, (int)(*d++));         
+          *m_pOutFile << szDatum << szEOL;
 	}
+      }
+      else {
+        for (i = 0; i < nrows; ++i) {
+          for (j = 0; j < ncols-1; ++j) {
+              sprintf (szDatum, szFormat, *d++);         
+              *m_pOutFile << szDatum << szDelimiter;
+          }
+          sprintf (szDatum, szFormat, *d++);         
+          *m_pOutFile << szDatum << szEOL;
+        }
+      }
+    }
     return 0;
-
 }
 //---------------------------------------------------------------
 

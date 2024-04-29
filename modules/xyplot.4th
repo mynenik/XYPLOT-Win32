@@ -2,7 +2,7 @@
 \
 \ Forth interface to xyplot
 \
-\ Copyright (c) 1999--2022 Krishna Myneni
+\ Copyright (c) 1999--2024 Krishna Myneni
 \
 \ This software is provided under the terms of the 
 \ GNU Affero General Public License (AGPL), v3.0 or later.
@@ -189,6 +189,8 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : file_open_dialog ( ^filter -- ^filename flag )
     FN_FILE_OPEN_DIALOG call ;
 
+: set_save_options ( addr -- | set file save format options )
+    FN_SET_SAVE_OPTIONS call ;
 
 [DEFINED] _WIN32_ [IF]  \ Interface functions for Windows version only
 : get_window_title ( c-addr umax -- uret )
@@ -207,9 +209,6 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 
 : radio_box ( ^label1 ^label2 ... n -- m | provide a radio button selection box )
     FN_RADIO_BOX call ;
-
-: set_save_options ( addr -- | set file save format options, specified in structure )
-    FN_SET_SAVE_OPTIONS call ;
 [THEN]
 
 1 SFLOATS constant SFLOAT      \ size in bytes of single precision float
@@ -324,20 +323,18 @@ c" white" set_background
 c" black" set_foreground
 0 0 set_grid_lines
 
-[UNDEFINED] _WIN32_ [IF]
 \ Modify the save options to some non-default values
 
 SaveOptions sv-opt
 
-2 sv-opt  SaveOptions->HeaderType ! \ user-defined prefix for header lines (non-default)
-0 sv-opt  SaveOptions->Delimiter  ! \ space delimiter (default)
+1 sv-opt  SaveOptions->HeaderType !   \ xyplot C header style (non-default)
+0 sv-opt  SaveOptions->Delimiter  !   \ space delimiter (default)
 0 sv-opt  SaveOptions->NumberFormat ! \ exponential number format (default)
 0 sv-opt  SaveOptions->EndOfLine  !   \ unix format
 sv-opt    SaveOptions->UserPrefix 16 erase
-s" #" sv-opt SaveOptions->UserPrefix swap cmove  ( this is the line prefix used by xmgrace ) 
+\ s" #" sv-opt SaveOptions->UserPrefix swap cmove  ( this is the line prefix used by xmgrace ) 
 
 sv-opt set_save_options
-[THEN]
 
 \ end of xyplot.4th
 

@@ -1,7 +1,7 @@
 /*
 XYPLOT.CPP
 
-Copyright (c) 1995--2021 Krishna Myneni
+Copyright (c) 1995--2024 Krishna Myneni
 
 Provided under the terms of the GNU Affero General Public License
 (AGPL) v 3.0 or later.
@@ -97,9 +97,10 @@ const void* FN_ADD_MENU_ITEM = add_menu_item;
 const void* FN_SET_BACKGROUND = set_background;
 const void* FN_SET_FOREGROUND = set_foreground;
 const void* FN_MESSAGE_BOX = message_box;
+const void* FN_GET_INPUT = get_input;
 const void* FN_FILE_OPEN_DIALOG = file_open_dialog;
 const void* FN_FILE_SAVE_DIALOG = file_save_dialog;
-const void* FN_GET_INPUT = get_input;
+const void* FN_SET_SAVE_OPTIONS = set_save_options;
 
 int nForthMenuItems = 0;
 vector<char*> ForthMenuCommandList;
@@ -580,6 +581,8 @@ void InitForthInterface ()
   sprintf (s, "%lu%sFN_FILE_SAVE_DIALOG\n", FN_FILE_SAVE_DIALOG, cs);
   strcat (fs, s);
   sprintf (s, "%lu%sFN_GET_INPUT\n", FN_GET_INPUT, cs);
+  strcat (fs, s);
+  sprintf (s, "%lu%sFN_SET_SAVE_OPTIONS\n", FN_SET_SAVE_OPTIONS, cs);
   strcat (fs, s);
 //  sprintf (s, "%lu%sMN_FILE\n", pMainWnd->m_nFileMenu, cs);
   sprintf (s, "%lu%sMN_FILE\n", 0, cs);
@@ -1361,6 +1364,16 @@ int file_save_dialog ()
                *GlobalSp-- = 0; *GlobalTp-- = OP_IVAL;
        }
 
+    return 0;
+}
+//----------------------------------------------------------------
+
+int set_save_options ()
+{
+    ++GlobalSp; ++GlobalTp;
+    SaveOptions *p = (SaveOptions*)(*GlobalSp);
+    SaveOptions s = *p;
+    pMainWnd->m_pDb->SetSaveOptions(s);
     return 0;
 }
 //----------------------------------------------------------------

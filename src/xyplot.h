@@ -3,7 +3,7 @@ xyplot.h
 
 Header file for XYPLOT (C++/Windows 95 version)
 
-Copyright (c) 1995--2020 Krishna Myneni
+Copyright (c) 1995--2024 Krishna Myneni
 
 Provided under the terms of the GNU Affero General Public
 License (AGPL) v 3.0 or later.
@@ -66,7 +66,8 @@ int set_window_limits();
 int add_menu_item();
 int set_background();
 int set_foreground();
+int get_input();
 int message_box();
 int file_open_dialog();
 int file_save_dialog();
-int get_input();
+int set_save_options();

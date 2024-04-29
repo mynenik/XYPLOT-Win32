@@ -2,7 +2,7 @@
 //
 // Header file for class CXyFile
 //
-// Copyright 1995--2020 Krishna Myneni
+// Copyright 1995--2024 Krishna Myneni
 //
 // Provided under the terms of the GNU Affero General Public
 // License (AGPL) v 3.0 or later.
@@ -32,11 +32,13 @@ public:
 	~CXyFile (void);
 	void ReadHeader (void);
 	void WriteHeader (char*);
+        void WriteHeaderLines(char*, char*, char*);
 	int Columns (void);
 	int ReadData (float*, int, int []);
 	int WriteData (float*, int, int);
 	int Fail () ;
 	void SetSaveOptions (SaveOptions s) {m_nSave = s;}
+        void GetFormatStrings(char*, char*, char*, char*);
 };
 
 extern int BlankLine (char*);

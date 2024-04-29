@@ -1,6 +1,6 @@
 // CSaveOptionsDialog.cpp
 //
-// Copyright 1998--2020 Krishna Myneni
+// Copyright 1998--2024 Krishna Myneni
 //
 // Provided under the terms of the GNU Affero General Public License
 // (AGPL) v 3.0 or later.
@@ -14,19 +14,21 @@
 
 BOOL CSaveOptionsDialog::OnInitDialog()
 {
-	if (!CModalDialog::OnInitDialog()) return FALSE;
+    if (!CModalDialog::OnInitDialog()) return FALSE;
 
-    m_pButtons[0] = (CButton*)GetDlgItem(IDC_HDR_XYPLOT);
-    m_pButtons[1] = (CButton*)GetDlgItem(IDC_HDR_USER);
-    m_pButtons[2] = (CButton*)GetDlgItem(IDC_HDR_NONE);
+    m_pButtons[0] = (CButton*)GetDlgItem(IDC_HDR_NONE);
+    m_pButtons[1] = (CButton*)GetDlgItem(IDC_HDR_XYPLOT);
+    m_pButtons[2] = (CButton*)GetDlgItem(IDC_HDR_USER);
+
     m_pButtons[3] = (CButton*)GetDlgItem(IDC_DELIM_SPACE);
     m_pButtons[4] = (CButton*)GetDlgItem(IDC_DELIM_TAB);
     m_pButtons[5] = (CButton*)GetDlgItem(IDC_DELIM_COMMA);
+
     m_pButtons[6] = (CButton*)GetDlgItem(IDC_FORMAT_EXP);
     m_pButtons[7] = (CButton*)GetDlgItem(IDC_FORMAT_FP);
     m_pButtons[8] = (CButton*)GetDlgItem(IDC_FORMAT_INT);
-    m_pButtons[9] = (CButton*)GetDlgItem(IDC_CRLF_DOS);
-    m_pButtons[10] = (CButton*)GetDlgItem(IDC_CRLF_UNIX);
+    m_pButtons[9] = (CButton*)GetDlgItem(IDC_CRLF_UNIX);
+    m_pButtons[10] = (CButton*)GetDlgItem(IDC_CRLF_DOS);
 
     int htype = m_pSaveOptions->HeaderType;
     int delim = m_pSaveOptions->Delimiter;
@@ -38,7 +40,7 @@ BOOL CSaveOptionsDialog::OnInitDialog()
     m_pButtons[fmt + 6]->SetCheck(TRUE);
     m_pButtons[crlf + 9]->SetCheck(TRUE);
 
-	return TRUE;
+    return TRUE;
 }
 //---------------------------------------------------------------
 
@@ -54,6 +56,6 @@ void CSaveOptionsDialog::OnOK()
     for (i = 9; i < 11; i++) if (m_pButtons[i]->GetCheck())
         m_pSaveOptions->CrLf = i - 9;
 
-	CModalDialog::OnOK();
+    CModalDialog::OnOK();
 }
 

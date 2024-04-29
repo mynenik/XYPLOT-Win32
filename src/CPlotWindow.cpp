@@ -841,7 +841,10 @@ void CPlotWindow::OnSaveOptions()
 
     SaveOptions s = m_pDb->GetSaveOptions();
     CSaveOptionsDialog sd(&s, this);
-    if (sd.DoModal() == IDOK) m_pDb->SetSaveOptions(s);
+    if (sd.DoModal() == IDOK) {
+	 m_pDb->SetSaveOptions(s);
+    }
+
 }
 //--------------------------------------------------------------
 
