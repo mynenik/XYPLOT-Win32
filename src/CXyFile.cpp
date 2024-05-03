@@ -1,6 +1,6 @@
 // CXyFile.cpp
 //
-// Copyright 1995--2020 Krishna Myneni
+// Copyright 1995--2024 Krishna Myneni
 //
 // Provided under the terms of the GNU Affero General Public License
 // (AGPL) v 3.0 or later.
@@ -18,7 +18,7 @@ using namespace std;
 
 CXyFile::CXyFile (char* name, int open_mode)
 {
-    m_szName = new char [255];
+    m_szName = new char [256];
     m_szHeader = new char [HEADER_LENGTH];
     m_szFirstLine = new char [MAX_LINE_LENGTH];
     m_pValues = new float [MAX_DATA_COLUMNS];
@@ -77,7 +77,7 @@ void CXyFile::ReadHeader()
     char* p;
     char temp[MAX_LINE_LENGTH];
 
-	*m_szHeader = '\0';
+    *m_szHeader = '\0';
 
     // Ignore blank lines at beginning of file.
 
@@ -128,7 +128,7 @@ void CXyFile::ReadHeader()
 	return;
       }
 
-	// Ignore blank lines after header
+    // Ignore blank lines after header
 
     while (BlankLine (m_szFirstLine) && (!m_pInFile->fail()))
       {
@@ -143,7 +143,7 @@ void CXyFile::GetFormatStrings(char* prefix, char* delim, char* numFmt, char* eo
 //
     if (prefix) {  // set the prefix string
       if (m_nSave.HeaderType == 2)
-           *prefix = '\000';  // no prefix char for now
+           strcpy(prefix, m_nSave.UserPrefix);
       else
 	   *prefix = '\000';
     }
@@ -317,7 +317,7 @@ int CXyFile::WriteData(float* data, int nrows, int ncols)
 // Write data to file
 
     float* d = data;
-    char szDatum [32], szDelimiter[4], szFormat[8], szEOL[4];
+    char szDatum [32], szDelimiter[4], szFormat[16], szEOL[4];
     int i, j;
     
     GetFormatStrings(NULL, szDelimiter, szFormat, szEOL);

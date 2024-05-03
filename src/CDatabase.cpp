@@ -1,6 +1,6 @@
 // CDatabase.cpp
 //
-// Copyright 1995--2020 Krishna Myneni
+// Copyright 1995--2024 Krishna Myneni
 //
 // This software is provided under the terms of the GNU
 // Affero General Public License (AGPL) v 3.0 or later.
@@ -27,7 +27,7 @@ CDatabase::CDatabase()
     m_nSave.Delimiter = 0;
     m_nSave.NumberFormat = 0;
     m_nSave.CrLf = 0;
-//    strcpy(m_nSave.UserPrefix, "#"); // default prefix for alternate header style is xmgrace comment
+    strcpy(m_nSave.UserPrefix, "#"); // default prefix for alternate header style is xmgrace comment
 }
 //---------------------------------------------------------------
 CDatabase::~CDatabase()
@@ -51,11 +51,6 @@ void CDatabase::RemoveSet(CDataset* d)
       if (d == *i) m_nSets.erase(i);
       i++;
   }
-
-  //for (int i = 0; i < n; i++)
-  //  {
-  //    if (d == m_nSets[i]) m_nSets.erase(&m_nSets[i]);
-  //  }
 }
 //---------------------------------------------------------------
 
@@ -371,14 +366,14 @@ CDataset* CDatabase::MakeDataset (CWorkspace41* ws, int n)
 	    d = new CComplex (2, npts, name, hdr);
 	    break;
 	  default:
-        d = NULL;
+            d = NULL;
 	}
 
     if (d)
     {
-	    d->CopyFromXY (&ws->x[jsr], &ws->y[jsr], ws->ds[n].npts);
-	    d->SetExtrema();
-	}
+      d->CopyFromXY (&ws->x[jsr], &ws->y[jsr], ws->ds[n].npts);
+      d->SetExtrema();
+    }
 
     return d;
 }
@@ -456,9 +451,8 @@ int CDatabase::SaveDataset (CDataset* d, vector<int> lim, char* name)
         int i1 = lim[0];
         int i2 = lim[1];
         int ncols = d->SizeOfDatum();
-        // float* p = d->begin() + i1*ncols;
-	float* p = (float*) &(*d)[0] + i1*ncols;
-	// float* p = (float*) &(*(d->begin())) + i1*ncols;
+	// float* p = (float*) &(*d)[0] + i1*ncols;
+	float* p = (float*) &(*(d->begin())) + i1*ncols;
         f.WriteData(p, i2-i1+1, ncols);
     }
     else

@@ -327,12 +327,12 @@ c" black" set_foreground
 
 SaveOptions sv-opt
 
-1 sv-opt  SaveOptions->HeaderType !   \ xyplot C header style (non-default)
+2 sv-opt  SaveOptions->HeaderType !   \ user-defined prefix (non-default)
 0 sv-opt  SaveOptions->Delimiter  !   \ space delimiter (default)
 0 sv-opt  SaveOptions->NumberFormat ! \ exponential number format (default)
 0 sv-opt  SaveOptions->EndOfLine  !   \ unix format
 sv-opt    SaveOptions->UserPrefix 16 erase
-\ s" #" sv-opt SaveOptions->UserPrefix swap cmove  ( this is the line prefix used by xmgrace ) 
+s" #" sv-opt SaveOptions->UserPrefix swap cmove  ( line prefix used by xmgrace ) 
 
 sv-opt set_save_options
 

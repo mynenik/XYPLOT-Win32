@@ -35,10 +35,15 @@ BOOL CSaveOptionsDialog::OnInitDialog()
     int fmt = m_pSaveOptions->NumberFormat;
     int crlf = m_pSaveOptions->CrLf;
 
+    char prefix[16];
+    strcpy(prefix, m_pSaveOptions->UserPrefix);
+
     m_pButtons[htype]->SetCheck(TRUE);
     m_pButtons[delim + 3]->SetCheck(TRUE);
     m_pButtons[fmt + 6]->SetCheck(TRUE);
     m_pButtons[crlf + 9]->SetCheck(TRUE);
+
+    SetDlgItemText(IDC_HDR_PREFIX, prefix);
 
     return TRUE;
 }
@@ -55,6 +60,10 @@ void CSaveOptionsDialog::OnOK()
         m_pSaveOptions->NumberFormat = i - 6;
     for (i = 9; i < 11; i++) if (m_pButtons[i]->GetCheck())
         m_pSaveOptions->CrLf = i - 9;
+
+    char prefix[16];
+    ((CEdit*) GetDlgItem(IDC_HDR_PREFIX))->GetLine(0, prefix, 16);
+    strcpy(m_pSaveOptions->UserPrefix, prefix);
 
     CModalDialog::OnOK();
 }

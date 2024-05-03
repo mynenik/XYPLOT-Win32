@@ -18,7 +18,7 @@ STYLE WS_CAPTION | WS_SYSMENU | DS_MODALFRAME
 CAPTION "About XYPLOT"
 BEGIN
   CTEXT "XYPLOT for Windows XP/7/8/10", -1, 0, 5, 190, 8
-  CTEXT "Version 1.5.0, Rls: 2024-04-29 (kForth ver. 1.8.0)", -1, 0, 14, 215, 8
+  CTEXT "Version 1.5.0, Rls: 2024-05-03 (kForth ver. 1.8.0)", -1, 0, 14, 215, 8
   CTEXT "Copyright (c) 1997--2024 Krishna Myneni and John Kielkopf", -1, 0, 23, 215, 8
   CTEXT "Provided under the terms of the GNU Affero General Public License", -1, 0, 32, 215, 8
   CTEXT "E-mail: krishna.myneni@ccreweb.org", -1, 0, 41, 215, 8
