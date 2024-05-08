@@ -1,6 +1,6 @@
 // Include file used by XYPLOT.RC
 //
-// Copyright (c) 1996--2020 Krishna Myneni
+// Copyright (c) 1996--2024 Krishna Myneni
 //
 // Provided under the terms of the GNU Affero General Public
 // License (AGPL) v 3.0 or later.
@@ -13,8 +13,6 @@
 #define ID_DATA_HDR         20
 #define ID_DATA_DEL         21
 #define ID_DATA_DUP         22
-#define ID_DATA_JOIN        23
-#define ID_DATA_PRUNE       24
 
 #define ID_PLOT_EXTREMA     30
 #define ID_PLOT_PICK        31

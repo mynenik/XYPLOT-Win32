@@ -1,9 +1,9 @@
 // Resource script for XYPLOT
 //
-// Copyright (c) 1996--2003 Krishna Myneni
+// Copyright (c) 1996--2024 Krishna Myneni
 // Creative Consulting for Research & Education
 //
-//  Last Revised: 8-13-2003
+//  Last Revised: 2024-05-08
 //
 #include <afxres.h>
 #include "resource.h"
@@ -30,26 +30,24 @@ BEGIN
     BEGIN
         POPUP "&Copy"
         BEGIN
-            MENUITEM "&Metafile",       ID_EDIT_COPY_WMF
-            MENUITEM "&Bitmap",         ID_EDIT_COPY_BMP
+            MENUITEM "&Metafile",   ID_EDIT_COPY_WMF
+            MENUITEM "&Bitmap",     ID_EDIT_COPY_BMP
         END
-        MENUITEM "&Paste",              ID_EDIT_PASTE
+        MENUITEM "&Paste",          ID_EDIT_PASTE
     END
 
     POPUP "&Data"
     BEGIN
-    	MENUITEM "&Header",			ID_DATA_HDR
-    	MENUITEM "&Delete",			ID_DATA_DEL
-    	MENUITEM "D&uplicate",		ID_DATA_DUP
-    	MENUITEM "&Join",			ID_DATA_JOIN
-    	MENUITEM "&Prune",			ID_DATA_PRUNE
+    	MENUITEM "&Header",         ID_DATA_HDR
+    	MENUITEM "&Delete",         ID_DATA_DEL
+    	MENUITEM "D&uplicate",      ID_DATA_DUP
     END
 
     POPUP "&Plot"
     BEGIN
     	POPUP "&View"
     	BEGIN
-    	  MENUITEM "&Cartesian",	ID_VIEW_CARTESIAN
+    	  MENUITEM "&Cartesian",    ID_VIEW_CARTESIAN
     	  MENUITEM "&Polar",        ID_VIEW_POLAR
     	  MENUITEM SEPARATOR
     	  MENUITEM "&Aspect",       ID_VIEW_ASPECT
@@ -58,10 +56,10 @@ BEGIN
     	  MENUITEM "&Forward",      ID_VIEW_FORWARD
     	END
         MENUITEM "&Extrema",        ID_PLOT_EXTREMA
-    	MENUITEM "&Pick",			ID_PLOT_PICK
-    	MENUITEM "&Drop",			ID_PLOT_DROP
-    	MENUITEM "&Grid",			ID_PLOT_GRID
-    	MENUITEM "&Color",			ID_PLOT_COLOR
+    	MENUITEM "&Pick",           ID_PLOT_PICK
+    	MENUITEM "&Drop",           ID_PLOT_DROP
+    	MENUITEM "&Grid",           ID_PLOT_GRID
+    	MENUITEM "&Color",          ID_PLOT_COLOR
     	POPUP "&Symbol",
     	BEGIN
     	  MENUITEM "&Line",         ID_SYMBOL_LINE
@@ -76,13 +74,13 @@ BEGIN
 
     POPUP "&Math"
     BEGIN
-    	MENUITEM "&Template",			ID_MATH_TEMPLATE
-    	MENUITEM "Exp&ression",			ID_MATH_EXPRESSION
+    	MENUITEM "&Template",       ID_MATH_TEMPLATE
+    	MENUITEM "Exp&ression",     ID_MATH_EXPRESSION
     END
 
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About...",                   ID_ABOUT
+        MENUITEM "&About...",       ID_ABOUT
     END
 END
 
