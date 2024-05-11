@@ -195,6 +195,9 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : make_menu ( ^menu_name -- menu_id | create a new menu )
     FN_MAKE_MENU call ;
 
+: make_submenu ( menu_id ^menu_name -- menu_id | create a submenu in existing menu )
+    FN_MAKE_SUBMENU call ;
+
 [DEFINED] _WIN32_ [IF]  \ Interface functions for Windows version only
 : get_window_title ( c-addr umax -- uret )
     FN_GET_WINDOW_TITLE call ;
@@ -203,11 +206,6 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
     FN_SET_WINDOW_TITLE call ;
 
 [ELSE]  \ Interface functions for Linux version only
-
-
-: make_submenu ( menu_id ^menu_name -- menu_id | create a submenu in existing menu )
-    FN_MAKE_SUBMENU call ;
-
 : radio_box ( ^label1 ^label2 ... n -- m | provide a radio button selection box )
     FN_RADIO_BOX call ;
 [THEN]

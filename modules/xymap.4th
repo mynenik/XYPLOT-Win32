@@ -121,13 +121,13 @@ Public:
     THEN
 ;	    
 	    
-\ MN_MATH  c" Maps" make_submenu  CONSTANT  MN_MAPS
+MN_MATH  c" Maps" make_submenu  CONSTANT  MN_MAPS
 
-MN_MATH  c" y_n+1 vs y_n"    c" 0 map"  add_menu_item
-MN_MATH  c" x_n+1 vs x_n"    c" 1 map"  add_menu_item
-MN_MATH  c" dy_n+1 vs dy_n"  c" 2 map"  add_menu_item
-MN_MATH  c" dx_n+1 vs dx_n"  c" 3 map"  add_menu_item
-MN_MATH  c" dy_n+1 vs dx_n"  c" 4 map"  add_menu_item
+MN_MAPS  c" y_n+1 vs y_n"    c" 0 map"  add_menu_item
+MN_MAPS  c" x_n+1 vs x_n"    c" 1 map"  add_menu_item
+MN_MAPS  c" dy_n+1 vs dy_n"  c" 2 map"  add_menu_item
+MN_MAPS  c" dx_n+1 vs dx_n"  c" 3 map"  add_menu_item
+MN_MAPS  c" dy_n+1 vs dx_n"  c" 4 map"  add_menu_item
 
 End-Module
 
