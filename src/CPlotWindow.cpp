@@ -1,6 +1,6 @@
 // CPlotWindow.cpp
 //
-// Copyright 1996--2020 Krishna Myneni
+// Copyright 1996--2024 Krishna Myneni
 //
 // This software is provided under the terms of the
 // GNU Affero General Public License (AGPL) v 3.0 or later.
@@ -47,7 +47,7 @@ extern int NumberParse (float*, char*);
 extern COLORREF LookupColor (char*);
 extern COLORREF colors_rgb_table[];
 extern int CompileAE (vector<BYTE>*, char* exp);
-extern int ExecuteForthExpression (char*, ostringstream*, int*, long int*);
+extern int ExecuteForthExpression (char*, ostringstream*, long int*);
 
 vector<char*> GetStartupFileList(char*);
 
@@ -522,18 +522,41 @@ void CPlotWindow::OnCopyMetafile ()
 }
 //---------------------------------------------------------------
 
-int CPlotWindow::AddMenuItem(int nMenu, char* name)
+unsigned long CPlotWindow::AddSubMenu(unsigned long hParentMenu, char* name)
+{
+    int nCount = 0;
+    HMENU hNewSubMenu = 0;
+    CMenu* pMenu = CMenu::FromHandle((HMENU) hParentMenu);
+    if (pMenu) {
+      nCount = pMenu->GetMenuItemCount();
+      CMenu* pNewSubMenu = new CMenu();
+      pNewSubMenu->CreatePopupMenu();
+      if (pNewSubMenu) {
+	hNewSubMenu = pNewSubMenu->m_hMenu;
+        pMenu->AppendMenu(MF_POPUP|MF_STRING, (UINT) hNewSubMenu, TEXT(name));
+      }
+    }
+    else {
+      char s[256];
+      sprintf(s, "Parent Menu %lx Not Found!", hParentMenu);
+      MessageBox(s);
+    }
+    return (unsigned long) hNewSubMenu;
+}
+//---------------------------------------------------------------
+
+int CPlotWindow::AddMenuItem(unsigned long hMenu, char* name)
 {
     char s[80];
     int id = 0;
-    CMenu* pTopMenu = this->GetMenu();
-    int ncount = pTopMenu->GetMenuItemCount();
+    // CMenu* pTopMenu = this->GetMenu();
+    // int ncount = pTopMenu->GetMenuItemCount();
     // sprintf (s, "%d items in the top menu", ncount);
-    // AfxMessageBox(s);
-    CMenu* pMenu = pTopMenu->GetSubMenu(nMenu);
-    if (pMenu)
+    
+    if (hMenu)
     {
-        ncount = pMenu->GetMenuItemCount();
+	CMenu* pMenu = CMenu::FromHandle((HMENU) hMenu);
+        // ncount = pMenu->GetMenuItemCount();
         // sprintf (s, "%d items in submenu %d", ncount, n);
         // AfxMessageBox(s);
         if (pMenu->AppendMenu(MF_STRING, ID_FORTH_MENUITEMS + nForthMenuItems,
@@ -544,6 +567,24 @@ int CPlotWindow::AddMenuItem(int nMenu, char* name)
           }
     }
     return id;
+}
+//---------------------------------------------------------------
+
+unsigned long CPlotWindow::MakeMenu(char* menu_name)
+{
+    CMenu* pTopMenu = this->GetMenu();
+    unsigned long hNewPullDownMenu = 0;
+    CMenu* pNewPullDownMenu = new CMenu();
+    pNewPullDownMenu->CreatePopupMenu();
+    if (pNewPullDownMenu) {
+      hNewPullDownMenu = (unsigned long) pNewPullDownMenu->m_hMenu;
+      pTopMenu->AppendMenu(MF_POPUP|MF_STRING, (UINT) hNewPullDownMenu, TEXT(menu_name));
+    }
+    else
+      MessageBox("Unable to create new menu!");
+   
+    SetMenu(pTopMenu);
+    return hNewPullDownMenu;
 }
 //---------------------------------------------------------------
 
@@ -569,10 +610,10 @@ void CPlotWindow::OnForthMenuItem ()
     long int line;
     char out_s[4096];
     memset(out_s, 0, 4096);
-    stringstream ForthOutput;
+    stringstream* pForthOutput = new stringstream(out_s, 4095);
 
-    ExecuteForthExpression (pCommand, (ostringstream*) &ForthOutput, &nError, &line);
-    ForthOutput.getline(out_s, 4095, 0);
+    nError = ExecuteForthExpression (pCommand, (ostringstream*) pForthOutput, &line);
+    pForthOutput->getline(out_s, 4095, 0);
     if (nError) {
 	char s[64];
 	if (nError & 0x100)
@@ -583,6 +624,7 @@ void CPlotWindow::OnForthMenuItem ()
 	 strcat(out_s, s);
      }
      if (strlen(out_s)) MessageBox(out_s);
+     delete pForthOutput;
 }
 //---------------------------------------------------------------
 
@@ -1479,32 +1521,39 @@ BOOL CPlotWindow::SaveMetafile(char* name)
 
 int CPlotWindow::LoadForthFile(char* fname)
 {
-    char s[256];
+    char s[512], out_s[2048];
     long int lnum;
-    long int *sp;
-    BYTE *tp;
+    memset (out_s, 0, 2048);
+    stringstream* pForthMessages = new stringstream(out_s, 2047);
 
     strcpy (s, "include ");
     strcat (s, fname);
-    istringstream* pSS = new istringstream (s);
 
-    vector<BYTE> op;
-    SetForthInputStream(*pSS);
-    int ec = ForthCompiler (&op, &lnum);
-    delete pSS;
-
-    if (ec) {
-      AfxMessageBox ("Forth Compiler error");
+    int nError = ExecuteForthExpression(s, (ostringstream*) pForthMessages, &lnum);
+    if (nError) {
+      pForthMessages->getline(out_s, 2047, 0);
+      MessageBox(out_s);
     }
-    else {
-      if (op.size()) {
-         ec = ForthVM (&op, &sp, &tp);
-         if (ec) {
-            AfxMessageBox ("Forth VM error");
-          }
-      }
-    }
-    return ec;
+//    istringstream* pSS = new istringstream (s);
+//
+//    vector<BYTE> op;
+//    SetForthInputStream(*pSS);
+//    int ec = ForthCompiler (&op, &lnum);
+//    delete pSS;
+//
+//    if (ec) {
+//      AfxMessageBox ("Forth Compiler error");
+//    }
+//    else {
+//      if (op.size()) {
+//         ec = ForthVM (&op, &sp, &tp);
+//         if (ec) {
+//            AfxMessageBox ("Forth VM error");
+//          }
+//      }
+//    }
+    delete pForthMessages;
+    return nError;
 }
 
 //---------------------------------------------------------------

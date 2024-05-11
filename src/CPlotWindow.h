@@ -3,7 +3,7 @@ CPlotWindow.h
 
 Header file for the CPlotWindow class
 
-Copyright (c) 1995--2020 Krishna Myneni
+Copyright (c) 1995--2024 Krishna Myneni
 
 This software is provided under the terms of the
 GNU Affero General Public License 3.0 or later
@@ -22,8 +22,9 @@ class CPlotWindow : public CFrameWnd {
 public:
         CPlotWindow();
         ~CPlotWindow();
-        int AddMenuItem(int, char*);
-        void MakeMenu(void);
+        int AddMenuItem(unsigned long, char*);
+	unsigned long AddSubMenu(unsigned long, char*);
+        unsigned long MakeMenu(char*);
         afx_msg void OnForthMenuItem ();
         afx_msg void OnPaint ();
         afx_msg void OnMouseMove (UINT, CPoint);

@@ -29,8 +29,14 @@ int AddToHeader (char*, char*, bool);
 void LoadInitializationFile();
 void InitForthInterface ();
 int LoadForthFile(char*);
-int ExecuteForthExpression (char*, ostringstream*, int*, long int*);
+int ExecuteForthExpression (char*, ostringstream*, long int*);
 COLORREF LookupColor(char*);
+
+struct IfcFuncTemplate
+{
+   const void* Function;
+   const char* constantName;
+};
 
 // The following functions provide the interface between
 // the C++ functions and the Forth environment. They
@@ -65,6 +71,8 @@ int get_window_limits();
 int set_window_limits();
 int add_menu_item();
 int set_background();
+int make_menu();
+int make_submenu();
 int set_foreground();
 int get_input();
 int message_box();

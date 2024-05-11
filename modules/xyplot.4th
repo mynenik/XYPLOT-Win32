@@ -192,6 +192,9 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 : set_save_options ( addr -- | set file save format options )
     FN_SET_SAVE_OPTIONS call ;
 
+: make_menu ( ^menu_name -- menu_id | create a new menu )
+    FN_MAKE_MENU call ;
+
 [DEFINED] _WIN32_ [IF]  \ Interface functions for Windows version only
 : get_window_title ( c-addr umax -- uret )
     FN_GET_WINDOW_TITLE call ;
@@ -201,8 +204,6 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
 
 [ELSE]  \ Interface functions for Linux version only
 
-: make_menu ( ^menu_name -- menu_id | create a new menu )
-    FN_MAKE_MENU call ;
 
 : make_submenu ( menu_id ^menu_name -- menu_id | create a submenu in existing menu )
     FN_MAKE_SUBMENU call ;
@@ -312,7 +313,7 @@ include xypeaks
 include xysort
 include xyswap
 include yn_vs_ym
-include xymap
+\ include xymap
 include grace
 include xyjoin
 

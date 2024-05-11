@@ -64,43 +64,48 @@ extern char* color_names[];
 bool debug = FALSE;                   // global variable for debug mode
 volatile int InputData;
 
-// Forth interface constant function pointers
-
-const void* FN_GET_COLOR_MAP  =  get_color_map;
-const void* FN_GET_ACTIVE_SET =  get_active_set;
-const void* FN_GET_OPERAND_SET = get_operand_set;
-const void* FN_GET_ACTIVE_PLOT = get_active_plot;
-const void* FN_GET_OPERAND_PLOT = get_operand_plot;
-const void* FN_SET_ACTIVE_PLOT = set_active_plot;
-const void* FN_SET_OPERAND_PLOT = set_operand_plot;
-const void* FN_GET_DS = get_ds;
-const void* FN_SET_DS_EXTREMA = set_ds_extrema;
-const void* FN_MAKE_DS = make_ds;
-const void* FN_GET_PLOT = get_plot;
-const void* FN_DROP_PLOT = drop_plot;
-const void* FN_MAKE_PLOT = make_plot;
-const void* FN_SET_PLOT_SYMBOL = set_plot_symbol;
-const void* FN_SET_PLOT_COLOR = set_plot_color;
-const void* FN_SET_PLOT_RGBCOLOR = set_plot_rgbcolor;
-const void* FN_DRAW_PLOT = draw_plot;
-const void* FN_GET_GRID = get_grid;
-const void* FN_SET_GRID_TICS = set_grid_tics;
-const void* FN_SET_GRID_LINES = set_grid_lines;
-const void* FN_GET_WINDOW_TITLE = get_window_title;
-const void* FN_SET_WINDOW_TITLE = set_window_title;
-const void* FN_CLEAR_WINDOW = clear_window;
-const void* FN_DRAW_WINDOW = draw_window;
-const void* FN_RESET_WINDOW = reset_window;
-const void* FN_GET_WINDOW_LIMITS = get_window_limits;
-const void* FN_SET_WINDOW_LIMITS = set_window_limits;
-const void* FN_ADD_MENU_ITEM = add_menu_item;
-const void* FN_SET_BACKGROUND = set_background;
-const void* FN_SET_FOREGROUND = set_foreground;
-const void* FN_MESSAGE_BOX = message_box;
-const void* FN_GET_INPUT = get_input;
-const void* FN_FILE_OPEN_DIALOG = file_open_dialog;
-const void* FN_FILE_SAVE_DIALOG = file_save_dialog;
-const void* FN_SET_SAVE_OPTIONS = set_save_options;
+// Template array for Forth interface functions
+        
+IfcFuncTemplate IfcFuncList[] = {
+        { (const void*) get_color_map,     "FN_GET_COLOR_MAP"    },
+        { (const void*) get_active_set,    "FN_GET_ACTIVE_SET"   },
+        { (const void*) get_operand_set,   "FN_GET_OPERAND_SET"  },
+        { (const void*) get_active_plot,   "FN_GET_ACTIVE_PLOT"  },
+        { (const void*) get_operand_plot,  "FN_GET_OPERAND_PLOT" },
+        { (const void*) set_active_plot,   "FN_SET_ACTIVE_PLOT"  },
+        { (const void*) set_operand_plot,  "FN_SET_OPERAND_PLOT" },
+        { (const void*) get_ds,            "FN_GET_DS"           },
+        { (const void*) set_ds_extrema,    "FN_SET_DS_EXTREMA"   },
+        { (const void*) make_ds,           "FN_MAKE_DS"          },
+        { (const void*) get_plot,          "FN_GET_PLOT"         },
+        { (const void*) drop_plot,         "FN_DROP_PLOT"        },
+        { (const void*) make_plot,         "FN_MAKE_PLOT"        },
+        { (const void*) set_plot_symbol,   "FN_SET_PLOT_SYMBOL"  },
+        { (const void*) set_plot_color,    "FN_SET_PLOT_COLOR"   },
+        { (const void*) set_plot_rgbcolor, "FN_SET_PLOT_RGBCOLOR"},
+        { (const void*) draw_plot,         "FN_DRAW_PLOT"        },
+        { (const void*) get_grid,          "FN_GET_GRID"         },
+        { (const void*) set_grid_tics,     "FN_SET_GRID_TICS"    },
+        { (const void*) set_grid_lines,    "FN_SET_GRID_LINES"   },
+        { (const void*) get_window_title,  "FN_GET_WINDOW_TITLE" },
+        { (const void*) set_window_title,  "FN_SET_WINDOW_TITLE" },
+        { (const void*) clear_window,      "FN_CLEAR_WINDOW"     },
+        { (const void*) draw_window,       "FN_DRAW_WINDOW"      },
+        { (const void*) reset_window,      "FN_RESET_WINDOW"     },
+        { (const void*) get_window_limits, "FN_GET_WINDOW_LIMITS" },
+        { (const void*) set_window_limits, "FN_SET_WINDOW_LIMITS" },
+        { (const void*) add_menu_item,     "FN_ADD_MENU_ITEM"     },
+        { (const void*) make_menu,         "FN_MAKE_MENU"         },
+        { (const void*) make_submenu,      "FN_MAKE_SUBMENU"      },
+        { (const void*) set_background,    "FN_SET_BACKGROUND"    },
+        { (const void*) set_foreground,    "FN_SET_FOREGROUND"    },
+//        { (const void*) radio_box,         "FN_RADIO_BOX"         },
+        { (const void*) message_box,       "FN_MESSAGE_BOX"       },
+        { (const void*) get_input,         "FN_GET_INPUT"         },
+        { (const void*) file_open_dialog,  "FN_FILE_OPEN_DIALOG"  },
+        { (const void*) file_save_dialog,  "FN_FILE_SAVE_DIALOG"  },
+        { (const void*) set_save_options,  "FN_SET_SAVE_OPTIONS"  }
+};
 
 int nForthMenuItems = 0;
 vector<char*> ForthMenuCommandList;
@@ -209,12 +214,11 @@ END_MESSAGE_MAP()
 
 BOOL CXyplotApp::InitInstance()
 {
-
     CommandLine = GetCommandLine();
     wClass = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW,
-        LoadStandardCursor (IDC_CROSS),
-        (HBRUSH) GetStockObject (WHITE_BRUSH),
-        LoadIcon ("XYPLOTICON"));
+    LoadStandardCursor (IDC_CROSS),
+    (HBRUSH) GetStockObject (WHITE_BRUSH),
+    LoadIcon ("XYPLOTICON"));
 
     m_pMainWnd = new CPlotWindow();
     m_pMainWnd->ShowWindow(m_nCmdShow);
@@ -233,8 +237,6 @@ BOOL CXyplotApp::InitInstance()
 
     return TRUE;
 }
-
-
 //------------------------------------------------------------------------
 
 int BlankLine (char* s)
@@ -481,172 +483,114 @@ int AddToHeader (char* text, char* hdr, bool prefix)
 }
 //-------------------------------------------------------------
 
-int ExecuteForthExpression (char* s, ostringstream* pOutput, int* pError, long int* pLine)
+int ExecuteForthExpression (char* s, ostringstream* pOutput, long int* pLine)
 {
-  // Return zero if no error, 1 if compiler error, 2 if VM error
+  // Return zero if no error; otherwise return the Forth error code.
 
-  istringstream* pSS = new istringstream (s);
-  long int* sp;
-  byte* tp;
-  vector<byte> op;
+    istringstream* pSS = new istringstream (s);
+    long int* sp;
+    int nError;
+    byte* tp;
+    vector<byte> op;
 
-  *pLine = 0;
-  SetForthInputStream(*pSS);
-  SetForthOutputStream(*pOutput);
-  *pError = ForthCompiler (&op,pLine);
-  delete pSS;
+    *pLine = 0;
+    SetForthInputStream(*pSS);
+    SetForthOutputStream(*pOutput);
+    nError = ForthCompiler (&op, pLine);
+    delete pSS;
 
-  if (*pError) return 1;
+    if (nError) return nError;
 
-  if (op.size())
-    {
+    if (op.size()) {
       // SetForthInputStream(cin);
-      *pError = ForthVM (&op, &sp, &tp);
-      if (*pError) return 2;
+      nError = ForthVM (&op, &sp, &tp);
     }
 
-  return 0;
+    return nError;
 }
 //-------------------------------------------------------------
 
 void InitForthInterface ()
 {
-  char fs[4096], s[64];
-  char* cs = " constant ";
+    char fs[1024], out_s[2048];
+    const void* funcPtr;
+    const char* constName;
+    int i, nError;
+    long int lnum;
+    size_t nIFCfuncs = sizeof(IfcFuncList) / sizeof(IfcFuncList[0]);
+    memset (out_s, 0, 2048);
+    stringstream* pForthMessages = new stringstream(out_s, 2047);
 
-  sprintf (s, "%lu%sFN_GET_COLOR_MAP\n", FN_GET_COLOR_MAP, cs);
-  strcpy (fs, s);
-  sprintf (s, "%lu%sFN_GET_ACTIVE_SET\n", FN_GET_ACTIVE_SET, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_OPERAND_SET\n", FN_GET_OPERAND_SET, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_ACTIVE_PLOT\n", FN_GET_ACTIVE_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_OPERAND_PLOT\n", FN_GET_OPERAND_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_ACTIVE_PLOT\n", FN_SET_ACTIVE_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_OPERAND_PLOT\n", FN_SET_OPERAND_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_DS\n", FN_GET_DS, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_DS_EXTREMA\n", FN_SET_DS_EXTREMA, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_MAKE_DS\n", FN_MAKE_DS, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_PLOT\n", FN_GET_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_DROP_PLOT\n", FN_DROP_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_MAKE_PLOT\n", FN_MAKE_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_PLOT_SYMBOL\n", FN_SET_PLOT_SYMBOL, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_PLOT_COLOR\n", FN_SET_PLOT_COLOR, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_PLOT_RGBCOLOR\n", FN_SET_PLOT_RGBCOLOR, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_DRAW_PLOT\n", FN_DRAW_PLOT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_GRID\n", FN_GET_GRID, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_GRID_TICS\n", FN_SET_GRID_TICS, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_GRID_LINES\n", FN_SET_GRID_LINES, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_WINDOW_TITLE\n", FN_GET_WINDOW_TITLE, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_WINDOW_TITLE\n", FN_SET_WINDOW_TITLE, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_CLEAR_WINDOW\n", FN_CLEAR_WINDOW, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_DRAW_WINDOW\n", FN_DRAW_WINDOW, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_RESET_WINDOW\n", FN_RESET_WINDOW, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_WINDOW_LIMITS\n", FN_GET_WINDOW_LIMITS, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_WINDOW_LIMITS\n", FN_SET_WINDOW_LIMITS, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_ADD_MENU_ITEM\n", FN_ADD_MENU_ITEM, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_BACKGROUND\n", FN_SET_BACKGROUND, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_FOREGROUND\n", FN_SET_FOREGROUND, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_MESSAGE_BOX\n", FN_MESSAGE_BOX, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_FILE_OPEN_DIALOG\n", FN_FILE_OPEN_DIALOG, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_FILE_SAVE_DIALOG\n", FN_FILE_SAVE_DIALOG, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_GET_INPUT\n", FN_GET_INPUT, cs);
-  strcat (fs, s);
-  sprintf (s, "%lu%sFN_SET_SAVE_OPTIONS\n", FN_SET_SAVE_OPTIONS, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_FILE\n", pMainWnd->m_nFileMenu, cs);
-  sprintf (s, "%lu%sMN_FILE\n", 0, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_EDIT\n", pMainWnd->m_nEditMenu, cs);
-  sprintf (s, "%lu%sMN_EDIT\n", 1, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_DATA\n", pMainWnd->m_nDataMenu, cs);
-  sprintf (s, "%lu%sMN_DATA\n", 2, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_PLOT\n", pMainWnd->m_nPlotMenu, cs);
-  sprintf (s, "%lu%sMN_PLOT\n", 3, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_MATH\n", pMainWnd->m_nMathMenu, cs);
-  sprintf (s, "%lu%sMN_MATH\n", 4, cs);
-  strcat (fs, s);
-//  sprintf (s, "%lu%sMN_HELP\n", pMainWnd->m_nHelpMenu, cs);
-  sprintf (s, "%lu%sMN_HELP\n", 5, cs);
-  strcat (fs, s);
+    for (i = 0; i < nIFCfuncs; i++) {
+        funcPtr = IfcFuncList[i].Function;
+        constName = IfcFuncList[i].constantName;
+        sprintf (fs, "%lu constant %s\n", funcPtr, constName);
+        nError = ExecuteForthExpression(fs, (ostringstream*) pForthMessages, &lnum);
+        if (nError) {
+                pForthMessages->getline(out_s, 2047, 0);
+                pMainWnd->MessageBox(out_s);
+		delete pForthMessages;
+                return;
+        }
+    }
 
-  char out_s[2048];
-  memset (out_s, 0, 2048);
-  stringstream* pSS = new stringstream(out_s, 2047);
-  int esrc, ec;
-  long int lnum;
+    char s[256];
+    const char* cs = "  CONSTANT ";
+    unsigned long hFileMenu, hEditMenu, hDataMenu, hPlotMenu, hMathMenu, hHelpMenu;
+    hFileMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(0)->m_hMenu;
+    hEditMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(1)->m_hMenu;
+    hDataMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(2)->m_hMenu;
+    hPlotMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(3)->m_hMenu;
+    hMathMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(4)->m_hMenu;
+    hHelpMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(5)->m_hMenu;
+     
+    sprintf (s, "%lu%sMN_FILE\n", hFileMenu, cs);
+    strcat (fs, s);
+    sprintf (s, "%lu%sMN_EDIT\n", hEditMenu, cs);
+    strcat (fs, s);
+    sprintf (s, "%lu%sMN_DATA\n", hDataMenu, cs);
+    strcat (fs, s);
+    sprintf (s, "%lu%sMN_PLOT\n", hPlotMenu, cs);
+    strcat (fs, s);
+    sprintf (s, "%lu%sMN_MATH\n", hMathMenu, cs);
+    strcat (fs, s);
+    sprintf (s, "%lu%sMN_HELP\n", hHelpMenu, cs);
+    strcat (fs, s);
 
-  esrc = ExecuteForthExpression(fs, (ostringstream*) pSS, &ec, &lnum);
-  if (esrc)
-    {
-      char s2[256];
-      sprintf(s2, "\nError: %d\n", esrc);
-      pSS->getline(out_s, 2047,0);
-      strcat(out_s, s2);
+    nError = ExecuteForthExpression(fs, (ostringstream*) pForthMessages, &lnum);
+    if (nError) {
+      sprintf(s, "\nError: %d\n", nError);
+      pForthMessages->getline(out_s, 2047, 0);
+      strcat(out_s, s);
       pMainWnd->MessageBox(out_s);
     }
-  delete pSS;
+    delete pForthMessages;
 }
 //-----------------------------------------------------------------
 
 int LoadForthFile(char* fname)
 {
   char s[512], out_s[1024];
-  int esrc, ec;
+  int nError;
   long int lnum;
 
   strcpy (s, "include ");
   strcat (s, fname);
 
   memset (out_s, 0, 1024);
-  stringstream* pSS = new stringstream(out_s, 1023);
-  esrc = ExecuteForthExpression (s, (ostringstream*) pSS, &ec, &lnum);
+  stringstream* pForthMessages = new stringstream(out_s, 1023);
+  nError = ExecuteForthExpression (s, (ostringstream*) pForthMessages, &lnum);
 
-  if (esrc)
+  if (nError)
   {
-      char s2[256];
-      sprintf(s2, "\nError: %d\n", esrc);
-      pSS->getline(out_s, 1023,0);
-      strcat(out_s, s2);
+      sprintf(s, "\nError: %d\n", nError);
+      pForthMessages->getline(out_s, 1023,0);
+      strcat(out_s, s);
       pMainWnd->MessageBox(out_s);
-      // pMainWnd->MessageBox("Error loading initialization file!");
   }
-  delete pSS;
+  delete pForthMessages;
 
-  return ec;
+  return nError;
 }
 
 //----------------------------------------------------------------
@@ -821,7 +765,7 @@ int set_ds_extrema ()
   // Reset extrema for specified dataset
 
   ++GlobalSp; ++GlobalTp;
-  int i = *GlobalSp;
+  long int i = *GlobalSp;
   if (i >= 0 && i < pMainWnd->m_pDb->Nsets())
     {
       CDataset* d = (*(pMainWnd->m_pDb))[i];
@@ -839,8 +783,7 @@ int make_ds ()
   char s[256];
 
   ++GlobalSp; ++GlobalTp;
-  if (*GlobalTp == OP_ADDR)
-    {
+  if (*GlobalTp == OP_ADDR) {
       int* ds_info = *((int**) GlobalSp);
       char* name = *((char**) ds_info);
       CDataset* d = pMainWnd->m_pDb->MakeDataset(ds_info);
@@ -877,7 +820,7 @@ int get_plot ()
     {
       int* pl_info = *((int**)GlobalSp);
       ++GlobalSp;
-      int nPlot = *GlobalSp;
+      long int nPlot = *GlobalSp;
       CPlotDisplay* pDi = pMainWnd->m_pDi;
       CDatabase* pDb = pMainWnd->m_pDb;
       int n = pDi->Nplots();
@@ -1010,7 +953,7 @@ int set_plot_rgbcolor ()
 int draw_plot ()
 {
   ++GlobalSp; ++GlobalTp;
-  int vis = *GlobalSp;
+  long int vis = *GlobalSp;
   CPlot* p = pMainWnd->m_pDi->GetActivePlot();
   unsigned c = p->GetColor();
   if (! vis)
@@ -1068,8 +1011,8 @@ int set_grid_lines ()
   pMainWnd->Invalidate();
   return 0;
 }
-
 //------------------------------------------------------------------
+
 int get_window_title ()
 {
   // stack: ( abuf nmax -- abuf nret )
@@ -1192,7 +1135,8 @@ int add_menu_item ()
   char* emsg1 = "add_menu_item: Invalid parameter";
   unsigned char *cp;
 //  Widget menu, new_item;
-  int menu, new_item;
+  unsigned long menu;
+  int new_item;
 
   ++GlobalSp; ++GlobalTp;
   if (*GlobalTp != OP_ADDR)
@@ -1221,24 +1165,63 @@ int add_menu_item ()
 
   menu = *GlobalSp;
 
-//  if (menu == pMainWnd->m_nMathMenu)
-  if (menu >= 0 && menu < (pMainWnd->GetMenu())->GetMenuItemCount())
-    {
-//      new_item = pMainWnd->AddMenuItem (menu, name, MathWidgets);
-      new_item = pMainWnd->AddMenuItem (menu, name);
-      if (new_item)
-	  {
+  new_item = pMainWnd->AddMenuItem (menu, name);
+  if (new_item)
 	    ForthMenuCommandList.push_back(fc);
-//	    XtAddCallback (new_item, XmNactivateCallback, ForthCB, fc);
-	  }
-    }
   else
-    {
       pMainWnd->MessageBox ("Unknown menu");
-    }
+  
   return 0;
 }
 //---------------------------------------------------------------
+
+int make_submenu ()
+{
+    // Create a new menu, attached to a parent menu
+    // Stack: ( parent_id ^menu_name -- submenu_id )
+    char name[256];
+
+    ++GlobalSp; ++GlobalTp;
+    if (*GlobalTp != OP_ADDR) { 
+      pMainWnd->MessageBox("make_submenu: Invalid parameter");
+      return 0;
+    }
+
+    unsigned char *cp = *((unsigned char**) GlobalSp);
+    int nCount = (int) *cp;
+    ++GlobalSp; ++GlobalTp;
+
+    unsigned int parent_id = (unsigned int) *GlobalSp;
+    unsigned int submenu_id = pMainWnd->AddSubMenu(parent_id, (char*) cp+1);
+
+    *GlobalTp-- = OP_IVAL; *GlobalSp-- = submenu_id;
+    return 0;
+}
+//---------------------------------------------------------------
+
+int make_menu ()
+{
+    // Create a new menu.
+    // Stack: ( ^menu_name -- menu_id )
+
+    char name[256];
+    ++GlobalSp; ++GlobalTp;
+    if (*GlobalTp != OP_ADDR) { 
+      pMainWnd->MessageBox("make_menu: Invalid parameter"); 
+      return 0;
+    }
+    unsigned char *cp = *((unsigned char**) GlobalSp);
+    int nCount = max((int) *cp, 255);
+
+    strncpy(name, (char*) cp+1, nCount);
+    name[nCount] = '\0';
+
+    // Create the menu and return the menu id on the stack
+    unsigned long menu_id = pMainWnd->MakeMenu (name);
+    *GlobalTp-- = OP_IVAL; *GlobalSp-- = menu_id;
+
+    return 0;
+}
 
 int set_background ()
 {
