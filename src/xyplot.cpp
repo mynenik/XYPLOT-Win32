@@ -512,29 +512,31 @@ int ExecuteForthExpression (char* s, ostringstream* pOutput, long int* pLine)
 
 void InitForthInterface ()
 {
-    char fs[1024], out_s[2048];
+    char s[256], out_s[2048];
     const void* funcPtr;
     const char* constName;
-    int i, nError;
+    int i, nError, nCount, nDisplay;
     long int lnum;
     size_t nIFCfuncs = sizeof(IfcFuncList) / sizeof(IfcFuncList[0]);
-    memset (out_s, 0, 2048);
-    stringstream* pForthMessages = new stringstream(out_s, 2047);
+    stringstream* pForthMessages = new stringstream();
 
     for (i = 0; i < nIFCfuncs; i++) {
-        funcPtr = IfcFuncList[i].Function;
-        constName = IfcFuncList[i].constantName;
-        sprintf (fs, "%lu constant %s\n", funcPtr, constName);
-        nError = ExecuteForthExpression(fs, (ostringstream*) pForthMessages, &lnum);
-        if (nError) {
-                pForthMessages->getline(out_s, 2047, 0);
-                pMainWnd->MessageBox(out_s);
-		delete pForthMessages;
-                return;
-        }
+      funcPtr = IfcFuncList[i].Function;
+      constName = IfcFuncList[i].constantName;
+      sprintf (s, "%lu constant %s\n", funcPtr, constName);
+      nError = ExecuteForthExpression(s, (ostringstream*) pForthMessages, &lnum);
+      if (nError) {
+	nCount = pForthMessages->str().size();
+	nDisplay = min(nCount, 2047);
+        pForthMessages->getline(out_s, nDisplay);
+	out_s[nDisplay] = '\0';
+        pMainWnd->MessageBox(out_s);
+	delete pForthMessages;
+        return;
+      }
     }
 
-    char s[256];
+    // pMainWnd->MessageBox("Completed Forth Interface Functions.");
     const char* cs = "  CONSTANT ";
     unsigned long hFileMenu, hEditMenu, hDataMenu, hPlotMenu, hMathMenu, hHelpMenu;
     hFileMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(0)->m_hMenu;
@@ -543,7 +545,8 @@ void InitForthInterface ()
     hPlotMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(3)->m_hMenu;
     hMathMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(4)->m_hMenu;
     hHelpMenu = (unsigned long) pMainWnd->GetMenu()->GetSubMenu(5)->m_hMenu;
-     
+    char fs[512];
+    fs[0] = '\0'; 
     sprintf (s, "%lu%sMN_FILE\n", hFileMenu, cs);
     strcat (fs, s);
     sprintf (s, "%lu%sMN_EDIT\n", hEditMenu, cs);
@@ -557,11 +560,15 @@ void InitForthInterface ()
     sprintf (s, "%lu%sMN_HELP\n", hHelpMenu, cs);
     strcat (fs, s);
 
+    // pMainWnd->MessageBox(fs);
+    pForthMessages->str("");
     nError = ExecuteForthExpression(fs, (ostringstream*) pForthMessages, &lnum);
     if (nError) {
-      sprintf(s, "\nError: %d\n", nError);
-      pForthMessages->getline(out_s, 2047, 0);
-      strcat(out_s, s);
+      // sprintf(out_s, "\nError: %d\n", nError);
+      nCount = pForthMessages->str().size();
+      nDisplay = min(nCount, 2046);
+      pForthMessages->getline(out_s, nDisplay);
+      out_s[nDisplay] = '\0';
       pMainWnd->MessageBox(out_s);
     }
     delete pForthMessages;
@@ -574,22 +581,21 @@ int LoadForthFile(char* fname)
   int nError;
   long int lnum;
 
-  strcpy (s, "include ");
-  strcat (s, fname);
-
-  memset (out_s, 0, 1024);
-  stringstream* pForthMessages = new stringstream(out_s, 1023);
+  sprintf (s, "include %s\n", fname);
+  stringstream* pForthMessages = new stringstream();
   nError = ExecuteForthExpression (s, (ostringstream*) pForthMessages, &lnum);
-
-  if (nError)
-  {
-      sprintf(s, "\nError: %d\n", nError);
-      pForthMessages->getline(out_s, 1023,0);
-      strcat(out_s, s);
+  // sprintf(out_s, "Command: %sError: %d\n", s, nError);
+  // pMainWnd->MessageBox(out_s);
+   
+  if (nError) {
+      int nCount = pForthMessages->str().size();
+      // printf(s, "\nError: %d\n", nError);
+      int nDisplay = min(nCount, 1023);
+      pForthMessages->getline(out_s, nDisplay);
+      out_s[nDisplay] = '\0';
       pMainWnd->MessageBox(out_s);
   }
   delete pForthMessages;
-
   return nError;
 }
 

@@ -609,22 +609,26 @@ void CPlotWindow::OnForthMenuItem ()
     int nError;
     long int line;
     char out_s[4096];
-    memset(out_s, 0, 4096);
-    stringstream* pForthOutput = new stringstream(out_s, 4095);
+    stringstream* pForthOutput = new stringstream();
 
     nError = ExecuteForthExpression (pCommand, (ostringstream*) pForthOutput, &line);
-    pForthOutput->getline(out_s, 4095, 0);
-    if (nError) {
-	char s[64];
-	if (nError & 0x100)
-	   sprintf (s, "Compiler Error %d, line %d\n", nError & 0xFF, line);
-	else
-	   sprintf (s, "VM Error %d\n", nError);
 
-	 strcat(out_s, s);
-     }
-     if (strlen(out_s)) MessageBox(out_s);
-     delete pForthOutput;
+    if (nError) {
+      int nCount = pForthOutput->str().size();
+      if (nCount) {
+        int nDisplay = min(nCount, 4095);
+        pForthOutput->getline(out_s, nDisplay);
+        out_s[nDisplay] = '\0';
+	// char s[64];
+	// if (nError & 0x100)
+	//   sprintf (s, "Compiler Error %d, line %d\n", nError & 0xFF, line);
+	// else
+	//   sprintf (s, "VM Error %d\n", nError);
+	// strcat(out_s, s);
+	 MessageBox(out_s);
+      }
+    }
+    delete pForthOutput;
 }
 //---------------------------------------------------------------
 
@@ -1523,16 +1527,18 @@ int CPlotWindow::LoadForthFile(char* fname)
 {
     char s[512], out_s[2048];
     long int lnum;
-    memset (out_s, 0, 2048);
-    stringstream* pForthMessages = new stringstream(out_s, 2047);
+    stringstream* pForthMessages = new stringstream();
 
-    strcpy (s, "include ");
-    strcat (s, fname);
-
+    sprintf (s, "include %s\n", fname);
     int nError = ExecuteForthExpression(s, (ostringstream*) pForthMessages, &lnum);
     if (nError) {
-      pForthMessages->getline(out_s, 2047, 0);
-      MessageBox(out_s);
+      int nCount = pForthMessages->str().size();
+      if (nCount) {
+        int nDisplay = min(nCount, 2047); 
+        pForthMessages->getline(out_s, nDisplay);
+	out_s[nDisplay] = '\0';
+        MessageBox(out_s);
+      }
     }
 //    istringstream* pSS = new istringstream (s);
 //
