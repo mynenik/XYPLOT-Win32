@@ -62,7 +62,7 @@ include ans-words.4th
 include strings.4th
 include files.4th
 include utils.4th
-include modules.fs
+include modules.4th
 include struct-200x.4th
 [UNDEFINED] _WIN32_ [IF] include signal.4th [THEN]
 
@@ -206,8 +206,10 @@ prec_DOUBLE  8 LSHIFT  data_REAL  OR  constant  REAL_DOUBLE
     FN_SET_WINDOW_TITLE call ;
 
 [ELSE]  \ Interface functions for Linux version only
+
 : radio_box ( ^label1 ^label2 ... n -- m | provide a radio button selection box )
     FN_RADIO_BOX call ;
+
 [THEN]
 
 1 SFLOATS constant SFLOAT      \ size in bytes of single precision float
